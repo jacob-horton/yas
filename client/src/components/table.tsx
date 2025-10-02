@@ -1,0 +1,64 @@
+import { createUniqueId, For, type ParentComponent } from 'solid-js';
+import type { JSX } from 'solid-js/jsx-runtime';
+
+export type TableProps = {
+  headings: JSX.Element[];
+  caption: string;
+};
+
+export type TableRowProps = { id: string; shadedBackground?: boolean };
+
+type TableComponent = ParentComponent<TableProps> & {
+  Row: ParentComponent<TableRowProps>;
+  Cell: ParentComponent;
+};
+
+export const Table: TableComponent = (props) => {
+  const captionId = createUniqueId();
+
+  return (
+    <div
+      class="w-full rounded-lg border border-gray-300 bg-white shadow-md overflow-clip"
+      aria-labelledby={captionId}
+      role="group"
+    >
+      <table class="w-full table-auto divide-y divide-gray-300">
+        <caption id={captionId} class="sr-only">
+          {props.caption}
+        </caption>
+        <thead class="uppercase tracking-wider text-gray-500 text-sm">
+          <tr>
+            <For each={props.headings}>
+              {(heading) => (
+                <th
+                  scope="col"
+                  class="px-4 py-2 text-left align-middle font-normal bg-gray-100"
+                >
+                  {heading}
+                </th>
+              )}
+            </For>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-300 text-gray-700">
+          {props.children}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export const Row: ParentComponent<TableRowProps> = (props) => {
+  return (
+    <tr id={props.id} classList={{ 'bg-gray-50': props.shadedBackground }}>
+      {props.children}
+    </tr>
+  );
+};
+
+export const Cell: ParentComponent = (props) => {
+  return <td class="px-4 py-2">{props.children}</td>;
+};
+
+Table.Row = Row;
+Table.Cell = Cell;
