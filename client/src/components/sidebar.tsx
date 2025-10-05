@@ -1,7 +1,9 @@
 import { A, useLocation } from '@solidjs/router';
 import { createContext, For, useContext, type Component } from 'solid-js';
 import type { Accessor, Setter } from 'solid-js';
-import { HouseIcon, SettingsIcon } from 'lucide-solid';
+
+import HouseIcon from 'lucide-solid/icons/house';
+import SettingsIcon from 'lucide-solid/icons/settings';
 
 export const SidebarContext = createContext<{
   showSidebar: Accessor<boolean>;

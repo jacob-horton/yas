@@ -1,5 +1,5 @@
 import { useContext, type ParentComponent } from 'solid-js';
-import { Menu } from 'lucide-solid';
+import MenuIcon from 'lucide-solid/icons/menu';
 import { SidebarContext } from './sidebar';
 
 type Props = {
@@ -19,7 +19,7 @@ export const Page: ParentComponent<Props> = (props) => {
             setShowSidebar(true);
           }}
         >
-          <Menu />
+          <MenuIcon />
         </button>
         <h1 class="text-3xl py-6 font-semibold">{props.title}</h1>
       </span>
