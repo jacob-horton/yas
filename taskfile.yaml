@@ -1,0 +1,43 @@
+version: '3'
+
+output: prefixed
+
+tasks:
+  db_up:
+    dir: 'db'
+    cmds:
+      - docker compose up -d
+
+  db_down:
+    dir: 'db'
+    cmds:
+      - docker compose down
+
+  client:
+    dir: 'client'
+    cmds:
+      - pnpm run dev
+    preconditions:
+      - pnpm i
+
+  server:
+    dir: 'server'
+    cmds:
+      - cargo run
+    preconditions:
+      - sh: cd ../db && sh ./is-running.sh
+        msg: Database needs to be running. Run `task db_up`
+
+  server_watch:
+    dir: 'server'
+    cmds:
+      - cargo watch -x run
+    preconditions:
+      - sh: cd ../db && sh ./is-running.sh
+        msg: Database needs to be running. Run `task db_up`
+
+  run_watch:
+    deps: [client, server_watch]
+
+  default:
+    deps: [client, server]

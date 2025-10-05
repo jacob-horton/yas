@@ -17,33 +17,76 @@ Planned improvements/changes:
 
 - PNPM
 - Rust
+- Docker
 - Taskfile.dev (optional)
 
 
 ## Quick-Start
 
-If using [Task](https://taskfile.dev), you can just run `task` to run the client and server
+If using [Task](https://taskfile.dev), you can start the database with:
+```bash
+task db_up
+```
+
+Then run the client and server with:
+```bash
+task
+```
 
 > [!Note]
-> The server does not automatically recompile when you make a change. If you want this to happen, install [cargo-watch](https://crates.io/crates/cargo-watch) and then you can use `task run_watch`
+> The server does not automatically recompile when you make a change. If you want this to happen, install [cargo-watch](https://crates.io/crates/cargo-watch), and then you can use `task run_watch`.
 
+
+## Database
+
+This uses Postgres running in a docker container.
+
+To start the database with Task:
+```bash
+task db_up
+```
+
+To stop it, run:
+```bash
+task db_down
+```
+
+To run without Task:
+```bash
+cd db
+docker compose up
+```
 
 
 ## Back-End
 
 ### Running
 
-Start back-end:
+To run with Task:
+```bash
+task server
+```
+
+> [!Note]
+> The server does not automatically recompile when you make a change. If you want this to happen, install [cargo-watch](https://crates.io/crates/cargo-watch), and then you can use `task server_watch`.
+
+To run without Task:
 ```bash
 cd server
 cargo run
 ```
 
+
 ## Front-End
 
 ### Running
 
-Start front-end:
+To run with Task:
+```bash
+task client
+```
+
+To run without Task:
 ```bash
 cd client
 pnpm install
@@ -56,7 +99,7 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 ## Building for Production
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 Builds the app for production to the `dist` folder.<br>
