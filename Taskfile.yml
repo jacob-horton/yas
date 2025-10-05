@@ -1,0 +1,25 @@
+version: '3'
+
+tasks:
+  client:
+    dir: 'client'
+    cmds:
+      - pnpm run dev
+    preconditions:
+      - pnpm i
+
+  server:
+    dir: 'server'
+    cmds:
+      - cargo run
+
+  server_watch:
+    dir: 'server'
+    cmds:
+      - cargo watch -x run
+
+  run_watch:
+    deps: [client, server_watch]
+
+  default:
+    deps: [client, server]

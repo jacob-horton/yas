@@ -17,15 +17,31 @@ Planned improvements/changes:
 
 - PNPM
 - Rust
+- Taskfile.dev (optional)
 
 
 ## Quick-Start
+
+If using [Task](https://taskfile.dev), you can just run `task` to run the client and server
+
+> [!Note]
+> The server does not automatically recompile when you make a change. If you want this to happen, install [cargo-watch](https://crates.io/crates/cargo-watch) and then you can use `task run_watch`
+
+
+
+## Back-End
+
+### Running
 
 Start back-end:
 ```bash
 cd server
 cargo run
 ```
+
+## Front-End
+
+### Running
 
 Start front-end:
 ```bash
@@ -37,7 +53,7 @@ pnpm run dev
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 
-## Building Front-End for Production
+## Building for Production
 
 ```bash
 npm run build
