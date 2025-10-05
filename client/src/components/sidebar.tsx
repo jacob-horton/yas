@@ -1,6 +1,6 @@
 import { A, useLocation } from '@solidjs/router';
-import { createContext, For, useContext, type Component } from 'solid-js';
 import type { Accessor, Setter } from 'solid-js';
+import { createContext, For, useContext, type Component } from 'solid-js';
 
 import HouseIcon from 'lucide-solid/icons/house';
 import SettingsIcon from 'lucide-solid/icons/settings';
@@ -30,21 +30,21 @@ export const Sidebar: Component = () => {
 
   return (
     <div
-      class="absolute z-30 inset-0 flex transition-all"
+      class="absolute inset-0 z-30 flex transition-all"
       classList={{
         '-translate-x-56 invisible': !showSidebar(),
         'translate-x-0': showSidebar(),
       }}
     >
-      <nav class="w-56 min-w-56 bg-gray-50 shadow-lg border-gray-200 border-r h-full p-2 text-gray-800 flex flex-col gap-2">
-        <h1 class="font-semibold text-xl">Scoreboard</h1>
+      <nav class="flex h-full w-56 min-w-56 flex-col gap-2 border-r border-gray-200 bg-gray-50 p-2 text-gray-800 shadow-lg">
+        <h1 class="text-xl font-semibold">Scoreboard</h1>
         <ul class="flex flex-col gap-1">
           <For each={routes}>
             {(route) => (
               <li>
                 <A
                   href={route.href}
-                  class="px-2 py-1 rounded-md flex gap-2 items-center hover:bg-gray-200"
+                  class="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-gray-200"
                   classList={{
                     'bg-violet-300 text-violet-800 hover:bg-violet-200':
                       location.pathname === route.href,

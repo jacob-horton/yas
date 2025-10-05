@@ -1,10 +1,9 @@
-import { For } from 'solid-js';
+import { createAsync, query } from '@solidjs/router';
+import type { Component } from 'solid-js';
+import { For, Suspense } from 'solid-js';
 import { Page } from '../components/page';
 import { ProgressBar } from '../components/progress-bar';
 import { Table } from '../components/table';
-import { createAsync, query } from '@solidjs/router';
-import { Suspense } from 'solid-js';
-import type { Component } from 'solid-js';
 
 export const getGroupScores = query(async () => {
   const res = await fetch('http://localhost:8080/api/group/scores');
@@ -17,7 +16,7 @@ export const getGroupScores = query(async () => {
 
 const LoadingText = () => {
   return (
-    <div class="bg-gray-200 rounded-sm animate-pulse w-full h-[1em] inline-block" />
+    <div class="inline-block h-[1em] w-full animate-pulse rounded-sm bg-gray-200" />
   );
 };
 
@@ -59,9 +58,9 @@ export const Scoreboard = () => {
                 </Table.Cell>
                 <Table.Cell>{score.name}</Table.Cell>
                 <Table.Cell>
-                  <span class="w-32 flex items-center">
+                  <span class="flex w-32 items-center">
                     <ProgressBar percentage={score.win_percent} />
-                    <span class="text-right w-18 min-w-10">
+                    <span class="w-18 min-w-10 text-right">
                       {score.win_percent}%
                     </span>
                   </span>

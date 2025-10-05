@@ -16,7 +16,7 @@ export const Table: TableComponent = (props) => {
 
   return (
     <div
-      class="w-full rounded-lg border border-gray-300 bg-white shadow-md overflow-clip"
+      class="w-full overflow-clip rounded-lg border border-gray-300 bg-white shadow-md"
       aria-labelledby={captionId}
       role="group"
     >
@@ -24,13 +24,13 @@ export const Table: TableComponent = (props) => {
         <caption id={captionId} class="sr-only">
           {props.caption}
         </caption>
-        <thead class="uppercase tracking-wider text-gray-500 text-sm">
+        <thead class="text-sm tracking-wider text-gray-500 uppercase">
           <tr>
             <For each={props.headings}>
               {(heading) => (
                 <th
                   scope="col"
-                  class="px-4 py-2 text-left align-middle font-normal bg-gray-100"
+                  class="bg-gray-100 px-4 py-2 text-left align-middle font-normal"
                 >
                   {heading}
                 </th>

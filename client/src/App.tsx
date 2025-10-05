@@ -1,17 +1,17 @@
 import { Route, Router } from '@solidjs/router';
-import { Scoreboard } from './pages/scoreboard';
-import { Settings } from './pages/settings';
 import { createSignal, type ParentComponent } from 'solid-js';
 import { Sidebar, SidebarContext } from './components/sidebar';
+import { Scoreboard } from './pages/scoreboard';
+import { Settings } from './pages/settings';
 
 const Layout: ParentComponent = (props) => {
   const [showSidebar, setShowSidebar] = createSignal(false);
 
   return (
-    <div class="flex h-screen min-h-screen max-h-screen">
+    <div class="flex h-screen max-h-screen min-h-screen">
       <SidebarContext.Provider value={{ showSidebar, setShowSidebar }}>
         <Sidebar />
-        <main class="w-full h-full">{props.children}</main>
+        <main class="h-full w-full">{props.children}</main>
       </SidebarContext.Provider>
     </div>
   );

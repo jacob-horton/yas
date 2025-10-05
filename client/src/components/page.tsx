@@ -1,5 +1,5 @@
-import { useContext, type ParentComponent } from 'solid-js';
 import MenuIcon from 'lucide-solid/icons/menu';
+import { useContext, type ParentComponent } from 'solid-js';
 import { SidebarContext } from './sidebar';
 
 type Props = {
@@ -10,10 +10,10 @@ export const Page: ParentComponent<Props> = (props) => {
   const { setShowSidebar } = useContext(SidebarContext)!;
 
   return (
-    <div class="px-4 mx-auto max-w-6xl w-full h-full">
-      <span class="flex gap-4 ps-2 items-center text-gray-800">
+    <div class="mx-auto h-full w-full max-w-6xl px-4">
+      <span class="flex items-center gap-4 ps-2 text-gray-800">
         <button
-          class="p-1 hover:cursor-pointer rounded-md hover:bg-gray-100"
+          class="rounded-md p-1 hover:cursor-pointer hover:bg-gray-100"
           onClick={(e) => {
             e.preventDefault();
             setShowSidebar(true);
@@ -21,7 +21,7 @@ export const Page: ParentComponent<Props> = (props) => {
         >
           <MenuIcon />
         </button>
-        <h1 class="text-3xl py-6 font-semibold">{props.title}</h1>
+        <h1 class="py-6 text-3xl font-semibold">{props.title}</h1>
       </span>
       <div>{props.children}</div>
     </div>

@@ -1,8 +1,8 @@
 export const ProgressBar = (props: { percentage: number }) => {
   return (
-    <div class="w-full h-4 bg-gray-100 border border-gray-300 rounded-sm overflow-clip">
+    <div class="h-4 w-full overflow-clip rounded-sm border border-gray-300 bg-gray-100">
       <div
-        class={`bg-violet-400 h-full`}
+        class={`h-full bg-violet-400`}
         style={{ width: `${props.percentage}%` }}
       />
     </div>
