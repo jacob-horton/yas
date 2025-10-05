@@ -6,10 +6,8 @@ export type TableProps = {
   caption: string;
 };
 
-export type TableRowProps = { id: string; shadedBackground?: boolean };
-
 type TableComponent = ParentComponent<TableProps> & {
-  Row: ParentComponent<TableRowProps>;
+  Row: ParentComponent;
   Cell: ParentComponent;
 };
 
@@ -48,12 +46,8 @@ export const Table: TableComponent = (props) => {
   );
 };
 
-export const Row: ParentComponent<TableRowProps> = (props) => {
-  return (
-    <tr id={props.id} classList={{ 'bg-gray-50': props.shadedBackground }}>
-      {props.children}
-    </tr>
-  );
+export const Row: ParentComponent = (props) => {
+  return <tr class="even:bg-gray-50">{props.children}</tr>;
 };
 
 export const Cell: ParentComponent = (props) => {
