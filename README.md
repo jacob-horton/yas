@@ -15,7 +15,7 @@ Planned improvements/changes:
 
 ## Requirements
 
-- NPM
+- PNPM
 - Rust
 
 
@@ -30,8 +30,8 @@ cargo run
 Start front-end:
 ```bash
 cd client
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
