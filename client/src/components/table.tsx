@@ -15,22 +15,22 @@ export const Table: TableComponent = (props) => {
   const captionId = createUniqueId();
 
   return (
-    <div
-      class="w-full overflow-clip rounded-lg border border-gray-300 bg-white shadow-md"
-      aria-labelledby={captionId}
-      role="group"
-    >
-      <table class="w-full table-auto divide-y divide-gray-300">
+    <div class="w-full" aria-labelledby={captionId} role="group">
+      <table class="w-full">
         <caption id={captionId} class="sr-only">
           {props.caption}
         </caption>
-        <thead class="text-sm tracking-wider text-gray-500 uppercase">
+        <thead>
           <tr>
             <For each={props.headings}>
-              {(heading) => (
+              {(heading, i) => (
                 <th
                   scope="col"
-                  class="bg-gray-100 px-4 py-2 text-left align-middle font-normal"
+                  class="bg-gray-100 px-5 py-3 text-start font-semibold"
+                  classList={{
+                    'rounded-s-md': i() === 0,
+                    'rounded-e-md': i() === props.headings.length - 1,
+                  }}
                 >
                   {heading}
                 </th>
@@ -38,20 +38,18 @@ export const Table: TableComponent = (props) => {
             </For>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-300 text-gray-700">
-          {props.children}
-        </tbody>
+        <tbody class="divide-y divide-gray-100">{props.children}</tbody>
       </table>
     </div>
   );
 };
 
 export const Row: ParentComponent = (props) => {
-  return <tr class="even:bg-gray-50">{props.children}</tr>;
+  return <tr>{props.children}</tr>;
 };
 
 export const Cell: ParentComponent = (props) => {
-  return <td class="px-4 py-2">{props.children}</td>;
+  return <td class="px-5 py-3">{props.children}</td>;
 };
 
 Table.Row = Row;

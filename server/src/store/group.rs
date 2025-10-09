@@ -19,7 +19,10 @@ pub async fn get_data() -> Result<Vec<Score>, Box<dyn std::error::Error>> {
     });
 
     let rows: Vec<Score> = client
-        .query("SELECT name, win_percent, points_per_game FROM scores", &[])
+        .query(
+            "SELECT name, win_percent, points_per_game FROM scores ORDER BY win_percent DESC",
+            &[],
+        )
         .await?
         .iter()
         .map(|r| Score {

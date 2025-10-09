@@ -2,6 +2,7 @@ import { createAsync, query } from '@solidjs/router';
 import type { Component } from 'solid-js';
 import { For, Suspense } from 'solid-js';
 import { Page } from '../components/page';
+import { PodiumCard, PodiumCardSkeleton } from '../components/podium-card';
 import { ProgressBar } from '../components/progress-bar';
 import { Table } from '../components/table';
 
@@ -45,32 +46,54 @@ export const Scoreboard = () => {
 
   return (
     <Page title="Scoreboard">
-      <Table
-        headings={[<></>, 'Name', 'Win Percentage', 'Points per Game']}
-        caption="table"
-      >
-        <Suspense fallback={<LoadingRows numCols={4} />}>
-          <For each={scores()}>
-            {(score, index) => (
-              <Table.Row>
-                <Table.Cell>
-                  <span class="text-gray-400">{index() + 1}</span>
-                </Table.Cell>
-                <Table.Cell>{score.name}</Table.Cell>
-                <Table.Cell>
-                  <span class="flex w-32 items-center">
-                    <ProgressBar percentage={score.win_percent} />
-                    <span class="w-18 min-w-10 text-right">
-                      {score.win_percent}%
+      <div class="flex flex-col gap-6">
+        <div class="flex gap-6">
+          <Suspense
+            fallback={
+              <For each={Array(3)}>
+                {(_, index) => <PodiumCardSkeleton position={index() + 1} />}
+              </For>
+            }
+          >
+            <For each={scores()?.slice(0, 3)}>
+              {(score, index) => (
+                <PodiumCard
+                  name={score.name}
+                  winRate={score.win_percent}
+                  pointsPerGame={score.points_per_game}
+                  position={index() + 1}
+                />
+              )}
+            </For>
+          </Suspense>
+        </div>
+        <Table
+          headings={['No.', 'Name', 'Win Rate', 'Points/Game']}
+          caption="table"
+        >
+          <Suspense fallback={<LoadingRows numCols={4} />}>
+            <For each={scores()}>
+              {(score, index) => (
+                <Table.Row>
+                  <Table.Cell>
+                    <span class="text-gray-400">{index() + 1}</span>
+                  </Table.Cell>
+                  <Table.Cell>{score.name}</Table.Cell>
+                  <Table.Cell>
+                    <span class="flex w-48 min-w-16 items-center">
+                      <ProgressBar percentage={score.win_percent} />
+                      <span class="w-18 min-w-10 text-right">
+                        {score.win_percent}%
+                      </span>
                     </span>
-                  </span>
-                </Table.Cell>
-                <Table.Cell>{score.points_per_game}</Table.Cell>
-              </Table.Row>
-            )}
-          </For>
-        </Suspense>
-      </Table>
+                  </Table.Cell>
+                  <Table.Cell>{score.points_per_game}</Table.Cell>
+                </Table.Row>
+              )}
+            </For>
+          </Suspense>
+        </Table>
+      </div>
     </Page>
   );
 };

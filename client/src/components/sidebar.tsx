@@ -44,7 +44,7 @@ export const Sidebar: Component = () => {
               <li>
                 <A
                   href={route.href}
-                  class="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-gray-200"
+                  class="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-gray-200 transition"
                   classList={{
                     'bg-violet-300 text-violet-800 hover:bg-violet-200':
                       location.pathname === route.href,
