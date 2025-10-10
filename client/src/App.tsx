@@ -1,6 +1,7 @@
 import { Route, Router } from '@solidjs/router';
 import { createSignal, type ParentComponent } from 'solid-js';
 import { Sidebar, SidebarContext } from './components/sidebar';
+import { Login } from './pages/login';
 import { Scoreboard } from './pages/scoreboard';
 import { Settings } from './pages/settings';
 
@@ -24,6 +25,8 @@ export default function App() {
         <Route path="/" component={Scoreboard} />
         <Route path="/settings" component={Settings} />
       </Route>
+
+      <Route path="/login" component={Login} />
     </Router>
   );
 }
