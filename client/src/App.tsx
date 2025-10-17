@@ -1,5 +1,7 @@
 import { Route, Router } from '@solidjs/router';
 import { createSignal, type ParentComponent } from 'solid-js';
+import { AuthProvider } from './auth/auth-provider';
+import { ProtectedRoute } from './auth/protected-route';
 import { Sidebar, SidebarContext } from './components/sidebar';
 import { Login } from './pages/login';
 import { Scoreboard } from './pages/scoreboard';
@@ -10,23 +12,27 @@ const Layout: ParentComponent = (props) => {
 
   return (
     <div class="flex h-screen max-h-screen min-h-screen">
-      <SidebarContext.Provider value={{ showSidebar, setShowSidebar }}>
-        <Sidebar />
-        <main class="h-full w-full">{props.children}</main>
-      </SidebarContext.Provider>
+      <ProtectedRoute>
+        <SidebarContext.Provider value={{ showSidebar, setShowSidebar }}>
+          <Sidebar />
+          <main class="h-full w-full">{props.children}</main>
+        </SidebarContext.Provider>
+      </ProtectedRoute>
     </div>
   );
 };
 
 export default function App() {
   return (
-    <Router>
-      <Route path="/" component={Layout}>
-        <Route path="/" component={Scoreboard} />
-        <Route path="/settings" component={Settings} />
-      </Route>
+    <AuthProvider>
+      <Router>
+        <Route path="/" component={Layout}>
+          <Route path="/" component={Scoreboard} />
+          <Route path="/settings" component={Settings} />
+        </Route>
 
-      <Route path="/login" component={Login} />
-    </Router>
+        <Route path="/login" component={Login} />
+      </Router>
+    </AuthProvider>
   );
 }

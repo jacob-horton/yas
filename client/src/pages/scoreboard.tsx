@@ -1,18 +1,17 @@
 import { createAsync, query } from '@solidjs/router';
 import type { Component } from 'solid-js';
 import { For, Suspense } from 'solid-js';
+import { api } from '../api';
+import { useAuth } from '../auth/auth-provider';
 import { Page } from '../components/page';
 import { PodiumCard, PodiumCardSkeleton } from '../components/podium-card';
 import { ProgressBar } from '../components/progress-bar';
 import { Table } from '../components/table';
 
 export const getGroupScores = query(async () => {
-  const res = await fetch('http://localhost:8080/api/group/scores');
-  if (!res.ok) {
-    throw new Error('Failed to fetch group scores');
-  }
-
-  return res.json();
+  // TODO: try/catch
+  const res = await api.get('/group/scores');
+  return res.data;
 }, 'groupScores');
 
 const LoadingText = () => {
@@ -42,11 +41,13 @@ const LoadingRows: Component<{ numCols: number; numRows?: number }> = (
 };
 
 export const Scoreboard = () => {
+  const { user } = useAuth()!;
   const scores = createAsync(() => getGroupScores());
 
   return (
     <Page title="Scoreboard">
       <div class="flex flex-col gap-6">
+        User: {user()}
         <div class="flex gap-6">
           <Suspense
             fallback={

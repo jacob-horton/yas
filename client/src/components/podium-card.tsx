@@ -1,8 +1,18 @@
-import type { Component } from 'solid-js';
+import { type Component } from 'solid-js';
+
+
+
+
+
+
+
+
+
+
 
 const COLOUR_MAP: Record<number, string> = {
   1: 'from-amber-200 to-orange-400',
-  2: 'from-gray-300 to-gray-400',
+  2: 'from-slate-200 to-slate-400',
   3: 'from-orange-300 to-red-400',
 } as const;
 
@@ -85,4 +95,3 @@ export const PodiumCardSkeleton: Component<{ position: number }> = (props) => {
     </div>
   );
 };
-
