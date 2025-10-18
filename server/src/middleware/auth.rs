@@ -21,28 +21,35 @@ impl FromRequest for AuthedUser {
 
     fn from_request(req: &HttpRequest, _payload: &mut Payload) -> Self::Future {
         let cookie = req.cookie("access_token");
-        if cookie.is_none() {
-            return err(StatusError::new("No access token", StatusCode::UNAUTHORIZED).into());
+        match cookie {
+            Some(access_token) => {
+                let mut validation = Validation::default();
+                validation.set_issuer(&[ISSUER]);
+
+                let token = decode::<AccessClaims>(
+                    access_token.value(),
+                    &DecodingKey::from_secret(SIGNING_KEY.as_ref()),
+                    &validation,
+                );
+
+                match token {
+                    Ok(token) => ok(AuthedUser {
+                        id: token
+                            .claims
+                            .sub
+                            .parse()
+                            .expect("Token is valid but ID is not an integer"),
+                    }),
+                    Err(_) => {
+                        err(StatusError::new(
+                            "Invalid access token",
+                            StatusCode::UNAUTHORIZED,
+                        )
+                        .into())
+                    }
+                }
+            }
+            None => err(StatusError::new("No access token", StatusCode::UNAUTHORIZED).into()),
         }
-
-        let access_token = cookie.unwrap();
-
-        let mut validation = Validation::default();
-        validation.set_issuer(&[ISSUER]);
-
-        let token = decode::<AccessClaims>(
-            access_token.value(),
-            &DecodingKey::from_secret(SIGNING_KEY.as_ref()),
-            &validation,
-        );
-
-        if token.is_err() {
-            return err(StatusError::new("Invalid access token", StatusCode::UNAUTHORIZED).into());
-        }
-
-        let token = token.unwrap();
-        ok(AuthedUser {
-            id: token.claims.sub.parse().unwrap(),
-        })
     }
 }

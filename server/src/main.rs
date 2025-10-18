@@ -9,7 +9,7 @@ mod middleware;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let pool = create_db_pool().await.unwrap();
+    let pool = create_db_pool().await.expect("Failed to create DB pool");
     HttpServer::new(move || {
         App::new()
             .wrap(

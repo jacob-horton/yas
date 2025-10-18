@@ -2,7 +2,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::domains::{
     auth::model::{AccessClaims, RefreshClaims},
-    user::repository::find_by_email,
+    user::repository::{DbError, find_by_email},
 };
 use argon2::{Argon2, PasswordHash, PasswordVerifier};
 use jsonwebtoken::{DecodingKey, EncodingKey, Validation, decode, encode};
@@ -23,14 +23,18 @@ pub struct Tokens {
 }
 
 fn is_password_valid(password: &str, password_hash: &str) -> bool {
-    let parsed_hash = PasswordHash::new(password_hash).unwrap();
+    let parsed_hash = PasswordHash::new(password_hash).expect("Password has was not valid");
     Argon2::default()
         .verify_password(password.as_ref(), &parsed_hash)
         .is_ok()
 }
 
 pub async fn authenticate_user(client: &Client, email: &str, password: &str) -> Option<Tokens> {
-    let user = find_by_email(client, email).await.unwrap();
+    let user = match find_by_email(client, email).await {
+        Ok(user) => user,
+        Err(DbError::NoRows) => return None,
+        Err(e) => panic!("Failed to find user by email: {e:?}"),
+    };
 
     if !is_password_valid(password, &user.password_hash) {
         return None;
@@ -45,7 +49,7 @@ pub fn generate_tokens(id: i32, session_version: i32) -> Tokens {
         sub: id.to_string(),
         exp: (SystemTime::now() + ACCESS_EXPIRATION)
             .duration_since(UNIX_EPOCH)
-            .unwrap()
+            .expect("Failed to calculate expiration time for access token")
             .as_secs() as usize,
     };
 
@@ -54,14 +58,14 @@ pub fn generate_tokens(id: i32, session_version: i32) -> Tokens {
         &access_claims,
         &EncodingKey::from_secret(SIGNING_KEY.as_ref()),
     )
-    .unwrap();
+    .expect("Failed to generate access token");
 
     let refresh_claims = RefreshClaims {
         iss: ISSUER.to_string(),
         sub: id.to_string(),
         exp: (SystemTime::now() + REFRESH_EXPIRATION)
             .duration_since(UNIX_EPOCH)
-            .unwrap()
+            .expect("Failed to calculate expiration time for refresh token")
             .as_secs() as usize,
         version: session_version,
     };
@@ -71,7 +75,7 @@ pub fn generate_tokens(id: i32, session_version: i32) -> Tokens {
         &refresh_claims,
         &EncodingKey::from_secret(SIGNING_KEY.as_ref()),
     )
-    .unwrap();
+    .expect("Failed to generate access token");
 
     Tokens {
         access_token,
@@ -79,7 +83,7 @@ pub fn generate_tokens(id: i32, session_version: i32) -> Tokens {
     }
 }
 
-pub fn parse_token<T: DeserializeOwned>(token: &str) -> T {
+pub fn parse_token<T: DeserializeOwned>(token: &str) -> Result<T, jsonwebtoken::errors::Error> {
     let mut validation = Validation::default();
     validation.set_issuer(&[ISSUER]);
 
@@ -87,8 +91,7 @@ pub fn parse_token<T: DeserializeOwned>(token: &str) -> T {
         token,
         &DecodingKey::from_secret(SIGNING_KEY.as_ref()),
         &validation,
-    )
-    .unwrap();
+    )?;
 
-    token.claims
+    Ok(token.claims)
 }

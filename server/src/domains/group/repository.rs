@@ -12,16 +12,24 @@ impl DbScore {
     }
 }
 
-pub async fn get_scores(client: &Client) -> Result<Vec<DbScore>, ()> {
+#[derive(Debug)]
+pub struct DbError(pub tokio_postgres::Error);
+
+impl From<tokio_postgres::Error> for DbError {
+    fn from(value: tokio_postgres::Error) -> Self {
+        Self(value)
+    }
+}
+
+pub async fn get_scores(client: &Client) -> Result<Vec<DbScore>, DbError> {
     let rows: Vec<DbScore> = client
         .query(
             "SELECT name, win_percent, points_per_game FROM scores ORDER BY win_percent DESC",
             &[],
         )
-        .await
-        .unwrap()
+        .await?
         .iter()
-        .map(|r| DbScore::from_row(r))
+        .map(DbScore::from_row)
         .collect();
 
     Ok(rows)
