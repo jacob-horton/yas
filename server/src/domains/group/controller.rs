@@ -4,7 +4,7 @@ use crate::{db::postgres::DbPool, domains::group::repository::get_scores};
 use actix_web::{HttpResponse, Responder, get, web};
 
 #[get("/group/scores")]
-async fn scores(user: AuthedUser, pool: web::Data<DbPool>) -> impl Responder {
+async fn scores(_: AuthedUser, pool: web::Data<DbPool>) -> impl Responder {
     let client = pool.get().await.unwrap();
     let scores = get_scores(&client).await.unwrap();
 

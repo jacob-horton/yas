@@ -24,7 +24,7 @@ pub async fn find_by_email(client: &Client, email: &str) -> Result<DbUser, ()> {
 
     let row = result.first().ok_or(())?;
 
-    Ok(DbUser::from_row(&row))
+    Ok(DbUser::from_row(row))
 }
 
 pub async fn find_by_id(client: &Client, id: i32) -> Result<DbUser, ()> {
@@ -38,5 +38,5 @@ pub async fn find_by_id(client: &Client, id: i32) -> Result<DbUser, ()> {
 
     let row = result.first().ok_or(())?;
 
-    Ok(DbUser::from_row(&row))
+    Ok(DbUser::from_row(row))
 }

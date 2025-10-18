@@ -21,11 +21,7 @@ pub async fn get_scores(client: &Client) -> Result<Vec<DbScore>, ()> {
         .await
         .unwrap()
         .iter()
-        .map(|r| DbScore {
-            name: r.get("name"),
-            win_percent: r.get("win_percent"),
-            points_per_game: r.get("points_per_game"),
-        })
+        .map(|r| DbScore::from_row(r))
         .collect();
 
     Ok(rows)

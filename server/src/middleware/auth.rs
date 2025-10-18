@@ -31,7 +31,7 @@ impl FromRequest for AuthedUser {
         validation.set_issuer(&[ISSUER]);
 
         let token = decode::<AccessClaims>(
-            &access_token.value(),
+            access_token.value(),
             &DecodingKey::from_secret(SIGNING_KEY.as_ref()),
             &validation,
         );
@@ -41,8 +41,8 @@ impl FromRequest for AuthedUser {
         }
 
         let token = token.unwrap();
-        return ok(AuthedUser {
+        ok(AuthedUser {
             id: token.claims.sub.parse().unwrap(),
-        });
+        })
     }
 }

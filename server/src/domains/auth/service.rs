@@ -24,9 +24,9 @@ pub struct Tokens {
 
 fn is_password_valid(password: &str, password_hash: &str) -> bool {
     let parsed_hash = PasswordHash::new(password_hash).unwrap();
-    return Argon2::default()
+    Argon2::default()
         .verify_password(password.as_ref(), &parsed_hash)
-        .is_ok();
+        .is_ok()
 }
 
 pub async fn authenticate_user(client: &Client, email: &str, password: &str) -> Option<Tokens> {
@@ -84,11 +84,11 @@ pub fn parse_token<T: DeserializeOwned>(token: &str) -> T {
     validation.set_issuer(&[ISSUER]);
 
     let token = decode::<T>(
-        &token,
+        token,
         &DecodingKey::from_secret(SIGNING_KEY.as_ref()),
         &validation,
     )
     .unwrap();
 
-    return token.claims;
+    token.claims
 }
