@@ -8,6 +8,10 @@ use actix_web::cookie::Cookie;
 use actix_web::http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, Responder, post, web};
 
+pub const ACCESS_COOKIE_NAME: &str = "access_token";
+pub const REFRESH_COOKIE_NAME: &str = "refresh_token";
+
+// TODO: set cookie expiry
 #[post("/auth/login")]
 async fn login(req: web::Json<LoginRequest>, pool: web::Data<DbPool>) -> impl Responder {
     let client = pool
@@ -18,7 +22,7 @@ async fn login(req: web::Json<LoginRequest>, pool: web::Data<DbPool>) -> impl Re
     match authenticate_user(&client, &req.email, &req.password).await {
         Some(tokens) => {
             // TODO: set secure and same site properly for prod
-            let access_cookie = Cookie::build("access_token", &tokens.access_token)
+            let access_cookie = Cookie::build(ACCESS_COOKIE_NAME, &tokens.access_token)
                 .http_only(true)
                 .secure(false)
                 .same_site(actix_web::cookie::SameSite::Lax)
@@ -26,7 +30,7 @@ async fn login(req: web::Json<LoginRequest>, pool: web::Data<DbPool>) -> impl Re
                 .path("/")
                 .finish();
 
-            let refresh_cookie = Cookie::build("refresh_token", &tokens.refresh_token)
+            let refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, &tokens.refresh_token)
                 .http_only(true)
                 .secure(false)
                 .same_site(actix_web::cookie::SameSite::Lax)
@@ -46,9 +50,37 @@ async fn login(req: web::Json<LoginRequest>, pool: web::Data<DbPool>) -> impl Re
     }
 }
 
+#[post("/auth/logout")]
+async fn logout() -> impl Responder {
+    // TODO: reduce duplication
+    // Unset both cookies
+    let mut access_cookie = Cookie::build(ACCESS_COOKIE_NAME, "")
+        .http_only(true)
+        .secure(false)
+        .same_site(actix_web::cookie::SameSite::Lax)
+        .domain("localhost")
+        .path("/")
+        .finish();
+    access_cookie.make_removal();
+
+    let mut refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, "")
+        .http_only(true)
+        .secure(false)
+        .same_site(actix_web::cookie::SameSite::Lax)
+        .domain("localhost")
+        .path("/")
+        .finish();
+    refresh_cookie.make_removal();
+
+    HttpResponse::NoContent()
+        .cookie(access_cookie)
+        .cookie(refresh_cookie)
+        .finish()
+}
+
 #[post("/auth/refresh")]
 pub async fn refresh(req: HttpRequest, pool: web::Data<DbPool>) -> impl Responder {
-    let cookie = req.cookie("refresh_token").ok_or(StatusError::new(
+    let cookie = req.cookie(REFRESH_COOKIE_NAME).ok_or(StatusError::new(
         "No refresh token found",
         StatusCode::UNAUTHORIZED,
     ))?;
@@ -83,7 +115,7 @@ pub async fn refresh(req: HttpRequest, pool: web::Data<DbPool>) -> impl Responde
 
     // TODO: reduce duplication
     // TODO: set secure and same site properly for prod
-    let access_cookie = Cookie::build("access_token", &new_tokens.access_token)
+    let access_cookie = Cookie::build(ACCESS_COOKIE_NAME, &new_tokens.access_token)
         .http_only(true)
         .secure(false)
         .same_site(actix_web::cookie::SameSite::Lax)
@@ -91,7 +123,7 @@ pub async fn refresh(req: HttpRequest, pool: web::Data<DbPool>) -> impl Responde
         .path("/")
         .finish();
 
-    let refresh_cookie = Cookie::build("refresh_token", &new_tokens.refresh_token)
+    let refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, &new_tokens.refresh_token)
         .http_only(true)
         .secure(false)
         .same_site(actix_web::cookie::SameSite::Lax)
@@ -106,5 +138,5 @@ pub async fn refresh(req: HttpRequest, pool: web::Data<DbPool>) -> impl Responde
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(login).service(refresh);
+    cfg.service(login).service(refresh).service(logout);
 }

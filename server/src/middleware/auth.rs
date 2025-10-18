@@ -3,6 +3,7 @@ use actix_web::{Error, FromRequest, HttpRequest, dev::Payload};
 use futures_util::future::{Ready, err, ok};
 use jsonwebtoken::{DecodingKey, Validation, decode};
 
+use crate::domains::auth::controller::ACCESS_COOKIE_NAME;
 use crate::domains::auth::{
     model::AccessClaims,
     service::{ISSUER, SIGNING_KEY},
@@ -20,7 +21,7 @@ impl FromRequest for AuthedUser {
     type Future = Ready<Result<Self, Self::Error>>;
 
     fn from_request(req: &HttpRequest, _payload: &mut Payload) -> Self::Future {
-        let cookie = req.cookie("access_token");
+        let cookie = req.cookie(ACCESS_COOKIE_NAME);
         match cookie {
             Some(access_token) => {
                 let mut validation = Validation::default();
@@ -40,13 +41,11 @@ impl FromRequest for AuthedUser {
                             .parse()
                             .expect("Token is valid but ID is not an integer"),
                     }),
-                    Err(_) => {
-                        err(StatusError::new(
-                            "Invalid access token",
-                            StatusCode::UNAUTHORIZED,
-                        )
-                        .into())
-                    }
+                    Err(_) => err(StatusError::new(
+                        "Invalid access token",
+                        StatusCode::UNAUTHORIZED,
+                    )
+                    .into()),
                 }
             }
             None => err(StatusError::new("No access token", StatusCode::UNAUTHORIZED).into()),
