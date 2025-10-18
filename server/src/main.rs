@@ -1,18 +1,16 @@
 use actix_cors::Cors;
 use actix_web::{App, HttpServer, http, web};
-use api::{
-    auth::{login::login, refresh::refresh},
-    group::scores::get_scores,
-    me::get_me,
-};
+use db::postgres::create_db_pool;
+use domains::{auth, group, user};
 
-mod api;
+mod db;
+mod domains;
 mod middleware;
-mod store;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    let pool = create_db_pool().await.unwrap();
+    HttpServer::new(move || {
         App::new()
             .wrap(
                 Cors::default()
@@ -21,12 +19,12 @@ async fn main() -> std::io::Result<()> {
                     .allowed_headers(vec![http::header::CONTENT_TYPE])
                     .supports_credentials(),
             )
+            .app_data(web::Data::new(pool.clone()))
             .service(
                 web::scope("/api")
-                    .service(login)
-                    .service(refresh)
-                    .service(get_scores)
-                    .service(get_me),
+                    .configure(auth::controller::config)
+                    .configure(user::controller::config)
+                    .configure(group::controller::config),
             )
     })
     .bind(("localhost", 8080))?

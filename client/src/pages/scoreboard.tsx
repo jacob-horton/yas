@@ -11,7 +11,7 @@ import { Table } from '../components/table';
 export const getGroupScores = query(async () => {
   // TODO: try/catch
   const res = await api.get('/group/scores');
-  return res.data;
+  return res.data.scores;
 }, 'groupScores');
 
 const LoadingText = () => {
@@ -47,7 +47,7 @@ export const Scoreboard = () => {
   return (
     <Page title="Scoreboard">
       <div class="flex flex-col gap-6">
-        User: {user()}
+        User: {JSON.stringify(user())}
         <div class="flex gap-6">
           <Suspense
             fallback={
