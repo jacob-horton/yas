@@ -1,3 +1,4 @@
+import { isAxiosError } from 'axios';
 import {
   type Accessor,
   createContext,
@@ -13,6 +14,7 @@ const AuthContext = createContext<{
   loading: Accessor<boolean>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<boolean>;
 }>();
 
 export const AuthProvider: ParentComponent = (props) => {
@@ -21,18 +23,10 @@ export const AuthProvider: ParentComponent = (props) => {
 
   async function login(email: string, password: string) {
     try {
-      await api.post(
-        '/auth/login',
-        {
-          email,
-          password,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      await api.post('/auth/login', {
+        email,
+        password,
+      });
 
       const res = await api.get('/me');
       setUser(res.data);
@@ -48,6 +42,30 @@ export const AuthProvider: ParentComponent = (props) => {
 
   setupAxiosInterceptors(logout);
 
+  async function register(name: string, email: string, password: string) {
+    try {
+      await api.post('/auth/register', {
+        name,
+        email,
+        password,
+      });
+
+      const res = await api.get('/me');
+      setUser(res.data);
+
+      return true;
+    } catch (e) {
+      if (isAxiosError(e) && e.status === 409) {
+        console.log('got here');
+        return false;
+      }
+
+      console.log('throwing');
+      // TODO: what to do here
+      throw e;
+    }
+  }
+
   onMount(async () => {
     try {
       const res = await api.get('/me');
@@ -60,7 +78,7 @@ export const AuthProvider: ParentComponent = (props) => {
   });
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, register }}>
       {props.children}
     </AuthContext.Provider>
   );

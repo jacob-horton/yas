@@ -4,6 +4,7 @@ import { AuthProvider } from './auth/auth-provider';
 import { ProtectedRoute } from './auth/protected-route';
 import { Sidebar, SidebarContext } from './components/sidebar';
 import { Login } from './pages/login';
+import { Register } from './pages/register';
 import { Scoreboard } from './pages/scoreboard';
 import { Settings } from './pages/settings';
 
@@ -32,6 +33,7 @@ export default function App() {
         </Route>
 
         <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
       </Router>
     </AuthProvider>
   );

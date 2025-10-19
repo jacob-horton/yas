@@ -1,7 +1,9 @@
+use crate::domains::auth::dto::RegisterRequest;
 use crate::domains::auth::model::RefreshClaims;
 use crate::domains::auth::service::{authenticate_user, generate_tokens, parse_token};
 use crate::domains::user;
 use crate::domains::user::repository::DbError;
+use crate::domains::user::service::{CreateUserError, create_user};
 use crate::middleware::errors::StatusError;
 use crate::{db::postgres::DbPool, domains::auth::dto::LoginRequest};
 use actix_web::cookie::Cookie;
@@ -137,6 +139,51 @@ pub async fn refresh(req: HttpRequest, pool: web::Data<DbPool>) -> impl Responde
         .finish())
 }
 
+// TODO: rate limit
+#[post("/auth/register")]
+pub async fn register(req: web::Json<RegisterRequest>, pool: web::Data<DbPool>) -> impl Responder {
+    let client = pool
+        .get()
+        .await
+        .expect("Failed to retrieve database connection from pool");
+
+    let user = create_user(&client, &req.name, &req.email, &req.password)
+        .await
+        .map_err(|e| match e {
+            CreateUserError::EmailAlreadyInUse => {
+                StatusError::new("Invalid refresh token", StatusCode::CONFLICT)
+            }
+            e => panic!("Failed to create user: {e:?}"),
+        })?;
+    let tokens = generate_tokens(user.id, user.session_version);
+
+    let access_cookie = Cookie::build(ACCESS_COOKIE_NAME, &tokens.access_token)
+        .http_only(true)
+        .secure(false)
+        .same_site(actix_web::cookie::SameSite::Lax)
+        .domain("localhost")
+        .path("/")
+        .finish();
+
+    let refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, &tokens.refresh_token)
+        .http_only(true)
+        .secure(false)
+        .same_site(actix_web::cookie::SameSite::Lax)
+        .domain("localhost")
+        .path("/")
+        .finish();
+
+    Ok::<_, StatusError>(
+        HttpResponse::NoContent()
+            .cookie(access_cookie)
+            .cookie(refresh_cookie)
+            .finish(),
+    )
+}
+
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(login).service(refresh).service(logout);
+    cfg.service(login)
+        .service(refresh)
+        .service(logout)
+        .service(register);
 }

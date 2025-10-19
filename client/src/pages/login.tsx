@@ -42,7 +42,9 @@ export const Login: Component = () => {
           />
           <span class="flex gap-4">
             <Button type="submit">Login</Button>
-            <Button variant="secondary">Sign up</Button>
+            <Button variant="secondary" onClick={() => navigate('/register')}>
+              Register
+            </Button>
           </span>
         </form>
       </div>

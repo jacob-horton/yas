@@ -27,6 +27,7 @@ async fn me(user: AuthedUser, pool: web::Data<DbPool>) -> impl Responder {
 
     Ok(HttpResponse::Ok().json(MeResponse {
         id: full_user.id,
+        name: full_user.name,
         email: full_user.email,
     }))
 }
