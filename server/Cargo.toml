@@ -12,9 +12,11 @@ bb8 = "0.9.0"
 bb8-postgres = "0.9.0"
 futures-util = "0.3.31"
 jsonwebtoken = "9.3.0"
+lazy_static = "1.5.0"
 password-hash = { version = "0.5.0" }
 rand = "0.8.5"
 refinery = { version = "0.8.16", features = ["tokio-postgres"] }
 serde = "1.0.228"
 tokio = { version = "1.47.1", features = ["full"] }
 tokio-postgres = "0.7.14"
+validator = { version = "0.20.0", features = ["derive"] }

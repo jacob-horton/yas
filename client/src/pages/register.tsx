@@ -5,6 +5,13 @@ import { useAuth } from '../auth/auth-provider';
 import { Button } from '../components/button';
 import { Input } from '../components/input';
 
+const ERROR_MESSAGES = {
+  length: 'Invalid length',
+  email: 'Must be a valid email',
+  common: 'Password is too common',
+  duplicate: 'Already in use',
+};
+
 export const Register: Component = () => {
   const [data, setData] = createStore({
     name: '',
@@ -14,6 +21,7 @@ export const Register: Component = () => {
   });
 
   const [errors, setErrors] = createStore<{
+    name?: string;
     email?: string;
     password?: string;
     confirmPassword?: string;
@@ -31,7 +39,10 @@ export const Register: Component = () => {
   const register = async (e: SubmitEvent) => {
     e.preventDefault();
 
-    setErrors({});
+    setErrors('name', undefined);
+    setErrors('email', undefined);
+    setErrors('password', undefined);
+    setErrors('confirmPassword', undefined);
 
     if (data.password !== data.confirmPassword) {
       setErrors('confirmPassword', "Password doesn't match");
@@ -39,8 +50,16 @@ export const Register: Component = () => {
     }
 
     // TODO: check type of error here
-    if (!(await auth.register(data.name, data.email, data.password))) {
-      setErrors('email', 'Email address already in use');
+    const errorDetails = await auth.register(
+      data.name,
+      data.email,
+      data.password
+    );
+    if (errorDetails) {
+      for (const detail of errorDetails.details) {
+        console.log(detail.property, detail.codes[0]);
+        setErrors(detail.property, ERROR_MESSAGES[detail.codes[0]]);
+      }
     }
   };
 
@@ -52,6 +71,7 @@ export const Register: Component = () => {
           <Input
             label="Name"
             value={data.name}
+            error={errors.name}
             onChange={(value) => setData('name', value)}
             placeholder="User"
           />
@@ -66,6 +86,7 @@ export const Register: Component = () => {
             label="Password"
             type="password"
             value={data.password}
+            error={errors.password}
             onChange={(value) => setData('password', value)}
             placeholder="●●●●●●●●●●●●"
           />

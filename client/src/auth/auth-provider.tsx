@@ -9,12 +9,26 @@ import {
 } from 'solid-js';
 import { api, setupAxiosInterceptors } from '../api';
 
+type DetailedStatusError = {
+  message: string;
+  details: ErrorDetail[];
+};
+
+type ErrorDetail = {
+  property: string;
+  codes: string;
+};
+
 const AuthContext = createContext<{
   user: Accessor<string | null>;
   loading: Accessor<boolean>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  register: (
+    name: string,
+    email: string,
+    password: string
+  ) => Promise<DetailedStatusError | null>;
 }>();
 
 export const AuthProvider: ParentComponent = (props) => {
@@ -53,11 +67,10 @@ export const AuthProvider: ParentComponent = (props) => {
       const res = await api.get('/me');
       setUser(res.data);
 
-      return true;
+      return null;
     } catch (e) {
-      if (isAxiosError(e) && e.status === 409) {
-        console.log('got here');
-        return false;
+      if (isAxiosError(e) && (e.status === 409 || e.status === 400)) {
+        return (await e.response?.data) as DetailedStatusError;
       }
 
       console.log('throwing');

@@ -4,11 +4,12 @@ use crate::domains::auth::service::{authenticate_user, generate_tokens, parse_to
 use crate::domains::user;
 use crate::domains::user::repository::DbError;
 use crate::domains::user::service::{CreateUserError, create_user};
-use crate::middleware::errors::StatusError;
+use crate::middleware::errors::{DetailedStatusError, ErrorDetail, StatusError};
 use crate::{db::postgres::DbPool, domains::auth::dto::LoginRequest};
 use actix_web::cookie::Cookie;
 use actix_web::http::StatusCode;
 use actix_web::{HttpRequest, HttpResponse, Responder, post, web};
+use validator::Validate;
 
 pub const ACCESS_COOKIE_NAME: &str = "access_token";
 pub const REFRESH_COOKIE_NAME: &str = "refresh_token";
@@ -141,18 +142,49 @@ pub async fn refresh(req: HttpRequest, pool: web::Data<DbPool>) -> impl Responde
 
 // TODO: rate limit
 #[post("/auth/register")]
-pub async fn register(req: web::Json<RegisterRequest>, pool: web::Data<DbPool>) -> impl Responder {
+pub async fn register(
+    req: web::Json<RegisterRequest>,
+    pool: web::Data<DbPool>,
+) -> Result<HttpResponse, actix_web::Error> {
     let client = pool
         .get()
         .await
         .expect("Failed to retrieve database connection from pool");
 
+    req.validate().map_err(|e| {
+        let details = e
+            .errors()
+            .iter()
+            .map(|(field, err)| match err {
+                validator::ValidationErrorsKind::Field(validation_errors) => {
+                    let codes = validation_errors
+                        .iter()
+                        .map(|err| err.code.to_string())
+                        .collect();
+                    ErrorDetail::new(field.to_string(), codes)
+                }
+                _ => ErrorDetail::new(field.to_string(), vec!["invalid-field".to_string()]),
+            })
+            .collect::<Vec<_>>();
+
+        DetailedStatusError::new(
+            StatusCode::BAD_REQUEST,
+            "Invalid user details".to_string(),
+            details,
+        )
+    })?;
+
     let user = create_user(&client, &req.name, &req.email, &req.password)
         .await
         .map_err(|e| match e {
-            CreateUserError::EmailAlreadyInUse => {
-                StatusError::new("Invalid refresh token", StatusCode::CONFLICT)
-            }
+            CreateUserError::EmailAlreadyInUse => DetailedStatusError::new(
+                StatusCode::CONFLICT,
+                "Email already in use".to_string(),
+                vec![ErrorDetail::new(
+                    "email".to_string(),
+                    vec!["duplicate".to_string()],
+                )],
+            ),
             e => panic!("Failed to create user: {e:?}"),
         })?;
     let tokens = generate_tokens(user.id, user.session_version);
@@ -173,12 +205,10 @@ pub async fn register(req: web::Json<RegisterRequest>, pool: web::Data<DbPool>) 
         .path("/")
         .finish();
 
-    Ok::<_, StatusError>(
-        HttpResponse::NoContent()
-            .cookie(access_cookie)
-            .cookie(refresh_cookie)
-            .finish(),
-    )
+    Ok(HttpResponse::NoContent()
+        .cookie(access_cookie)
+        .cookie(refresh_cookie)
+        .finish())
 }
 
 pub fn config(cfg: &mut web::ServiceConfig) {

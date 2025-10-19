@@ -2,8 +2,11 @@ use std::error::Error;
 use std::fmt::{Display, Formatter};
 
 use actix_web::http::StatusCode;
+use actix_web::http::header::ContentType;
 use actix_web::{HttpResponse, HttpResponseBuilder, ResponseError};
+use serde::Serialize;
 
+// TODO: move elsewhere
 #[derive(Debug, Clone)]
 pub struct StatusError {
     pub message: String,
@@ -34,8 +37,57 @@ impl Error for StatusError {
 impl ResponseError for StatusError {
     fn error_response(&self) -> HttpResponse {
         HttpResponseBuilder::new(self.status_code())
-            .content_type("text/plain; charset=utf-8")
+            .content_type(ContentType::plaintext())
             .body(self.to_string())
+    }
+
+    fn status_code(&self) -> StatusCode {
+        self.status_code
+    }
+}
+
+// TODO: rename to form error? This only makes sense when there are properties to reference
+#[derive(Debug, Clone, Serialize)]
+pub struct DetailedStatusError {
+    #[serde(skip_serializing)]
+    pub status_code: StatusCode,
+    pub message: String,
+    pub details: Vec<ErrorDetail>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct ErrorDetail {
+    pub property: String,
+    pub codes: Vec<String>,
+}
+
+impl DetailedStatusError {
+    pub fn new(status_code: StatusCode, message: String, details: Vec<ErrorDetail>) -> Self {
+        Self {
+            status_code,
+            message,
+            details,
+        }
+    }
+}
+
+impl ErrorDetail {
+    pub fn new(property: String, codes: Vec<String>) -> Self {
+        Self { property, codes }
+    }
+}
+
+impl Display for DetailedStatusError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Bad request: {}", self.message)
+    }
+}
+
+impl Error for DetailedStatusError {}
+
+impl ResponseError for DetailedStatusError {
+    fn error_response(&self) -> HttpResponse {
+        HttpResponseBuilder::new(self.status_code()).json(self)
     }
 
     fn status_code(&self) -> StatusCode {
