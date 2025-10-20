@@ -3,6 +3,7 @@ import { type ParentComponent } from 'solid-js';
 import { AuthProvider } from './auth/auth-provider';
 import { ProtectedRoute } from './auth/protected-route';
 import { Sidebar } from './components/sidebar';
+import { CreateGroup } from './pages/create-group';
 import { Login } from './pages/login';
 import { Register } from './pages/register';
 import { Scoreboard } from './pages/scoreboard';
@@ -25,6 +26,7 @@ export default function App() {
       <Router>
         <Route path="/" component={Layout}>
           <Route path="/" component={Scoreboard} />
+          <Route path="/groups/create" component={CreateGroup} />
           <Route path="/settings" component={Settings} />
         </Route>
 

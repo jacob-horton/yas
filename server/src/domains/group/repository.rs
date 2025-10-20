@@ -61,3 +61,51 @@ pub async fn get_user_groups(client: &Client, user_id: i32) -> Result<Vec<DbGrou
 
     Ok(rows)
 }
+
+pub async fn create_group(client: &Client, name: &str) -> Result<DbGroup, DbError> {
+    let rows: Vec<DbGroup> = client
+        .query(
+            "INSERT INTO groups(name) VALUES ($1::TEXT)
+            RETURNING id, name, created_at",
+            &[&name],
+        )
+        .await?
+        .iter()
+        .map(DbGroup::from_row)
+        .collect();
+
+    Ok(rows.first().unwrap().to_owned())
+}
+
+#[derive(Debug, Clone)]
+pub enum MemberType {
+    Member,
+    Admin,
+    Owner,
+}
+
+impl MemberType {
+    fn as_str(&self) -> &'static str {
+        match self {
+            Self::Member => "member",
+            Self::Admin => "admin",
+            Self::Owner => "owner",
+        }
+    }
+}
+
+pub async fn add_user_to_group(
+    client: &Client,
+    group_id: i32,
+    user_id: i32,
+    member_type: MemberType,
+) -> Result<(), DbError> {
+    client
+        .query(
+            "INSERT INTO group_members(user_id, group_id, role) VALUES ($1, $2, $3::TEXT)",
+            &[&user_id, &group_id, &member_type.as_str()],
+        )
+        .await?;
+
+    Ok(())
+}

@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use super::model::{DbGroup, DbScore};
 
@@ -23,6 +23,11 @@ impl From<DbScore> for Score {
             points_per_game: value.points_per_game,
         }
     }
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct CreateGroupRequest {
+    pub name: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
