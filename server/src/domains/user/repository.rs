@@ -1,5 +1,3 @@
-use std::error::Error;
-
 use tokio_postgres::{Client, Row};
 
 use super::model::{DbUser, InsertDbUser};
@@ -12,6 +10,7 @@ impl DbUser {
             email: row.get("email"),
             session_version: row.get("session_version"),
             password_hash: row.get("password_hash"),
+            created_at: row.get("created_at"),
         }
     }
 }
@@ -27,7 +26,7 @@ pub enum DbError {
 pub async fn find_by_email(client: &Client, email: &str) -> Result<DbUser, DbError> {
     let result = client
         .query(
-            "SELECT id, name, email, session_version, password_hash FROM users WHERE email = $1::TEXT LIMIT 1",
+            "SELECT id, name, email, session_version, password_hash, created_at FROM users WHERE email = $1::TEXT LIMIT 1",
             &[&email],
         )
         .await
@@ -41,7 +40,7 @@ pub async fn find_by_email(client: &Client, email: &str) -> Result<DbUser, DbErr
 pub async fn find_by_id(client: &Client, id: i32) -> Result<DbUser, DbError> {
     let result = client
         .query(
-            "SELECT id, name, email, session_version, password_hash FROM users WHERE id = $1 LIMIT 1",
+            "SELECT id, name, email, session_version, password_hash, created_at FROM users WHERE id = $1 LIMIT 1",
             &[&id],
         )
         .await

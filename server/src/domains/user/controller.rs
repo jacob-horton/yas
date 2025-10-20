@@ -29,6 +29,7 @@ async fn me(user: AuthedUser, pool: web::Data<DbPool>) -> impl Responder {
         id: full_user.id,
         name: full_user.name,
         email: full_user.email,
+        created_at: full_user.created_at,
     }))
 }
 

@@ -19,8 +19,14 @@ type ErrorDetail = {
   codes: string;
 };
 
+export type User = {
+  id: number;
+  name: string;
+  email: string;
+};
+
 const AuthContext = createContext<{
-  user: Accessor<string | null>;
+  user: Accessor<User | null>;
   loading: Accessor<boolean>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -32,7 +38,7 @@ const AuthContext = createContext<{
 }>();
 
 export const AuthProvider: ParentComponent = (props) => {
-  const [user, setUser] = createSignal<string | null>(null);
+  const [user, setUser] = createSignal<User | null>(null);
   const [loading, setLoading] = createSignal(true);
 
   async function login(email: string, password: string) {
@@ -43,7 +49,7 @@ export const AuthProvider: ParentComponent = (props) => {
       });
 
       const res = await api.get('/me');
-      setUser(res.data);
+      setUser(res.data as User);
     } catch {
       // TODO: check axios error
     }

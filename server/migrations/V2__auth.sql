@@ -1,8 +1,10 @@
--- TODO: make email unique
+SET TIMEZONE TO 'UTC';
+
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
-    session_version INTEGER NOT NULL DEFAULT 1
+    session_version INTEGER NOT NULL DEFAULT 1,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
