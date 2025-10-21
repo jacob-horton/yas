@@ -1,17 +1,17 @@
-import { useNavigate } from '@solidjs/router';
-import { createSignal } from 'solid-js';
-import { api } from '../api';
-import { Button } from '../components/button';
-import { Input } from '../components/input';
-import { Page } from '../components/page';
+import { useNavigate } from "@solidjs/router";
+import { createSignal } from "solid-js";
+import { api } from "../api";
+import { Button } from "../components/button";
+import { Input } from "../components/input";
+import { Page } from "../components/page";
 
 export const CreateGroup = () => {
   const navigate = useNavigate();
-  const [name, setName] = createSignal('');
+  const [name, setName] = createSignal("");
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    const res = await api.post('/groups', { name: name() });
+    const res = await api.post("/groups", { name: name() });
     console.log(res);
 
     navigate(`/groups/${res.data.id}`);

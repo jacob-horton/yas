@@ -8,12 +8,13 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write ."
+    "lint": "biome lint",
+    "lint:fix": "biome lint --write --unsafe",
+    "format": "biome format --write"
   },
   "license": "MIT",
   "devDependencies": {
+    "@biomejs/biome": "2.2.6",
     "@eslint/js": "^9.36.0",
     "@tailwindcss/vite": "^4.1.13",
     "eslint": "^9.36.0",

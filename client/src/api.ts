@@ -1,12 +1,12 @@
-import axios from 'axios';
+import axios from "axios";
 
 export const api = axios.create({
-  baseURL: 'http://localhost:8080/api/',
+  baseURL: "http://localhost:8080/api/",
   timeout: 1000,
   withCredentials: true,
 });
 
-const REFRESH_PATH = '/auth/refresh';
+const REFRESH_PATH = "/auth/refresh";
 
 export const setupAxiosInterceptors = (logout: () => void) => {
   api.interceptors.response.use(
@@ -37,6 +37,6 @@ export const setupAxiosInterceptors = (logout: () => void) => {
         logout();
         return Promise.reject(refreshError);
       }
-    }
+    },
   );
 };

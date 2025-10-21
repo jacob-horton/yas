@@ -1,4 +1,4 @@
-import { isAxiosError } from 'axios';
+import { isAxiosError } from "axios";
 import {
   type Accessor,
   createContext,
@@ -6,8 +6,8 @@ import {
   onMount,
   type ParentComponent,
   useContext,
-} from 'solid-js';
-import { api, setupAxiosInterceptors } from '../api';
+} from "solid-js";
+import { api, setupAxiosInterceptors } from "../api";
 
 type DetailedStatusError = {
   message: string;
@@ -33,7 +33,7 @@ const AuthContext = createContext<{
   register: (
     name: string,
     email: string,
-    password: string
+    password: string,
   ) => Promise<DetailedStatusError | null>;
 }>();
 
@@ -43,12 +43,12 @@ export const AuthProvider: ParentComponent = (props) => {
 
   async function login(email: string, password: string) {
     try {
-      await api.post('/auth/login', {
+      await api.post("/auth/login", {
         email,
         password,
       });
 
-      const res = await api.get('/me');
+      const res = await api.get("/me");
       setUser(res.data as User);
     } catch {
       // TODO: check axios error
@@ -56,7 +56,7 @@ export const AuthProvider: ParentComponent = (props) => {
   }
 
   async function logout() {
-    await api.post('/auth/logout');
+    await api.post("/auth/logout");
     setUser(null);
   }
 
@@ -64,13 +64,13 @@ export const AuthProvider: ParentComponent = (props) => {
 
   async function register(name: string, email: string, password: string) {
     try {
-      await api.post('/auth/register', {
+      await api.post("/auth/register", {
         name,
         email,
         password,
       });
 
-      const res = await api.get('/me');
+      const res = await api.get("/me");
       setUser(res.data);
 
       return null;
@@ -79,7 +79,7 @@ export const AuthProvider: ParentComponent = (props) => {
         return (await e.response?.data) as DetailedStatusError;
       }
 
-      console.log('throwing');
+      console.log("throwing");
       // TODO: what to do here
       throw e;
     }
@@ -87,7 +87,7 @@ export const AuthProvider: ParentComponent = (props) => {
 
   onMount(async () => {
     try {
-      const res = await api.get('/me');
+      const res = await api.get("/me");
       setUser(res.data);
     } catch {
       setUser(null);

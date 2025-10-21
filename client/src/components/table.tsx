@@ -1,5 +1,5 @@
-import { createUniqueId, For, type ParentComponent } from 'solid-js';
-import type { JSX } from 'solid-js/jsx-runtime';
+import { createUniqueId, For, type ParentComponent } from "solid-js";
+import type { JSX } from "solid-js/jsx-runtime";
 
 export type TableProps = {
   headings: JSX.Element[];
@@ -28,8 +28,8 @@ export const Table: TableComponent = (props) => {
                   scope="col"
                   class="bg-gray-100 px-5 py-3 text-start font-semibold"
                   classList={{
-                    'rounded-s-md': i() === 0,
-                    'rounded-e-md': i() === props.headings.length - 1,
+                    "rounded-s-md": i() === 0,
+                    "rounded-e-md": i() === props.headings.length - 1,
                   }}
                 >
                   {heading}

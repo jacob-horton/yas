@@ -1,13 +1,13 @@
-import { Route, Router } from '@solidjs/router';
-import { type ParentComponent } from 'solid-js';
-import { AuthProvider } from './auth/auth-provider';
-import { ProtectedRoute } from './auth/protected-route';
-import { Sidebar } from './components/sidebar';
-import { CreateGroup } from './pages/create-group';
-import { Login } from './pages/login';
-import { Register } from './pages/register';
-import { Scoreboard } from './pages/scoreboard';
-import { Settings } from './pages/settings';
+import { Route, Router } from "@solidjs/router";
+import type { ParentComponent } from "solid-js";
+import { AuthProvider } from "./auth/auth-provider";
+import { ProtectedRoute } from "./auth/protected-route";
+import { Sidebar } from "./components/sidebar";
+import { CreateGroup } from "./pages/create-group";
+import { Login } from "./pages/login";
+import { Register } from "./pages/register";
+import { Scoreboard } from "./pages/scoreboard";
+import { Settings } from "./pages/settings";
 
 const Layout: ParentComponent = (props) => {
   return (

@@ -1,18 +1,18 @@
-import { createAsync, query } from '@solidjs/router';
-import type { Component } from 'solid-js';
-import { For, Suspense } from 'solid-js';
-import { api } from '../api';
-import { useAuth } from '../auth/auth-provider';
-import { Page } from '../components/page';
-import { PodiumCard, PodiumCardSkeleton } from '../components/podium-card';
-import { ProgressBar } from '../components/progress-bar';
-import { Table } from '../components/table';
+import { createAsync, query } from "@solidjs/router";
+import type { Component } from "solid-js";
+import { For, Suspense } from "solid-js";
+import { api } from "../api";
+import { useAuth } from "../auth/auth-provider";
+import { Page } from "../components/page";
+import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
+import { ProgressBar } from "../components/progress-bar";
+import { Table } from "../components/table";
 
 export const getGroupScores = query(async () => {
   // TODO: try/catch
-  const res = await api.get('/group/scores');
+  const res = await api.get("/group/scores");
   return res.data.scores;
-}, 'groupScores');
+}, "groupScores");
 
 const LoadingText = () => {
   return (
@@ -21,7 +21,7 @@ const LoadingText = () => {
 };
 
 const LoadingRows: Component<{ numCols: number; numRows?: number }> = (
-  props
+  props,
 ) => {
   return (
     <For each={Array(props.numRows ?? 5)}>
@@ -69,7 +69,7 @@ export const Scoreboard = () => {
           </Suspense>
         </div>
         <Table
-          headings={['No.', 'Name', 'Win Rate', 'Points/Game']}
+          headings={["No.", "Name", "Win Rate", "Points/Game"]}
           caption="table"
         >
           <Suspense fallback={<LoadingRows numCols={4} />}>
