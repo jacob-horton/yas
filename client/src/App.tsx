@@ -30,7 +30,7 @@ export default function App() {
           <Route path="/" component={Settings} />
           <Route path="/scoreboards/:id" component={Scoreboard} />
 
-          <Route path="/scoreboard/create" component={CreateScoreboard} />
+          <Route path="/scoreboards/create" component={CreateScoreboard} />
           <Route path="/groups/create" component={CreateGroup} />
           <Route path="/settings" component={Settings} />
         </Route>

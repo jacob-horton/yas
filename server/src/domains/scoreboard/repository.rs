@@ -1,6 +1,6 @@
 use tokio_postgres::{Client, Row};
 
-use crate::domains::group::repository::get_user_groups;
+use crate::domains::{group::repository::get_user_groups, scoreboard::model::PlayerScore};
 
 use super::model::DbScoreboard;
 
@@ -11,6 +11,16 @@ impl DbScoreboard {
             name: row.get("name"),
             players_per_game: row.get("players_per_game"),
             group_id: row.get("group_id"),
+        }
+    }
+}
+
+impl PlayerScore {
+    fn from_row(row: &Row) -> Self {
+        Self {
+            points_per_game: row.get("points_per_game"),
+            win_percent: row.get("win_percent"),
+            user_id: row.get("user_id"),
         }
     }
 }
@@ -40,6 +50,38 @@ pub async fn get_user_scoreboards(
         .await?
         .iter()
         .map(DbScoreboard::from_row)
+        .collect();
+
+    Ok(rows)
+}
+
+pub async fn get_scores(client: &Client, scoreboard_id: i32) -> Result<Vec<PlayerScore>, DbError> {
+    // TODO: limit
+    let rows = client
+        .query("
+WITH game_results AS (
+    SELECT
+        s.game_id,
+        s.user_id,
+        s.score,
+        -- find the winner's score per game
+        MAX(s.score) OVER (PARTITION BY s.game_id) AS winning_score
+    FROM scores s
+    JOIN games g ON g.id = s.game_id
+    WHERE g.scoreboard_id = $1
+)
+SELECT
+    user_id,
+    AVG(score)::numeric(10,2)::float AS points_per_game,
+    ROUND(100.0 * SUM(CASE WHEN score = winning_score THEN 1 ELSE 0 END) / COUNT(*), 2)::int AS win_percent
+FROM game_results
+GROUP BY user_id
+ORDER BY win_percent DESC;",
+            &[&scoreboard_id],
+        )
+        .await?
+        .iter()
+        .map(PlayerScore::from_row)
         .collect();
 
     Ok(rows)

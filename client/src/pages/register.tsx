@@ -57,7 +57,6 @@ export const Register: Component = () => {
     );
     if (errorDetails) {
       for (const detail of errorDetails.details) {
-        console.log(detail.property, detail.codes[0]);
         setErrors(detail.property, ERROR_MESSAGES[detail.codes[0]]);
       }
     }

@@ -1,16 +1,6 @@
 use tokio_postgres::{Client, Row};
 
-use super::model::{DbGroup, DbScore};
-
-impl DbScore {
-    fn from_row(row: &Row) -> Self {
-        Self {
-            name: row.get("name"),
-            win_percent: row.get("win_percent"),
-            points_per_game: row.get("points_per_game"),
-        }
-    }
-}
+use super::model::DbGroup;
 
 impl DbGroup {
     fn from_row(row: &Row) -> Self {
@@ -29,20 +19,6 @@ impl From<tokio_postgres::Error> for DbError {
     fn from(value: tokio_postgres::Error) -> Self {
         Self(value)
     }
-}
-
-pub async fn get_scores(client: &Client) -> Result<Vec<DbScore>, DbError> {
-    let rows: Vec<DbScore> = client
-        .query(
-            "SELECT name, win_percent, points_per_game FROM scores ORDER BY win_percent DESC",
-            &[],
-        )
-        .await?
-        .iter()
-        .map(DbScore::from_row)
-        .collect();
-
-    Ok(rows)
 }
 
 pub async fn get_user_groups(client: &Client, user_id: i32) -> Result<Vec<DbGroup>, DbError> {

@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use actix_web::{HttpResponse, Responder, get, post, web};
 use serde::Deserialize;
 
@@ -9,9 +7,10 @@ use crate::{
         group::{dto::Group, repository::get_user_groups},
         scoreboard::{
             self,
-            dto::{GroupScoreboards, Scoreboard},
+            dto::{GroupScoreboards, Score, Scoreboard, ScoreboardResponse},
             repository::{self, get_user_scoreboards},
         },
+        user,
     },
     middleware::auth::AuthedUser,
 };
@@ -80,6 +79,46 @@ async fn create_scoreboard(
     HttpResponse::Ok().json(Scoreboard::from(scoreboard))
 }
 
+#[get("/scoreboards/{id}")]
+async fn get_scores(
+    path: web::Path<i32>,
+    _: AuthedUser,
+    pool: web::Data<DbPool>,
+) -> impl Responder {
+    let client = pool
+        .get()
+        .await
+        .expect("Failed to retrieve database connection from pool");
+
+    let scores = repository::get_scores(&client, path.into_inner())
+        .await
+        .expect("Failed to read scores from database");
+
+    let users =
+        user::repository::bulk_find_by_id(&client, scores.iter().map(|s| s.user_id).collect())
+            .await
+            .expect("Failed to get users from database");
+
+    HttpResponse::Ok().json(ScoreboardResponse {
+        name: "Scoreboardddd".to_string(),
+        scores: scores
+            .into_iter()
+            .map(|s| Score {
+                name: users
+                    .iter()
+                    .find(|u| u.id == s.user_id)
+                    .unwrap()
+                    .name
+                    .clone(),
+                win_percent: s.win_percent,
+                points_per_game: s.points_per_game,
+            })
+            .collect(),
+    })
+}
+
 pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(get_scoreboards).service(create_scoreboard);
+    cfg.service(get_scoreboards)
+        .service(create_scoreboard)
+        .service(get_scores);
 }

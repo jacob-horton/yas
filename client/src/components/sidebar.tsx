@@ -104,7 +104,7 @@ export const Sidebar: Component = () => {
                       <p>{group.group.name}</p>
                     </button>
                     <A
-                      href={`/scoreboard/create?group=${group.group.id}`}
+                      href={`/scoreboards/create?group=${group.group.id}`}
                       class="rounded-sm transition hover:cursor-pointer hover:bg-gray-50"
                     >
                       <PlusIcon stroke-width={1.5} size={18} />
@@ -140,12 +140,19 @@ export const Sidebar: Component = () => {
             <p class="font-semibold">CONFIGURATION</p>
             <div class="flex-grow border-t" />
           </span>
-          <ul class="flex flex-col gap-2">
+          <ul class="flex flex-col gap-1">
             <li>
               <NavItem
                 href="/groups/create"
-                icon={HouseIcon}
-                name="Create Group"
+                icon={PlusIcon}
+                name="Create group"
+              />
+            </li>
+            <li>
+              <NavItem
+                href="/scoreboards/create"
+                icon={PlusIcon}
+                name="Create scoreboard"
               />
             </li>
           </ul>

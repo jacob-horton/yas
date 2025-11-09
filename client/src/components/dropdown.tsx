@@ -1,16 +1,25 @@
 import CircleAlertIcon from "lucide-solid/icons/circle-alert";
-import { type Component, For, Show } from "solid-js";
+import { type Component, createEffect, For } from "solid-js";
 
-// TODO: handle placeholder and fallback better
 export const Dropdown: Component<{
   label: string;
   value: string;
   fallback?: string;
-  placeholder?: string;
   options: { label: string; value: string }[];
   onChange: (value: string) => void;
   error?: string;
 }> = (props) => {
+  // If option doesn't exist, fallback to the first option
+  createEffect(() => {
+    if (props.options.length === 0) {
+      return;
+    }
+
+    if (!props.options.find((o) => o.value === props.value)) {
+      props.onChange(props.options[0].value);
+    }
+  });
+
   return (
     <div
       class="flex flex-col gap-1 transition"
@@ -38,11 +47,6 @@ export const Dropdown: Component<{
             onChange={(e) => props.onChange(e.target.value)}
             disabled={props.options.length === 0}
           >
-            <Show when={props.placeholder}>
-              <option value="" disabled selected>
-                {props.placeholder}
-              </option>
-            </Show>
             <For
               each={props.options}
               fallback={

@@ -51,10 +51,24 @@ pub async fn find_by_id(client: &Client, id: i32) -> Result<DbUser, DbError> {
     Ok(DbUser::from_row(row))
 }
 
+pub async fn bulk_find_by_id(client: &Client, ids: Vec<i32>) -> Result<Vec<DbUser>, DbError> {
+    let result = client
+        .query(
+            "SELECT id, name, email, session_version, password_hash, created_at FROM users WHERE id = ANY($1)",
+            &[&ids],
+        )
+        .await
+        .map_err(|_| DbError::QueryFailed)?;
+
+    let row = result.iter().map(DbUser::from_row).collect();
+
+    Ok(row)
+}
+
 pub async fn create(client: &Client, user: InsertDbUser) -> Result<DbUser, DbError> {
     let result = client
         .query(
-            "INSERT INTO users(name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, session_version, password_hash",
+            "INSERT INTO users(name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, session_version, password_hash, created_at",
             &[&user.name, &user.email, &user.password_hash],
         )
         .await

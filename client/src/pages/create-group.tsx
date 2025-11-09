@@ -12,8 +12,6 @@ export const CreateGroup = () => {
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
     const res = await api.post("/groups", { name: name() });
-    console.log(res);
-
     navigate(`/groups/${res.data.id}`);
   }
 

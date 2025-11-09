@@ -26,3 +26,16 @@ pub struct GroupScoreboards {
     pub group: Group,
     pub scoreboards: Vec<Scoreboard>,
 }
+
+#[derive(Debug, Clone, Serialize)]
+pub struct Score {
+    pub name: String,
+    pub win_percent: i32,
+    pub points_per_game: f64,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct ScoreboardResponse {
+    pub name: String,
+    pub scores: Vec<Score>,
+}

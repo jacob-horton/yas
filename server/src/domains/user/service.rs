@@ -11,7 +11,7 @@ use super::{
 #[derive(Debug, Clone)]
 pub enum CreateUserError {
     EmailAlreadyInUse,
-    DbError,
+    DbError(DbError),
 }
 
 pub async fn create_user(
@@ -36,6 +36,6 @@ pub async fn create_user(
     .await
     .map_err(|e| match e {
         DbError::DuplicateKey => CreateUserError::EmailAlreadyInUse,
-        _ => CreateUserError::DbError,
+        _ => CreateUserError::DbError(e),
     })
 }

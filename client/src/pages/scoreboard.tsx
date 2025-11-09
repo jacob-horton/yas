@@ -6,11 +6,10 @@ import { Page } from "../components/page";
 import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { Table } from "../components/table";
-import { useAuth } from "../auth/auth-provider";
 
 export const getGroupScores = query(async (id) => {
   // TODO: try/catch
-  const res = await api.get(`/group/${id}/scores`);
+  const res = await api.get(`/scoreboards/${id}`);
   return res.data.scores;
 }, "groupScores");
 
@@ -87,7 +86,7 @@ export const Scoreboard = () => {
                       </span>
                     </span>
                   </Table.Cell>
-                  <Table.Cell>{score.points_per_game}</Table.Cell>
+                  <Table.Cell>{score.points_per_game.toFixed(2)}</Table.Cell>
                 </Table.Row>
               )}
             </For>

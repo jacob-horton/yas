@@ -19,7 +19,7 @@ export const PodiumCard: Component<{
   pointsPerGame: number;
 }> = (props) => {
   return (
-    <div class="w-60 overflow-clip rounded-md border pb-8">
+    <div class="w-68 overflow-clip rounded-md border pb-8">
       <div
         class={`relative border-black border-b bg-gradient-to-br px-6 py-4 text-end font-semibold text-4xl text-white ${COLOUR_MAP[props.position]}`}
       >

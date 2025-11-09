@@ -35,7 +35,6 @@ export const CreateScoreboard = () => {
       group_id: Number.parseInt(query.group as string, 10),
       players_per_game: Number.parseInt(numPlayers(), 10),
     });
-    console.log(res);
     revalidate(SCOREBOARD_QUERY_KEY);
 
     navigate(`/scoreboards/${res.data.id}`);
@@ -63,7 +62,6 @@ export const CreateScoreboard = () => {
           value={(query.group as string | undefined) ?? ""}
           onChange={(value) => setQuery({ group: value })}
           fallback="No groups available"
-          placeholder="Please select a group"
           options={
             groups()?.map((g) => ({ label: g.name, value: g.id.toString() })) ??
             []
