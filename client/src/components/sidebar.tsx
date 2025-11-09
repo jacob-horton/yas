@@ -101,13 +101,20 @@ export const Sidebar: Component = () => {
                   </button>
                   <Show when={openGroups().has(group.group.id)}>
                     <ul class="my-2 ms-6 flex flex-col gap-1">
-                      <For each={group.scoreboards}>
+                      <For
+                        each={group.scoreboards}
+                        fallback={
+                          <span class="text-gray-300">No scoreboards yet</span>
+                        }
+                      >
                         {(scoreboard) => (
-                          <NavItem
-                            href={`/scoreboard/${scoreboard.id}`}
-                            icon={HouseIcon}
-                            name={scoreboard.name}
-                          />
+                          <li>
+                            <NavItem
+                              href={`/scoreboards/${scoreboard.id}`}
+                              icon={HouseIcon}
+                              name={scoreboard.name}
+                            />
+                          </li>
                         )}
                       </For>
                     </ul>
@@ -115,6 +122,21 @@ export const Sidebar: Component = () => {
                 </li>
               )}
             </For>
+          </ul>
+
+          <span class="flex items-center gap-3 text-gray-300 text-sm">
+            <SettingsIcon size={18} />
+            <p class="font-semibold">CONFIGURATION</p>
+            <div class="flex-grow border-t" />
+          </span>
+          <ul class="flex flex-col gap-2">
+            <li>
+              <NavItem
+                href="/groups/create"
+                icon={HouseIcon}
+                name="Create Group"
+              />
+            </li>
           </ul>
         </div>
 

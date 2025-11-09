@@ -30,21 +30,21 @@ async fn get_scoreboards(user: AuthedUser, pool: web::Data<DbPool>) -> impl Resp
         .await
         .expect("Failed to read scoreboards from database");
 
-    let mut scoreboards_by_group: HashMap<i32, Vec<Scoreboard>> = HashMap::new();
-
-    // Group scoreboards
-    for scoreboard in scoreboards {
-        scoreboards_by_group
-            .entry(scoreboard.group_id)
-            .or_insert(Vec::new())
-            .push(Scoreboard::from(scoreboard));
-    }
-
-    let grouped_scoreboards: Vec<GroupScoreboards> = scoreboards_by_group
+    // NOTE: this is not the most efficient - using array filtering for each group
+    let grouped_scoreboards: Vec<GroupScoreboards> = groups
         .iter()
-        .map(|(group_id, scoreboards)| GroupScoreboards {
-            group: Group::from(groups.iter().find(|g| g.id == *group_id).unwrap().clone()),
-            scoreboards: scoreboards.clone(),
+        .map(|g| GroupScoreboards {
+            group: Group::from(g.clone()),
+            scoreboards: scoreboards
+                .iter()
+                .filter_map(|s| {
+                    if s.group_id == g.id {
+                        Some(Scoreboard::from(s.clone()))
+                    } else {
+                        None
+                    }
+                })
+                .collect(),
         })
         .collect();
 
