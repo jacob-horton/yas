@@ -2,13 +2,16 @@ import { A, createAsync, query, useLocation } from "@solidjs/router";
 import { createSignal, For, Show, type Component } from "solid-js";
 
 import type { LucideProps } from "lucide-solid";
+import ChevronDownIcon from "lucide-solid/icons/chevron-down";
 import HouseIcon from "lucide-solid/icons/house";
+import PlusIcon from "lucide-solid/icons/plus";
 import SettingsIcon from "lucide-solid/icons/settings";
 import UsersIcon from "lucide-solid/icons/users";
-import ChevronDownIcon from "lucide-solid/icons/chevron-down";
 import type { JSX } from "solid-js/jsx-runtime";
 import { api } from "../api";
 import { useAuth } from "../auth/auth-provider";
+
+export const SCOREBOARD_QUERY_KEY = "myScoreboards";
 
 export const getGroups = query(async () => {
   // TODO: try/catch
@@ -17,7 +20,7 @@ export const getGroups = query(async () => {
     group: { id: number; name: string; created_at: string };
     scoreboards: { id: number; name: string; players_per_game: number }[];
   }[];
-}, "myScoreboards");
+}, SCOREBOARD_QUERY_KEY);
 
 type Route = {
   href: string;
@@ -85,20 +88,28 @@ export const Sidebar: Component = () => {
             <For each={groups()}>
               {(group) => (
                 <li>
-                  <button
-                    class="mb-1 flex w-full items-center gap-2 text-gray-300 hover:cursor-pointer"
-                    type="button"
-                    onclick={() => toggleGroup(group.group.id)}
-                  >
-                    <ChevronDownIcon
-                      stroke-width={1.5}
-                      classList={{
-                        "rotate-180": openGroups().has(group.group.id),
-                      }}
-                      class="rotate-0 transition"
-                    />
-                    <p>{group.group.name}</p>
-                  </button>
+                  <div class="flex items-center text-gray-300">
+                    <button
+                      class="flex w-full items-center gap-2 hover:cursor-pointer"
+                      type="button"
+                      onclick={() => toggleGroup(group.group.id)}
+                    >
+                      <ChevronDownIcon
+                        stroke-width={1.5}
+                        classList={{
+                          "rotate-180": openGroups().has(group.group.id),
+                        }}
+                        class="rotate-0 transition"
+                      />
+                      <p>{group.group.name}</p>
+                    </button>
+                    <A
+                      href={`/scoreboard/create?group=${group.group.id}`}
+                      class="rounded-sm transition hover:cursor-pointer hover:bg-gray-50"
+                    >
+                      <PlusIcon stroke-width={1.5} size={18} />
+                    </A>
+                  </div>
                   <Show when={openGroups().has(group.group.id)}>
                     <ul class="my-2 ms-6 flex flex-col gap-1">
                       <For

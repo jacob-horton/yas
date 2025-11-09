@@ -8,6 +8,7 @@ import { Login } from "./pages/login";
 import { Register } from "./pages/register";
 import { Scoreboard } from "./pages/scoreboard";
 import { Settings } from "./pages/settings";
+import { CreateScoreboard } from "./pages/create-scoreboard";
 
 const Layout: ParentComponent = (props) => {
   return (
@@ -27,9 +28,11 @@ export default function App() {
         <Route path="/" component={Layout}>
           {/* TODO: home/welcome page */}
           <Route path="/" component={Settings} />
+          <Route path="/scoreboards/:id" component={Scoreboard} />
+
+          <Route path="/scoreboard/create" component={CreateScoreboard} />
           <Route path="/groups/create" component={CreateGroup} />
           <Route path="/settings" component={Settings} />
-          <Route path="/scoreboard/:id" component={Scoreboard} />
         </Route>
 
         <Route path="/login" component={Login} />

@@ -44,3 +44,21 @@ pub async fn get_user_scoreboards(
 
     Ok(rows)
 }
+
+pub async fn create(
+    client: &Client,
+    name: &str,
+    players_per_game: i32,
+    group_id: i32,
+) -> Result<DbScoreboard, ()> {
+    let result = client
+        .query(
+            "INSERT INTO scoreboards(name, players_per_game, group_id) VALUES ($1, $2, $3) RETURNING id, name, players_per_game, group_id",
+            &[&name, &players_per_game, &group_id],
+        )
+        .await.unwrap();
+
+    let row = result.first().unwrap();
+
+    Ok(DbScoreboard::from_row(row))
+}
