@@ -17,7 +17,6 @@ pub const REFRESH_COOKIE_NAME: &str = "refresh_token";
 // TODO: set cookie expiry
 #[post("/auth/login")]
 async fn login(req: web::Json<LoginRequest>, pool: web::Data<DbPool>) -> impl Responder {
-    println!("here");
     let client = pool
         .get()
         .await

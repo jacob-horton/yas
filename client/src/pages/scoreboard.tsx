@@ -1,16 +1,16 @@
-import { createAsync, query } from "@solidjs/router";
+import { createAsync, query, useParams } from "@solidjs/router";
 import type { Component } from "solid-js";
 import { For, Suspense } from "solid-js";
 import { api } from "../api";
-import { useAuth } from "../auth/auth-provider";
 import { Page } from "../components/page";
 import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { Table } from "../components/table";
+import { useAuth } from "../auth/auth-provider";
 
-export const getGroupScores = query(async () => {
+export const getGroupScores = query(async (id) => {
   // TODO: try/catch
-  const res = await api.get("/group/scores");
+  const res = await api.get(`/group/${id}/scores`);
   return res.data.scores;
 }, "groupScores");
 
@@ -41,13 +41,12 @@ const LoadingRows: Component<{ numCols: number; numRows?: number }> = (
 };
 
 export const Scoreboard = () => {
-  const { user } = useAuth()!;
-  const scores = createAsync(() => getGroupScores());
+  const params = useParams();
+  const scores = createAsync(() => getGroupScores(params.id));
 
   return (
     <Page title="Scoreboard">
       <div class="flex flex-col gap-6">
-        User: {JSON.stringify(user())}
         <div class="flex gap-6">
           <Suspense
             fallback={

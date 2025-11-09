@@ -25,9 +25,11 @@ export default function App() {
     <AuthProvider>
       <Router>
         <Route path="/" component={Layout}>
-          <Route path="/" component={Scoreboard} />
+          {/* TODO: home/welcome page */}
+          <Route path="/" component={Settings} />
           <Route path="/groups/create" component={CreateGroup} />
           <Route path="/settings" component={Settings} />
+          <Route path="/scoreboard/:id" component={Scoreboard} />
         </Route>
 
         <Route path="/login" component={Login} />

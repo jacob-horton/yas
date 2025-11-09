@@ -1,4 +1,4 @@
 pub mod controller;
-pub mod dto;
-mod model;
+mod dto;
+pub mod model;
 pub mod repository;

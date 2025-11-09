@@ -1,5 +1,6 @@
 use crate::domains::group::dto::{CreateGroupRequest, Group, ScoresResponse};
 use crate::domains::group::repository::{self, MemberType, add_user_to_group, get_user_groups};
+use crate::domains::scoreboard::repository::get_user_scoreboards;
 use crate::middleware::auth::AuthedUser;
 use crate::{db::postgres::DbPool, domains::group::repository::get_scores};
 use actix_web::{HttpResponse, Responder, get, post, web};
@@ -11,6 +12,7 @@ async fn get_groups(user: AuthedUser, pool: web::Data<DbPool>) -> impl Responder
         .await
         .expect("Failed to retrieve database connection from pool");
 
+    get_user_scoreboards(&client, user.id).await.unwrap();
     let groups = get_user_groups(&client, user.id)
         .await
         .expect("Failed to read groups from database");
@@ -47,13 +49,14 @@ async fn create_group(
     HttpResponse::Ok().json(group)
 }
 
-#[get("/group/scores")]
+#[get("/group/{id}/scores")]
 async fn scores(_: AuthedUser, pool: web::Data<DbPool>) -> impl Responder {
     let client = pool
         .get()
         .await
         .expect("Failed to retrieve database connection from pool");
 
+    // TODO: get scores for specific group
     let scores = get_scores(&client)
         .await
         .expect("Failed to read scores from database");

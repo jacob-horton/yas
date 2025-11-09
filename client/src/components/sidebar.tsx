@@ -1,19 +1,23 @@
 import { A, createAsync, query, useLocation } from "@solidjs/router";
-import { For, type Component } from "solid-js";
+import { createSignal, For, Show, type Component } from "solid-js";
 
 import type { LucideProps } from "lucide-solid";
 import HouseIcon from "lucide-solid/icons/house";
 import SettingsIcon from "lucide-solid/icons/settings";
 import UsersIcon from "lucide-solid/icons/users";
+import ChevronDownIcon from "lucide-solid/icons/chevron-down";
 import type { JSX } from "solid-js/jsx-runtime";
 import { api } from "../api";
 import { useAuth } from "../auth/auth-provider";
 
 export const getGroups = query(async () => {
   // TODO: try/catch
-  const res = await api.get("/me/groups");
-  return res.data as { id: number; name: string; created_at: string }[];
-}, "myGroups");
+  const res = await api.get("/me/scoreboards");
+  return res.data as {
+    group: { id: number; name: string; created_at: string };
+    scoreboards: { id: number; name: string; players_per_game: number }[];
+  }[];
+}, "myScoreboards");
 
 type Route = {
   href: string;
@@ -26,7 +30,7 @@ const NavItem: Component<Route> = (props) => {
   return (
     <A
       href={props.href}
-      class="flex items-center gap-2 rounded-md px-2 py-1 transition hover:bg-gray-200"
+      class="flex items-center gap-2 rounded-md px-2 py-1 transition hover:bg-gray-100"
       classList={{
         "bg-violet-300 text-violet-800 hover:bg-violet-200":
           location.pathname === props.href,
@@ -41,6 +45,21 @@ const NavItem: Component<Route> = (props) => {
 export const Sidebar: Component = () => {
   const { user } = useAuth()!;
   const groups = createAsync(() => getGroups());
+
+  // Toggle states - if in set, it's open
+  const [openGroups, setOpenGroups] = createSignal<Set<number>>(new Set());
+
+  function toggleGroup(id: number) {
+    setOpenGroups((prev) => {
+      const newSet = new Set(prev); // copy to trigger reactivity
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  }
 
   return (
     <nav class="flex h-full w-80 min-w-80 flex-col gap-4 border-gray-200 border-r p-4 text-gray-800">
@@ -62,15 +81,37 @@ export const Sidebar: Component = () => {
             <p class="font-semibold">GROUPS</p>
             <div class="flex-grow border-t" />
           </span>
-          <ul class="flex flex-col gap-1">
+          <ul class="flex flex-col gap-2">
             <For each={groups()}>
               {(group) => (
                 <li>
-                  <NavItem
-                    href={`/groups/${group.id}`}
-                    icon={HouseIcon}
-                    name={group.name}
-                  />
+                  <button
+                    class="mb-1 flex w-full items-center gap-2 text-gray-300 hover:cursor-pointer"
+                    type="button"
+                    onclick={() => toggleGroup(group.group.id)}
+                  >
+                    <ChevronDownIcon
+                      stroke-width={1.5}
+                      classList={{
+                        "rotate-180": openGroups().has(group.group.id),
+                      }}
+                      class="rotate-0 transition"
+                    />
+                    <p>{group.group.name}</p>
+                  </button>
+                  <Show when={openGroups().has(group.group.id)}>
+                    <ul class="my-2 ms-6 flex flex-col gap-1">
+                      <For each={group.scoreboards}>
+                        {(scoreboard) => (
+                          <NavItem
+                            href={`/scoreboard/${scoreboard.id}`}
+                            icon={HouseIcon}
+                            name={scoreboard.name}
+                          />
+                        )}
+                      </For>
+                    </ul>
+                  </Show>
                 </li>
               )}
             </For>

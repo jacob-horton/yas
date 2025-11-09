@@ -2,10 +2,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crate::domains::{
     auth::model::{AccessClaims, RefreshClaims},
-    user::{
-        model::InsertDbUser,
-        repository::{DbError, create, find_by_email},
-    },
+    user::repository::{DbError, find_by_email},
 };
 use argon2::{Argon2, PasswordHash, PasswordVerifier};
 use jsonwebtoken::{DecodingKey, EncodingKey, Validation, decode, encode};

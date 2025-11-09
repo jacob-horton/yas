@@ -3,6 +3,8 @@ use actix_web::{App, HttpServer, http, web};
 use db::postgres::create_db_pool;
 use domains::{auth, group, user};
 
+use crate::domains::scoreboard;
+
 mod db;
 mod domains;
 mod middleware;
@@ -23,8 +25,9 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::scope("/api")
                     .configure(auth::controller::config)
-                    .configure(user::controller::config)
-                    .configure(group::controller::config),
+                    .configure(group::controller::config)
+                    .configure(scoreboard::controller::config)
+                    .configure(user::controller::config),
             )
     })
     .bind(("localhost", 8080))?
