@@ -19,7 +19,7 @@ export const Input: Component<{
         classList={{ "bg-red-100 focus-within:border-red-500": !!props.error }}
       >
         <div
-          class="w-2 bg-transparent transition group-focus-within:bg-orange-400"
+          class="w-2 rounded-l-sm bg-transparent transition group-focus-within:bg-orange-400"
           classList={{ "group-focus-within:bg-red-500": !!props.error }}
         />
         <div class="px-3 py-2">
