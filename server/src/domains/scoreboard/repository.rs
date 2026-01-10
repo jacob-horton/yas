@@ -104,3 +104,17 @@ pub async fn create(
 
     Ok(DbScoreboard::from_row(row))
 }
+
+pub async fn get(client: &Client, id: i32) -> Result<DbScoreboard, ()> {
+    let result = client
+        .query(
+            "SELECT id, name, players_per_game, group_id FROM scoreboards WHERE id = $1",
+            &[&id],
+        )
+        .await
+        .unwrap();
+
+    let row = result.first().unwrap();
+
+    Ok(DbScoreboard::from_row(row))
+}

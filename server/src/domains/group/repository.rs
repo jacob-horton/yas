@@ -1,5 +1,7 @@
 use tokio_postgres::{Client, Row};
 
+use crate::domains::user::model::DbUser;
+
 use super::model::DbGroup;
 
 impl DbGroup {
@@ -33,6 +35,23 @@ pub async fn get_user_groups(client: &Client, user_id: i32) -> Result<Vec<DbGrou
         .await?
         .iter()
         .map(DbGroup::from_row)
+        .collect();
+
+    Ok(rows)
+}
+
+pub async fn get_members(client: &Client, group_id: i32) -> Result<Vec<DbUser>, DbError> {
+    let rows: Vec<DbUser> = client
+        .query(
+            "SELECT users.id, users.name, users.email, users.session_version, users.password_hash, users.created_at
+            FROM group_members
+            JOIN users ON group_members.user_id = users.id
+            WHERE group_members.group_id = $1",
+            &[&group_id],
+        )
+        .await?
+        .iter()
+        .map(DbUser::from_row)
         .collect();
 
     Ok(rows)

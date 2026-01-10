@@ -7,7 +7,7 @@ use crate::{
         group::{dto::Group, repository::get_user_groups},
         scoreboard::{
             self,
-            dto::{GroupScoreboards, Score, Scoreboard, ScoreboardResponse},
+            dto::{GroupScoreboards, Score, Scoreboard, ScoreboardScoresResponse},
             repository::{self, get_user_scoreboards},
         },
         user,
@@ -30,10 +30,12 @@ async fn get_scoreboards(user: AuthedUser, pool: web::Data<DbPool>) -> impl Resp
         .await
         .expect("Failed to retrieve database connection from pool");
 
+    // Group info
     let groups = get_user_groups(&client, user.id)
         .await
         .expect("Failed to read groups from database");
 
+    // Scoreboard info (each scoreboard is linked to a group via ID)
     let scoreboards = get_user_scoreboards(&client, user.id)
         .await
         .expect("Failed to read scoreboards from database");
@@ -80,6 +82,24 @@ async fn create_scoreboard(
 }
 
 #[get("/scoreboards/{id}")]
+async fn get_scoreboard(
+    path: web::Path<i32>,
+    _: AuthedUser,
+    pool: web::Data<DbPool>,
+) -> impl Responder {
+    let client = pool
+        .get()
+        .await
+        .expect("Failed to retrieve database connection from pool");
+
+    let scoreboard = repository::get(&client, path.into_inner())
+        .await
+        .expect("Failed to read scoreboard from database");
+
+    HttpResponse::Ok().json(Scoreboard::from(scoreboard))
+}
+
+#[get("/scoreboards/{id}/scores")]
 async fn get_scores(
     path: web::Path<i32>,
     _: AuthedUser,
@@ -99,7 +119,8 @@ async fn get_scores(
             .await
             .expect("Failed to get users from database");
 
-    HttpResponse::Ok().json(ScoreboardResponse {
+    // TODO: load scoreboard name. Do we load the whole scoreboard?
+    HttpResponse::Ok().json(ScoreboardScoresResponse {
         name: "Scoreboardddd".to_string(),
         scores: scores
             .into_iter()
@@ -120,5 +141,6 @@ async fn get_scores(
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(get_scoreboards)
         .service(create_scoreboard)
-        .service(get_scores);
+        .service(get_scores)
+        .service(get_scoreboard);
 }

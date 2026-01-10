@@ -9,6 +9,7 @@ pub struct Scoreboard {
     pub id: i32,
     pub name: String,
     pub players_per_game: i32,
+    pub group_id: i32,
 }
 
 impl From<DbScoreboard> for Scoreboard {
@@ -17,6 +18,7 @@ impl From<DbScoreboard> for Scoreboard {
             id: value.id,
             name: value.name,
             players_per_game: value.players_per_game,
+            group_id: value.group_id,
         }
     }
 }
@@ -35,7 +37,7 @@ pub struct Score {
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct ScoreboardResponse {
+pub struct ScoreboardScoresResponse {
     pub name: String,
     pub scores: Vec<Score>,
 }

@@ -1,4 +1,4 @@
-import { createAsync, query, useParams } from "@solidjs/router";
+import { createAsync, query, useNavigate, useParams } from "@solidjs/router";
 import type { Component } from "solid-js";
 import { For, Suspense } from "solid-js";
 import { api } from "../api";
@@ -7,11 +7,11 @@ import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { Table } from "../components/table";
 
-export const getGroupScores = query(async (id) => {
+const getScoreboardData = query(async (id) => {
   // TODO: try/catch
-  const res = await api.get(`/scoreboards/${id}`);
-  return res.data.scores;
-}, "groupScores");
+  const res = await api.get(`/scoreboards/${id}/scores`);
+  return res.data;
+}, "scoreboardData");
 
 const LoadingText = () => {
   return (
@@ -41,10 +41,21 @@ const LoadingRows: Component<{ numCols: number; numRows?: number }> = (
 
 export const Scoreboard = () => {
   const params = useParams();
-  const scores = createAsync(() => getGroupScores(params.id));
+  const scoreboardData = createAsync(() => getScoreboardData(params.id));
+  const navigate = useNavigate();
 
+  // TODO: proper loading for scoreboard name
   return (
-    <Page title="Scoreboard">
+    <Page
+      title={scoreboardData()?.name ?? "Loading"}
+      actions={[
+        {
+          text: "Record Game",
+          variant: "primary",
+          onAction: () => navigate(`/scoreboards/${params.id}/record`),
+        },
+      ]}
+    >
       <div class="flex flex-col gap-6">
         <div class="flex gap-6">
           <Suspense
@@ -54,7 +65,7 @@ export const Scoreboard = () => {
               </For>
             }
           >
-            <For each={scores()?.slice(0, 3)}>
+            <For each={scoreboardData()?.scores?.slice(0, 3)}>
               {(score, index) => (
                 <PodiumCard
                   name={score.name}
@@ -71,7 +82,7 @@ export const Scoreboard = () => {
           caption="table"
         >
           <Suspense fallback={<LoadingRows numCols={4} />}>
-            <For each={scores()}>
+            <For each={scoreboardData()?.scores}>
               {(score, index) => (
                 <Table.Row>
                   <Table.Cell>

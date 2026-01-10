@@ -3,7 +3,7 @@ use tokio_postgres::{Client, Row};
 use super::model::{DbUser, InsertDbUser};
 
 impl DbUser {
-    fn from_row(row: &Row) -> Self {
+    pub fn from_row(row: &Row) -> Self {
         Self {
             id: row.get("id"),
             name: row.get("name"),

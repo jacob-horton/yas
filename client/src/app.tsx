@@ -9,6 +9,7 @@ import { Register } from "./pages/register";
 import { Scoreboard } from "./pages/scoreboard";
 import { Settings } from "./pages/settings";
 import { CreateScoreboard } from "./pages/create-scoreboard";
+import { RecordGame } from "./pages/record-game";
 
 const Layout: ParentComponent = (props) => {
   return (
@@ -29,6 +30,7 @@ export default function App() {
           {/* TODO: home/welcome page */}
           <Route path="/" component={Settings} />
           <Route path="/scoreboards/:id" component={Scoreboard} />
+          <Route path="/scoreboards/:id/record" component={RecordGame} />
 
           <Route path="/scoreboards/create" component={CreateScoreboard} />
           <Route path="/groups/create" component={CreateGroup} />

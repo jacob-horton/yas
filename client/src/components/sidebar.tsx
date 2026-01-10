@@ -2,7 +2,7 @@ import { A, createAsync, query, useLocation } from "@solidjs/router";
 import { createSignal, For, Show, type Component } from "solid-js";
 
 import type { LucideProps } from "lucide-solid";
-import ChevronDownIcon from "lucide-solid/icons/chevron-down";
+import ChevronRightIcon from "lucide-solid/icons/chevron-right";
 import HouseIcon from "lucide-solid/icons/house";
 import PlusIcon from "lucide-solid/icons/plus";
 import SettingsIcon from "lucide-solid/icons/settings";
@@ -94,10 +94,10 @@ export const Sidebar: Component = () => {
                       type="button"
                       onclick={() => toggleGroup(group.group.id)}
                     >
-                      <ChevronDownIcon
+                      <ChevronRightIcon
                         stroke-width={1.5}
                         classList={{
-                          "rotate-180": openGroups().has(group.group.id),
+                          "rotate-90": openGroups().has(group.group.id),
                         }}
                         class="rotate-0 transition"
                       />
