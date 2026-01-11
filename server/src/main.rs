@@ -5,10 +5,7 @@ mod models;
 mod repositories;
 mod services;
 
-use axum::{
-    Router,
-    routing::{delete, get, post},
-};
+use axum::Router;
 use sqlx::postgres::PgPoolOptions;
 use std::{env, net::SocketAddr, sync::Arc};
 use tower_sessions::{Expiry, SessionManagerLayer, cookie::time::Duration};
@@ -55,11 +52,8 @@ async fn main() {
     let app_state = AppState { user_repo };
 
     let app = Router::new()
-        .route("/user", post(handlers::auth::create_user))
-        .route("/session", post(handlers::auth::create_session))
-        .route("/session", delete(handlers::auth::delete_session))
-        .route("/session", get(handlers::auth::get_session))
-        .layer(session_layer)
+        .nest("/api", handlers::api_router())
+        .layer(session_layer) // Handles sessions/auth
         .with_state(app_state);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));

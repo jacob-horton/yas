@@ -2,32 +2,20 @@ use crate::{
     AppState,
     constants::SESSION_USER_KEY,
     extractors::AuthUser,
-    models::user::{CreateSessionReq, CreateUserReq, UserResponse},
+    models::user::{CreateSessionReq, UserResponse},
     services,
 };
-use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
+use axum::{
+    Json, Router,
+    extract::State,
+    http::StatusCode,
+    response::IntoResponse,
+    routing::{delete, get, post},
+};
 use tower_sessions::Session;
 
-// Sign up
-pub async fn create_user(
-    State(state): State<AppState>,
-    Json(payload): Json<CreateUserReq>,
-) -> Result<impl IntoResponse, (StatusCode, String)> {
-    let hash = services::auth::hash_password(&payload.password)
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e))?;
-
-    let user = state
-        .user_repo
-        .create(&payload.username, &hash)
-        .await
-        .map_err(|_| (StatusCode::CONFLICT, "Username taken".to_string()))?;
-
-    let response: UserResponse = user.into();
-    Ok((StatusCode::CREATED, Json(response)))
-}
-
 // Login
-pub async fn create_session(
+async fn create_session(
     State(state): State<AppState>,
     session: Session,
     Json(payload): Json<CreateSessionReq>,
@@ -54,12 +42,19 @@ pub async fn create_session(
 }
 
 // Logout
-pub async fn delete_session(session: Session) -> impl IntoResponse {
+async fn delete_session(session: Session) -> impl IntoResponse {
     session.delete().await.ok();
     (StatusCode::OK, "Logged out")
 }
 
 // Get current user
-pub async fn get_session(AuthUser(user): AuthUser) -> Result<impl IntoResponse, StatusCode> {
+async fn get_session(AuthUser(user): AuthUser) -> Result<impl IntoResponse, StatusCode> {
     Ok(Json(serde_json::json!({ "user_id": user.id })))
+}
+
+pub fn router() -> Router<AppState> {
+    Router::new()
+        .route("/session", post(create_session))
+        .route("/session", delete(delete_session))
+        .route("/session", get(get_session))
 }
