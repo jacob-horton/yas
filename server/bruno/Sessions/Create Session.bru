@@ -1,12 +1,12 @@
 meta {
-  name: Delete Session
+  name: Create Session
   type: http
-  seq: 5
+  seq: 2
 }
 
-delete {
+post {
   url: http://localhost:3000/api/session
-  body: none
+  body: json
   auth: inherit
 }
 

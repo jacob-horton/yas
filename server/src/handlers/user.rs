@@ -2,6 +2,7 @@ use axum::{Json, Router, extract::State, http::StatusCode, response::IntoRespons
 
 use crate::{
     AppState,
+    extractors::validated_json::ValidatedJson,
     models::user::{CreateUserReq, UserResponse},
     services,
 };
@@ -9,14 +10,14 @@ use crate::{
 // Sign up
 async fn create_user(
     State(state): State<AppState>,
-    Json(payload): Json<CreateUserReq>,
+    ValidatedJson(payload): ValidatedJson<CreateUserReq>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
     let hash = services::auth::hash_password(&payload.password)
         .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e))?;
 
     let user = state
         .user_repo
-        .create(&payload.username, &hash)
+        .create(&state.pool, &payload.username, &hash)
         .await
         .map_err(|_| (StatusCode::CONFLICT, "Username taken".to_string()))?;
 

@@ -6,16 +6,18 @@ mod repositories;
 mod services;
 
 use axum::Router;
-use sqlx::postgres::PgPoolOptions;
+use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::{env, net::SocketAddr, sync::Arc};
 use tower_sessions::{Expiry, SessionManagerLayer, cookie::time::Duration};
 use tower_sessions_sqlx_store::PostgresStore;
 
-use crate::repositories::user_repo::UserRepo;
+use crate::repositories::{group_repo::GroupRepo, user_repo::UserRepo};
 
 #[derive(Clone)]
 pub struct AppState {
+    pub pool: PgPool,
     pub user_repo: Arc<UserRepo>,
+    pub group_repo: Arc<GroupRepo>,
 }
 
 #[tokio::main]
@@ -48,8 +50,13 @@ async fn main() {
         .with_expiry(Expiry::OnInactivity(Duration::days(30)));
 
     // Setup repositories & state
-    let user_repo = Arc::new(UserRepo::new(pool.clone()));
-    let app_state = AppState { user_repo };
+    let user_repo = Arc::new(UserRepo {});
+    let group_repo = Arc::new(GroupRepo {});
+    let app_state = AppState {
+        pool: pool.clone(),
+        user_repo,
+        group_repo,
+    };
 
     let app = Router::new()
         .nest("/api", handlers::api_router())

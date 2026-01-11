@@ -1,8 +1,8 @@
 use crate::{
     AppState,
     constants::SESSION_USER_KEY,
-    extractors::AuthUser,
-    models::user::{CreateSessionReq, UserResponse},
+    extractors::{auth::AuthUser, validated_json::ValidatedJson},
+    models::{auth::CreateSessionReq, user::UserResponse},
     services,
 };
 use axum::{
@@ -18,11 +18,11 @@ use tower_sessions::Session;
 async fn create_session(
     State(state): State<AppState>,
     session: Session,
-    Json(payload): Json<CreateSessionReq>,
+    ValidatedJson(payload): ValidatedJson<CreateSessionReq>,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
     let user = state
         .user_repo
-        .find_by_username(&payload.username)
+        .find_by_username(&state.pool, &payload.username)
         .await
         .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?
         .ok_or((StatusCode::UNAUTHORIZED, "Invalid credentials".to_string()))?;

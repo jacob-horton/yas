@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
+use validator::Validate;
 
 #[derive(Debug, FromRow)]
 pub struct UserDb {
@@ -27,14 +28,14 @@ impl From<UserDb> for UserResponse {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Validate)]
 pub struct CreateUserReq {
+    #[validate(length(min = 3, max = 50, message = "Name must be between 3 and 50 chars"))]
     pub username: String,
-    pub password: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct CreateSessionReq {
-    pub username: String,
+    #[validate(length(
+        min = 8,
+        max = 1023,
+        message = "Password must be between 3 and 1023 chars"
+    ))]
     pub password: String,
 }
