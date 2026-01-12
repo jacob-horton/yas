@@ -1,7 +1,7 @@
 use crate::{
     AppState,
     constants::SESSION_USER_KEY,
-    error::AppError,
+    errors::{AppError, AuthError},
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     models::{auth::CreateSessionReq, user::UserResponse},
     services,
@@ -24,12 +24,11 @@ async fn create_session(
     let user = state
         .user_repo
         .find_by_username(&state.pool, &payload.username)
-        .await
-        .map_err(|e| AppError::InternalServerError(e.to_string()))?
-        .ok_or(AppError::Unauthorised("Invalid credentials".to_string()))?;
+        .await?
+        .ok_or(AuthError::InvalidCredentials)?;
 
     if !services::auth::verify_password(&user.password_hash, &payload.password) {
-        return Err(AppError::Unauthorised("Invalid credentials".to_string()));
+        return Err(AuthError::InvalidCredentials.into());
     }
 
     // Create session (sets the cookie automatically)

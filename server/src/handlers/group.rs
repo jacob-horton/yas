@@ -2,7 +2,7 @@ use axum::{Json, Router, extract::State, http::StatusCode, response::IntoRespons
 
 use crate::{
     AppState,
-    error::AppError,
+    errors::AppError,
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     handlers::invite::create_invite,
     models::group::{CreateGroupReq, GroupResponse},

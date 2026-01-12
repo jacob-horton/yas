@@ -2,7 +2,7 @@ use axum::{Json, Router, extract::State, http::StatusCode, response::IntoRespons
 
 use crate::{
     AppState,
-    error::AppError,
+    errors::{AppError, UserError},
     extractors::validated_json::ValidatedJson,
     models::user::{CreateUserReq, UserResponse},
     services,
@@ -19,7 +19,7 @@ async fn create_user(
         .user_repo
         .create(&state.pool, &payload.username, &hash)
         .await
-        .map_err(|_| AppError::Conflict("Username already taken".to_string()))?;
+        .map_err(|_| UserError::UserAlreadyExists)?;
 
     let response: UserResponse = user.into();
     Ok((StatusCode::CREATED, Json(response)))

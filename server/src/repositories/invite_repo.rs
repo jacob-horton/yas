@@ -25,6 +25,7 @@ impl InviteRepo {
         .await
     }
 
+    // Finds invite by code and locks until updated
     pub async fn find_by_code_for_update<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,

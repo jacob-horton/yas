@@ -1,6 +1,6 @@
 use crate::AppState;
 
-use crate::error::AppError;
+use crate::errors::{AppError, GroupError};
 use crate::models::group::{CreateGroupReq, GroupDb, GroupMemberRole};
 
 // TODO: should this be concerned with status codes?
@@ -21,7 +21,8 @@ pub async fn create_group(
     state
         .group_repo
         .add_member(&mut *tx, group.id, owner_id, GroupMemberRole::Owner)
-        .await?;
+        .await
+        .map_err(GroupError::Database)?;
 
     tx.commit().await?;
 

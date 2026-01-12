@@ -1,5 +1,5 @@
 mod constants;
-mod error;
+mod errors;
 mod extractors;
 mod handlers;
 mod models;

@@ -1,4 +1,9 @@
-use crate::{AppState, constants::SESSION_USER_KEY, error::AppError, models::user::UserDb};
+use crate::{
+    AppState,
+    constants::SESSION_USER_KEY,
+    errors::{AppError, AuthError},
+    models::user::UserDb,
+};
 use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
 use tower_sessions::Session;
 
@@ -22,15 +27,14 @@ impl FromRequestParts<AppState> for AuthUser {
             .get(SESSION_USER_KEY)
             .await
             .map_err(|e| AppError::InternalServerError(e.to_string()))?
-            .ok_or(AppError::Unauthorised("You must be logged in".to_string()))?;
+            .ok_or(AuthError::InvalidSession)?;
 
         // Verify user still exists in DB - prevents "zombie" sessions if user deleted but session still valid
         let user = state
             .user_repo
             .find_by_id(&state.pool, user_id)
-            .await
-            .map_err(|_| AppError::InternalServerError("Database error".to_string()))?
-            .ok_or(AppError::Unauthorised("User no longer exists".to_string()))?;
+            .await?
+            .ok_or(AuthError::InvalidSession)?;
 
         // 4. Return the user
         Ok(AuthUser(user))

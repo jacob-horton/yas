@@ -7,7 +7,8 @@ use axum::{
 };
 
 use crate::{
-    AppState, error::AppError, extractors::auth::AuthUser, models::invite::InviteResponse, services,
+    AppState, errors::AppError, extractors::auth::AuthUser, models::invite::InviteResponse,
+    services,
 };
 
 pub async fn create_invite(
