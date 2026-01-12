@@ -4,7 +4,6 @@ use crate::{
     AppState,
     errors::AppError,
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
-    handlers::invite::create_invite,
     models::group::{CreateGroupReq, GroupResponse},
     services,
 };
@@ -23,7 +22,5 @@ async fn create_group(
 }
 
 pub fn router() -> Router<AppState> {
-    Router::new()
-        .route("/groups", post(create_group))
-        .route("/groups/:id/invites", post(create_invite))
+    Router::new().route("/groups", post(create_group))
 }

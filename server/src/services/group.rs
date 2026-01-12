@@ -5,7 +5,6 @@ use crate::AppState;
 use crate::errors::{AppError, GroupError};
 use crate::models::group::{CreateGroupReq, GroupDb, GroupMemberRole};
 
-// TODO: should this be concerned with status codes?
 pub async fn create_group(
     state: &AppState,
     owner_id: Uuid,
@@ -17,7 +16,8 @@ pub async fn create_group(
     let group = state
         .group_repo
         .create(&mut *tx, &payload.name, owner_id)
-        .await?;
+        .await
+        .map_err(GroupError::Database)?;
 
     // Add user as owner of the group
     state

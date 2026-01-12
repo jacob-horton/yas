@@ -41,5 +41,7 @@ async fn accept_invite(
 }
 
 pub fn router() -> Router<AppState> {
-    Router::new().route("/invites/:code/accept", post(accept_invite))
+    Router::new()
+        .route("/groups/:id/invites", post(create_invite))
+        .route("/invites/:code/accept", post(accept_invite))
 }

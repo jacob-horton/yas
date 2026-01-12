@@ -3,6 +3,7 @@ use axum::Router;
 use crate::AppState;
 
 mod auth;
+mod game;
 mod group;
 mod invite;
 mod user;
@@ -14,4 +15,5 @@ pub fn api_router() -> Router<AppState> {
         .merge(user::router())
         .merge(group::router())
         .merge(invite::router())
+        .merge(game::router())
 }

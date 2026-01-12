@@ -5,6 +5,7 @@ use crate::{
     AppState,
     errors::{AppError, GroupError, InviteError},
     models::{group::GroupMemberRole, invite::InviteDb},
+    policies::GroupAction,
 };
 
 pub async fn create_link(
@@ -18,7 +19,7 @@ pub async fn create_link(
         .await?
         .ok_or(GroupError::MemberNotFound)?;
 
-    if !(member.role == GroupMemberRole::Admin || member.role == GroupMemberRole::Owner) {
+    if member.role.can_perform(GroupAction::CreateInvite) {
         return Err(GroupError::Forbidden.into());
     }
 

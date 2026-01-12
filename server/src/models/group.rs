@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, prelude::Type, types::Uuid};
 use validator::Validate;
 
+use crate::policies::GroupAction;
+
 #[derive(Debug, FromRow)]
 pub struct GroupDb {
     pub id: Uuid,
@@ -25,6 +27,22 @@ pub enum GroupMemberRole {
     Owner,
 }
 
+impl GroupMemberRole {
+    pub fn can_perform(&self, action: GroupAction) -> bool {
+        match (self, action) {
+            // Owners can do everything
+            (GroupMemberRole::Owner, _) => true,
+
+            // Admin only actions
+            (GroupMemberRole::Admin, GroupAction::CreateInvite) => true,
+            (GroupMemberRole::Admin, GroupAction::CreateGame) => true,
+
+            // Deny everything else
+            _ => false,
+        }
+    }
+}
+
 #[derive(Debug, Serialize)]
 pub struct GroupResponse {
     pub id: String,
@@ -33,11 +51,11 @@ pub struct GroupResponse {
 }
 
 impl From<GroupDb> for GroupResponse {
-    fn from(user: GroupDb) -> Self {
+    fn from(group: GroupDb) -> Self {
         Self {
-            id: user.id.to_string(),
-            name: user.name,
-            created_at: user.created_at.to_rfc3339(),
+            id: group.id.to_string(),
+            name: group.name,
+            created_at: group.created_at.to_rfc3339(),
         }
     }
 }

@@ -3,6 +3,7 @@ mod errors;
 mod extractors;
 mod handlers;
 mod models;
+mod policies;
 mod repositories;
 mod services;
 
@@ -12,14 +13,18 @@ use std::{env, net::SocketAddr, sync::Arc};
 use tower_sessions::{Expiry, SessionManagerLayer, cookie::time::Duration};
 use tower_sessions_sqlx_store::PostgresStore;
 
-use crate::repositories::{group_repo::GroupRepo, invite_repo::InviteRepo, user_repo::UserRepo};
+use crate::repositories::{
+    game_repo::GameRepo, group_repo::GroupRepo, invite_repo::InviteRepo, user_repo::UserRepo,
+};
 
 #[derive(Clone)]
 pub struct AppState {
     pub pool: PgPool,
+
     pub user_repo: Arc<UserRepo>,
     pub group_repo: Arc<GroupRepo>,
     pub invite_repo: Arc<InviteRepo>,
+    pub game_repo: Arc<GameRepo>,
 }
 
 #[tokio::main]
@@ -55,12 +60,14 @@ async fn main() {
     let user_repo = Arc::new(UserRepo {});
     let group_repo = Arc::new(GroupRepo {});
     let invite_repo = Arc::new(InviteRepo {});
+    let game_repo = Arc::new(GameRepo {});
 
     let app_state = AppState {
         pool: pool.clone(),
         user_repo,
         group_repo,
         invite_repo,
+        game_repo,
     };
 
     let app = Router::new()
