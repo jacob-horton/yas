@@ -1,6 +1,6 @@
 use sqlx::{PgExecutor, Postgres};
 
-use crate::models::group::GroupDb;
+use crate::models::group::{GroupDb, GroupMemberDb, GroupMemberRole};
 
 pub struct GroupRepo {}
 
@@ -36,13 +36,30 @@ impl GroupRepo {
         executor: impl PgExecutor<'e, Database = Postgres>,
         group_id: i32,
         user_id: i32,
+        role: GroupMemberRole,
     ) -> Result<(), sqlx::Error> {
-        sqlx::query("INSERT INTO group_members (user_id, group_id) VALUES ($1, $2)")
+        sqlx::query("INSERT INTO group_members (user_id, group_id, role) VALUES ($1, $2, $3)")
             .bind(user_id)
             .bind(group_id)
+            .bind(role)
             .execute(executor)
             .await?;
 
         Ok(())
+    }
+
+    pub async fn get_member<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        group_id: i32,
+        user_id: i32,
+    ) -> Result<Option<GroupMemberDb>, sqlx::Error> {
+        sqlx::query_as::<_, GroupMemberDb>(
+            "SELECT * FROM group_members WHERE user_id = $1 AND group_id = $2",
+        )
+        .bind(user_id)
+        .bind(group_id)
+        .fetch_optional(executor)
+        .await
     }
 }

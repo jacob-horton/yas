@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+use sqlx::{FromRow, prelude::Type};
 use validator::Validate;
 
 #[derive(Debug, FromRow)]
@@ -8,6 +8,21 @@ pub struct GroupDb {
     pub id: i32,
     pub name: String,
     pub created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, FromRow)]
+pub struct GroupMemberDb {
+    pub group_id: i32,
+    pub user_id: i32,
+    pub role: GroupMemberRole,
+}
+
+#[derive(Debug, Serialize, Deserialize, Type, PartialEq, Eq)]
+#[sqlx(type_name = "user_role", rename_all = "lowercase")]
+pub enum GroupMemberRole {
+    Member,
+    Admin,
+    Owner,
 }
 
 #[derive(Debug, Serialize)]

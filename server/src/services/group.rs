@@ -1,36 +1,29 @@
 use crate::AppState;
 
-use crate::models::group::{CreateGroupReq, GroupDb};
-use axum::http::StatusCode;
+use crate::error::AppError;
+use crate::models::group::{CreateGroupReq, GroupDb, GroupMemberRole};
 
+// TODO: should this be concerned with status codes?
 pub async fn create_group(
     state: &AppState,
     owner_id: i32,
     payload: CreateGroupReq,
-) -> Result<GroupDb, (StatusCode, String)> {
-    let mut tx = state
-        .pool
-        .begin()
-        .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+) -> Result<GroupDb, AppError> {
+    let mut tx = state.pool.begin().await?;
 
     // Create group
     let group = state
         .group_repo
         .create(&mut *tx, &payload.name, owner_id)
-        .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+        .await?;
 
-    // Add user as member
+    // Add user as owner of the group
     state
         .group_repo
-        .add_member(&mut *tx, group.id, owner_id)
-        .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+        .add_member(&mut *tx, group.id, owner_id, GroupMemberRole::Owner)
+        .await?;
 
-    tx.commit()
-        .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+    tx.commit().await?;
 
     Ok(group)
 }

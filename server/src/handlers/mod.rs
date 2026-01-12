@@ -4,6 +4,7 @@ use crate::AppState;
 
 mod auth;
 mod group;
+mod invite;
 mod user;
 
 // Combines all sub-modules into one router
@@ -12,4 +13,5 @@ pub fn api_router() -> Router<AppState> {
         .merge(auth::router())
         .merge(user::router())
         .merge(group::router())
+        .merge(invite::router())
 }
