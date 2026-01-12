@@ -3,7 +3,6 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use serde_json::json;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -142,7 +141,7 @@ impl IntoResponse for AppError {
             AppError::BadRequest(e) => (StatusCode::BAD_REQUEST, e),
         };
 
-        let body = Json(json!({
+        let body = Json(serde_json::json!({
             "error": message
         }));
 

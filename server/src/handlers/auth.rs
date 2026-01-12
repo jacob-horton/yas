@@ -33,7 +33,7 @@ async fn create_session(
 
     // Create session (sets the cookie automatically)
     session
-        .insert(SESSION_USER_KEY, user.id)
+        .insert(SESSION_USER_KEY, user.id.to_string())
         .await
         .map_err(|e| AppError::InternalServerError(e.to_string()))?;
 
@@ -49,7 +49,7 @@ async fn delete_session(session: Session) -> impl IntoResponse {
 
 // Get current user
 async fn get_session(AuthUser(user): AuthUser) -> Result<impl IntoResponse, AppError> {
-    Ok(Json(serde_json::json!({ "user_id": user.id })))
+    Ok(Json(serde_json::json!({ "user_id": user.id.to_string() })))
 }
 
 pub fn router() -> Router<AppState> {

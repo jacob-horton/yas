@@ -1,3 +1,5 @@
+use sqlx::types::Uuid;
+
 use crate::AppState;
 
 use crate::errors::{AppError, GroupError};
@@ -6,7 +8,7 @@ use crate::models::group::{CreateGroupReq, GroupDb, GroupMemberRole};
 // TODO: should this be concerned with status codes?
 pub async fn create_group(
     state: &AppState,
-    owner_id: i32,
+    owner_id: Uuid,
     payload: CreateGroupReq,
 ) -> Result<GroupDb, AppError> {
     let mut tx = state.pool.begin().await?;

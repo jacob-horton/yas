@@ -9,8 +9,8 @@ impl InviteRepo {
     pub async fn create<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,
-        group_id: i32,
-        created_by: i32,
+        group_id: Uuid,
+        created_by: Uuid,
         max_uses: Option<i32>,
         expires_at: Option<DateTime<Utc>>,
     ) -> Result<InviteDb, sqlx::Error> {

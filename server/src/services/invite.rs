@@ -9,8 +9,8 @@ use crate::{
 
 pub async fn create_link(
     state: &AppState,
-    group_id: i32,
-    creator_id: i32,
+    group_id: Uuid,
+    creator_id: Uuid,
 ) -> Result<InviteDb, AppError> {
     let member = state
         .group_repo
@@ -39,7 +39,7 @@ pub async fn create_link(
 
 pub async fn accept_invite(
     state: &AppState,
-    user_id: i32,
+    user_id: Uuid,
     invite_code: Uuid,
 ) -> Result<(), AppError> {
     let mut tx = state.pool.begin().await?;

@@ -1,4 +1,4 @@
-use sqlx::{PgExecutor, Postgres};
+use sqlx::{PgExecutor, Postgres, types::Uuid};
 
 use crate::models::user::UserDb;
 
@@ -34,7 +34,7 @@ impl UserRepo {
     pub async fn find_by_id<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,
-        id: i32,
+        id: Uuid,
     ) -> Result<Option<UserDb>, sqlx::Error> {
         sqlx::query_as::<_, UserDb>("SELECT * FROM users WHERE id = $1")
             .bind(id)

@@ -5,6 +5,7 @@ use crate::{
     models::user::UserDb,
 };
 use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
+use sqlx::types::Uuid;
 use tower_sessions::Session;
 
 pub struct AuthUser(pub UserDb);
@@ -23,11 +24,13 @@ impl FromRequestParts<AppState> for AuthUser {
             .map_err(|_| AppError::InternalServerError("Failed to load session".to_string()))?;
 
         // Check if "user_id" exists in the session
-        let user_id: i32 = session
-            .get(SESSION_USER_KEY)
+        let user_id: Uuid = session
+            .get::<String>(SESSION_USER_KEY)
             .await
             .map_err(|e| AppError::InternalServerError(e.to_string()))?
-            .ok_or(AuthError::InvalidSession)?;
+            .ok_or(AuthError::InvalidSession)?
+            .parse()
+            .map_err(|_| AuthError::InvalidSession)?;
 
         // Verify user still exists in DB - prevents "zombie" sessions if user deleted but session still valid
         let user = state

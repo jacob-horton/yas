@@ -1,19 +1,19 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, prelude::Type};
+use sqlx::{FromRow, prelude::Type, types::Uuid};
 use validator::Validate;
 
 #[derive(Debug, FromRow)]
 pub struct GroupDb {
-    pub id: i32,
+    pub id: Uuid,
     pub name: String,
     pub created_at: DateTime<Utc>,
 }
 
 #[derive(Debug, FromRow)]
 pub struct GroupMemberDb {
-    pub group_id: i32,
-    pub user_id: i32,
+    pub group_id: Uuid,
+    pub user_id: Uuid,
     pub role: GroupMemberRole,
 }
 
@@ -27,7 +27,7 @@ pub enum GroupMemberRole {
 
 #[derive(Debug, Serialize)]
 pub struct GroupResponse {
-    pub id: i32,
+    pub id: String,
     pub name: String,
     pub created_at: String,
 }
@@ -35,7 +35,7 @@ pub struct GroupResponse {
 impl From<GroupDb> for GroupResponse {
     fn from(user: GroupDb) -> Self {
         Self {
-            id: user.id,
+            id: user.id.to_string(),
             name: user.name,
             created_at: user.created_at.to_rfc3339(),
         }
