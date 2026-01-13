@@ -14,7 +14,8 @@ use tower_sessions::{Expiry, SessionManagerLayer, cookie::time::Duration};
 use tower_sessions_sqlx_store::PostgresStore;
 
 use crate::repositories::{
-    game_repo::GameRepo, group_repo::GroupRepo, invite_repo::InviteRepo, user_repo::UserRepo,
+    game_repo::GameRepo, group_repo::GroupRepo, invite_repo::InviteRepo, match_repo::MatchRepo,
+    user_repo::UserRepo,
 };
 
 #[derive(Clone)]
@@ -25,6 +26,7 @@ pub struct AppState {
     pub group_repo: Arc<GroupRepo>,
     pub invite_repo: Arc<InviteRepo>,
     pub game_repo: Arc<GameRepo>,
+    pub match_repo: Arc<MatchRepo>,
 }
 
 #[tokio::main]
@@ -61,13 +63,16 @@ async fn main() {
     let group_repo = Arc::new(GroupRepo {});
     let invite_repo = Arc::new(InviteRepo {});
     let game_repo = Arc::new(GameRepo {});
+    let match_repo = Arc::new(MatchRepo {});
 
     let app_state = AppState {
         pool: pool.clone(),
+
         user_repo,
         group_repo,
         invite_repo,
         game_repo,
+        match_repo,
     };
 
     let app = Router::new()

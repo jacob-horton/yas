@@ -62,4 +62,24 @@ impl GroupRepo {
         .fetch_optional(executor)
         .await
     }
+
+    /// Verifies if a list of users are all members of a specific group.
+    pub async fn are_members<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        group_id: Uuid,
+        user_ids: &[Uuid],
+    ) -> Result<bool, sqlx::Error> {
+        // Get number of users that are members of this group
+        let count: i64 = sqlx::query_scalar(
+            "SELECT count(*) FROM group_members WHERE group_id = $1 AND user_id = ANY($2)",
+        )
+        .bind(group_id)
+        .bind(user_ids)
+        .fetch_one(executor)
+        .await?;
+
+        // Check if all user_ids provided were within the group
+        Ok(count == user_ids.len() as i64)
+    }
 }

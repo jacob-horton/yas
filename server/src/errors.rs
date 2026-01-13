@@ -54,6 +54,32 @@ pub enum InviteError {
 }
 
 #[derive(Debug, Error)]
+pub enum GameError {
+    #[error(transparent)]
+    Database(#[from] sqlx::Error),
+}
+
+#[derive(Debug, Error)]
+pub enum MatchError {
+    #[error("Invalid user ID for score")]
+    InvalidUserID,
+
+    #[error(
+        "Number of scores provided does not match the number of players per match for this game"
+    )]
+    IncorrectNumberOfScores,
+
+    #[error("One or more players are not a member of this group")]
+    OneOrMorePlayersNotMember,
+
+    #[error("The same player was used in multiple scores")]
+    DuplicatePlayer,
+
+    #[error(transparent)]
+    Database(#[from] sqlx::Error),
+}
+
+#[derive(Debug, Error)]
 pub enum AppError {
     #[error(transparent)]
     Auth(#[from] AuthError),
@@ -66,6 +92,12 @@ pub enum AppError {
 
     #[error(transparent)]
     User(#[from] UserError),
+
+    #[error(transparent)]
+    Game(#[from] GameError),
+
+    #[error(transparent)]
+    Match(#[from] MatchError),
 
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -114,6 +146,30 @@ impl IntoResponse for AppError {
                 InviteError::Expired => (StatusCode::GONE, err.to_string()),
                 InviteError::LimitReached => (StatusCode::GONE, err.to_string()),
                 InviteError::Database(e) => {
+                    eprintln!("Invite DB error: {:?}", e);
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        "Internal server error".to_string(),
+                    )
+                }
+            },
+
+            AppError::Game(err) => match err {
+                GameError::Database(e) => {
+                    eprintln!("Invite DB error: {:?}", e);
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        "Internal server error".to_string(),
+                    )
+                }
+            },
+
+            AppError::Match(err) => match err {
+                MatchError::InvalidUserID => (StatusCode::BAD_REQUEST, err.to_string()),
+                MatchError::IncorrectNumberOfScores => (StatusCode::BAD_REQUEST, err.to_string()),
+                MatchError::OneOrMorePlayersNotMember => (StatusCode::BAD_REQUEST, err.to_string()),
+                MatchError::DuplicatePlayer => (StatusCode::BAD_REQUEST, err.to_string()),
+                MatchError::Database(e) => {
                     eprintln!("Invite DB error: {:?}", e);
                     (
                         StatusCode::INTERNAL_SERVER_ERROR,

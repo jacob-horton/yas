@@ -21,4 +21,15 @@ impl GameRepo {
         .fetch_one(executor)
         .await
     }
+
+    pub async fn get<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        game_id: Uuid,
+    ) -> Result<GameDb, sqlx::Error> {
+        sqlx::query_as::<_, GameDb>("SELECT * FROM games WHERE id = $1")
+            .bind(game_id)
+            .fetch_one(executor)
+            .await
+    }
 }

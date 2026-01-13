@@ -19,7 +19,7 @@ pub async fn create_link(
         .await?
         .ok_or(GroupError::MemberNotFound)?;
 
-    if member.role.can_perform(GroupAction::CreateInvite) {
+    if !member.role.can_perform(GroupAction::CreateInvite) {
         return Err(GroupError::Forbidden.into());
     }
 
