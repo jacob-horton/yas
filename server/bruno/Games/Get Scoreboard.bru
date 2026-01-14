@@ -1,0 +1,21 @@
+meta {
+  name: Get Scoreboard
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:3000/api/games/cd49d33e-6f62-4e18-95de-2833ba6fad80/scoreboard?order_by=average_score&num_matches=1
+  body: none
+  auth: inherit
+}
+
+params:query {
+  order_by: average_score
+  num_matches: 1
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

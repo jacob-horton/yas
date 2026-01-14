@@ -15,7 +15,7 @@ use tower_sessions_sqlx_store::PostgresStore;
 
 use crate::repositories::{
     game_repo::GameRepo, group_repo::GroupRepo, invite_repo::InviteRepo, match_repo::MatchRepo,
-    user_repo::UserRepo,
+    stats_repo::StatsRepo, user_repo::UserRepo,
 };
 
 #[derive(Clone)]
@@ -27,6 +27,7 @@ pub struct AppState {
     pub invite_repo: Arc<InviteRepo>,
     pub game_repo: Arc<GameRepo>,
     pub match_repo: Arc<MatchRepo>,
+    pub stats_repo: Arc<StatsRepo>,
 }
 
 #[tokio::main]
@@ -64,6 +65,7 @@ async fn main() {
     let invite_repo = Arc::new(InviteRepo {});
     let game_repo = Arc::new(GameRepo {});
     let match_repo = Arc::new(MatchRepo {});
+    let stats_repo = Arc::new(StatsRepo {});
 
     let app_state = AppState {
         pool: pool.clone(),
@@ -73,6 +75,7 @@ async fn main() {
         invite_repo,
         game_repo,
         match_repo,
+        stats_repo,
     };
 
     let app = Router::new()

@@ -2,7 +2,7 @@ use sqlx::types::Uuid;
 
 use crate::AppState;
 
-use crate::errors::{AppError, GroupError, MatchError};
+use crate::errors::{AppError, GameError, GroupError, MatchError};
 use crate::models::game_match::{CreateMatchReq, MatchDb, MatchScoreDb};
 use crate::policies::GroupAction;
 
@@ -15,7 +15,12 @@ pub async fn create_match(
     let mut tx = state.pool.begin().await?;
 
     // Check user has permissions ot create the match within the group
-    let game = state.game_repo.get(&mut *tx, game_id).await?;
+    let game = state
+        .game_repo
+        .get(&mut *tx, game_id)
+        .await?
+        .ok_or(GameError::NotFound)?;
+
     let member = state
         .group_repo
         .get_member(&mut *tx, game.group_id, user_id)

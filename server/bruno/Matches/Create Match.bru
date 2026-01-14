@@ -6,8 +6,23 @@ meta {
 
 post {
   url: http://localhost:3000/api/games/cd49d33e-6f62-4e18-95de-2833ba6fad80/matches
-  body: none
+  body: json
   auth: inherit
+}
+
+body:json {
+  {
+    "scores": [
+      {
+        "user_id": "4fff11e1-8a91-4452-a710-523168d5c9b9",
+        "score": 11
+      },
+      {
+        "user_id": "ab0a1a07-4e4a-4a33-987d-17d513d2826f",
+        "score": 25
+      }
+    ]
+  }
 }
 
 settings {

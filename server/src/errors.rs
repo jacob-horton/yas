@@ -55,6 +55,9 @@ pub enum InviteError {
 
 #[derive(Debug, Error)]
 pub enum GameError {
+    #[error("Game not found")]
+    NotFound,
+
     #[error(transparent)]
     Database(#[from] sqlx::Error),
 }
@@ -155,6 +158,7 @@ impl IntoResponse for AppError {
             },
 
             AppError::Game(err) => match err {
+                GameError::NotFound => (StatusCode::NOT_FOUND, err.to_string()),
                 GameError::Database(e) => {
                     eprintln!("Invite DB error: {:?}", e);
                     (

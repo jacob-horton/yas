@@ -26,10 +26,10 @@ impl GameRepo {
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,
         game_id: Uuid,
-    ) -> Result<GameDb, sqlx::Error> {
+    ) -> Result<Option<GameDb>, sqlx::Error> {
         sqlx::query_as::<_, GameDb>("SELECT * FROM games WHERE id = $1")
             .bind(game_id)
-            .fetch_one(executor)
+            .fetch_optional(executor)
             .await
     }
 }
