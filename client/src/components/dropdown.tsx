@@ -61,7 +61,7 @@ export const Dropdown: Component<{
           }}
         >
           <div
-            class="w-2 bg-transparent transition"
+            class="w-2 rounded-l-sm bg-transparent transition"
             classList={{
               "bg-orange-400": isOpen() && !props.error,
               "group-focus-within:bg-orange-400": !props.error,

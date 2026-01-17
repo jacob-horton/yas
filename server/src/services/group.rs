@@ -3,6 +3,7 @@ use sqlx::types::Uuid;
 use crate::AppState;
 
 use crate::errors::{AppError, GroupError};
+use crate::models::game::GameDb;
 use crate::models::group::{CreateGroupReq, GroupDb, GroupMemberRole};
 
 pub async fn create_group(
@@ -29,4 +30,25 @@ pub async fn create_group(
     tx.commit().await?;
 
     Ok(group)
+}
+
+pub async fn get_games_in_group(
+    state: &AppState,
+    user_id: Uuid,
+    group_id: Uuid,
+) -> Result<Vec<GameDb>, AppError> {
+    // Check user is a member
+    state
+        .group_repo
+        .get_member(&state.pool, group_id, user_id)
+        .await?
+        .ok_or(GroupError::MemberNotFound)?;
+
+    let games = state
+        .game_repo
+        .get_games_in_group(&state.pool, group_id)
+        .await
+        .map_err(GroupError::Database)?;
+
+    Ok(games)
 }

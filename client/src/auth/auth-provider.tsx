@@ -43,12 +43,11 @@ export const AuthProvider: ParentComponent = (props) => {
 
   async function login(email: string, password: string) {
     try {
-      await api.post("/auth/login", {
+      const res = await api.post("/sessions", {
         email,
         password,
       });
 
-      const res = await api.get("/me");
       setUser(res.data as User);
     } catch {
       // TODO: check axios error
@@ -56,7 +55,7 @@ export const AuthProvider: ParentComponent = (props) => {
   }
 
   async function logout() {
-    await api.post("/auth/logout");
+    await api.delete("/sessions");
     setUser(null);
   }
 
@@ -64,13 +63,12 @@ export const AuthProvider: ParentComponent = (props) => {
 
   async function register(name: string, email: string, password: string) {
     try {
-      await api.post("/auth/register", {
+      const res = await api.post("/users", {
         name,
         email,
         password,
       });
 
-      const res = await api.get("/me");
       setUser(res.data);
 
       return null;
@@ -87,7 +85,7 @@ export const AuthProvider: ParentComponent = (props) => {
 
   onMount(async () => {
     try {
-      const res = await api.get("/me");
+      const res = await api.get("/users/me");
       setUser(res.data);
     } catch {
       setUser(null);
@@ -103,4 +101,12 @@ export const AuthProvider: ParentComponent = (props) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const auth = useContext(AuthContext);
+
+  if (!auth) {
+    throw new Error("useAuth must be used within AuthContext");
+  }
+
+  return auth;
+};

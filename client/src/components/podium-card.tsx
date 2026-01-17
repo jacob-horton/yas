@@ -34,7 +34,7 @@ export const PodiumCard: Component<{
 
         <div class="flex">
           <div class="w-full font-semibold">
-            <p class="text-lg">{props.winRate}%</p>
+            <p class="text-lg">{(props.winRate * 100).toFixed(0)}%</p>
             <p class="font-normal text-gray-400 text-xs">WIN RATE</p>
           </div>
 
@@ -51,7 +51,7 @@ export const PodiumCard: Component<{
 // TODO: reduce duplication
 export const PodiumCardSkeleton: Component<{ position: number }> = (props) => {
   return (
-    <div class="w-60 overflow-clip rounded-md border pb-8">
+    <div class="w-68 overflow-clip rounded-md border pb-8">
       <div
         class={`relative border-black border-b bg-gradient-to-br px-6 py-4 text-end font-semibold text-4xl text-white ${COLOUR_MAP[props.position]}`}
       >

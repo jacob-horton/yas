@@ -1,17 +1,16 @@
 import { createAsync, query, useParams } from "@solidjs/router";
-import { Page } from "../components/page";
-import { api } from "../api";
 import { createSignal, For, Suspense } from "solid-js";
-import { Input } from "../components/input";
-import { Dropdown } from "../components/dropdown";
+import { api } from "../api";
 import type { User } from "../auth/auth-provider";
+import { Dropdown } from "../components/dropdown";
+import { Page } from "../components/page";
 
 const GET_SCOREBOARD_QUERY_KEY = "getScoreboard";
 const GET_MEMBERS_QUERY_KEY = "getMembers";
 
 const getScoreboard = query(async (id) => {
   // TODO: try/catch
-  const res = await api.get(`/scoreboards/${id}`);
+  const res = await api.get(`/games/${id}/scoreboard`);
   return res.data as {
     id: number;
     name: string;

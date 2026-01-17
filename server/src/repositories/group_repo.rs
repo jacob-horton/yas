@@ -82,4 +82,17 @@ impl GroupRepo {
         // Check if all user_ids provided were within the group
         Ok(count == user_ids.len() as i64)
     }
+
+    pub async fn get_user_groups<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        user_id: Uuid,
+    ) -> Result<Vec<GroupDb>, sqlx::Error> {
+        sqlx::query_as::<_, GroupDb>(
+            "SELECT groups.* FROM groups JOIN group_members ON groups.id = group_members.group_id WHERE group_members.user_id = $1",
+        )
+        .bind(user_id)
+        .fetch_all(executor)
+        .await
+    }
 }

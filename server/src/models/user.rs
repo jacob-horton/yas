@@ -6,7 +6,8 @@ use validator::Validate;
 #[derive(Debug, FromRow)]
 pub struct UserDb {
     pub id: Uuid,
-    pub username: String,
+    pub name: String,
+    pub email: String,
     pub password_hash: String,
     pub created_at: DateTime<Utc>,
 }
@@ -14,7 +15,8 @@ pub struct UserDb {
 #[derive(Debug, Serialize)]
 pub struct UserResponse {
     pub id: String,
-    pub username: String,
+    pub email: String,
+    pub name: String,
     pub joined_at: String,
 }
 
@@ -22,7 +24,8 @@ impl From<UserDb> for UserResponse {
     fn from(user: UserDb) -> Self {
         Self {
             id: user.id.to_string(),
-            username: user.username,
+            name: user.name,
+            email: user.email,
             joined_at: user.created_at.to_rfc3339(),
         }
     }
@@ -30,12 +33,14 @@ impl From<UserDb> for UserResponse {
 
 #[derive(Debug, Deserialize, Validate)]
 pub struct CreateUserReq {
-    #[validate(length(min = 3, max = 50, message = "Name must be between 3 and 50 chars"))]
-    pub username: String,
+    #[validate(email(message = "Email must be valid"))]
+    pub email: String,
+    #[validate(length(min = 2, max = 50, message = "Name must be between 2 and 512 chars"))]
+    pub name: String,
     #[validate(length(
         min = 8,
         max = 1023,
-        message = "Password must be between 3 and 1023 chars"
+        message = "Password must be between 8 and 1023 chars"
     ))]
     pub password: String,
 }

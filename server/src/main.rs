@@ -7,9 +7,16 @@ mod policies;
 mod repositories;
 mod services;
 
-use axum::Router;
+use axum::{
+    Router,
+    http::{
+        HeaderValue, Method,
+        header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
+    },
+};
 use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::{env, net::SocketAddr, sync::Arc};
+use tower_http::cors::CorsLayer;
 use tower_sessions::{Expiry, SessionManagerLayer, cookie::time::Duration};
 use tower_sessions_sqlx_store::PostgresStore;
 
@@ -59,6 +66,12 @@ async fn main() {
         .with_secure(use_secure_cookies == "true")
         .with_expiry(Expiry::OnInactivity(Duration::days(30)));
 
+    let cors_layer = CorsLayer::new()
+        .allow_origin("http://localhost:3000".parse::<HeaderValue>().unwrap())
+        .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
+        .allow_headers([CONTENT_TYPE, AUTHORIZATION, ACCEPT])
+        .allow_credentials(true);
+
     // Setup repositories & state
     let user_repo = Arc::new(UserRepo {});
     let group_repo = Arc::new(GroupRepo {});
@@ -81,9 +94,10 @@ async fn main() {
     let app = Router::new()
         .nest("/api", handlers::api_router())
         .layer(session_layer) // Handles sessions/auth
+        .layer(cors_layer)
         .with_state(app_state);
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
     println!("Listening on {}", addr);
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();

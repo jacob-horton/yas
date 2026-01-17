@@ -4,12 +4,12 @@ import { AuthProvider } from "./auth/auth-provider";
 import { ProtectedRoute } from "./auth/protected-route";
 import { Sidebar } from "./components/sidebar";
 import { CreateGroup } from "./pages/create-group";
+import { CreateGame } from "./pages/create-game";
 import { Login } from "./pages/login";
+import { RecordGame } from "./pages/record-game";
 import { Register } from "./pages/register";
 import { Scoreboard } from "./pages/scoreboard";
 import { Settings } from "./pages/settings";
-import { CreateScoreboard } from "./pages/create-scoreboard";
-import { RecordGame } from "./pages/record-game";
 
 const Layout: ParentComponent = (props) => {
   return (
@@ -26,13 +26,14 @@ export default function App() {
   return (
     <AuthProvider>
       <Router>
+        {/* Protected routes */}
         <Route path="/" component={Layout}>
           {/* TODO: home/welcome page */}
           <Route path="/" component={Settings} />
-          <Route path="/scoreboards/:id" component={Scoreboard} />
-          <Route path="/scoreboards/:id/record" component={RecordGame} />
+          <Route path="/games/:id/scoreboard" component={Scoreboard} />
+          <Route path="/games/:id/record" component={RecordGame} />
 
-          <Route path="/scoreboards/create" component={CreateScoreboard} />
+          <Route path="/games/create" component={CreateGame} />
           <Route path="/groups/create" component={CreateGroup} />
           <Route path="/settings" component={Settings} />
         </Route>

@@ -3,8 +3,12 @@ use validator::Validate;
 
 #[derive(Debug, Deserialize, Validate)]
 pub struct CreateSessionReq {
-    #[validate(length(min = 3, max = 50, message = "Username must be between 3 and 50 chars"))]
-    pub username: String,
-    #[validate(length(min = 3, max = 50, message = "Username must be between 3 and 50 chars"))]
+    #[validate(email(message = "Email must be valid"))]
+    pub email: String,
+    #[validate(length(
+        min = 8,
+        max = 1023,
+        message = "Password must be between 8 and 1023 chars"
+    ))]
     pub password: String,
 }

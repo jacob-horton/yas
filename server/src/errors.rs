@@ -7,7 +7,7 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum AuthError {
-    #[error("Incorrect username or password")]
+    #[error("Incorrect email or password")]
     InvalidCredentials,
 
     #[error("Invalid session")]
@@ -16,8 +16,11 @@ pub enum AuthError {
 
 #[derive(Debug, Error)]
 pub enum UserError {
-    #[error("User with this username already exists")]
+    #[error("User with this email already exists")]
     UserAlreadyExists,
+
+    #[error("User not found")]
+    NotFound,
 
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -122,6 +125,7 @@ impl IntoResponse for AppError {
 
             AppError::User(err) => match err {
                 UserError::UserAlreadyExists => (StatusCode::CONFLICT, err.to_string()),
+                UserError::NotFound => (StatusCode::NOT_FOUND, err.to_string()),
                 UserError::Database(e) => {
                     eprintln!("User DB error: {:?}", e);
                     (

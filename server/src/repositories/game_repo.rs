@@ -32,4 +32,15 @@ impl GameRepo {
             .fetch_optional(executor)
             .await
     }
+
+    pub async fn get_games_in_group<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        group_id: Uuid,
+    ) -> Result<Vec<GameDb>, sqlx::Error> {
+        sqlx::query_as::<_, GameDb>("SELECT * FROM games WHERE group_id = $1")
+            .bind(group_id)
+            .fetch_all(executor)
+            .await
+    }
 }

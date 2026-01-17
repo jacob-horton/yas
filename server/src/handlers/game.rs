@@ -33,6 +33,21 @@ pub async fn create_game(
     Ok((StatusCode::CREATED, Json(response)))
 }
 
+pub async fn get_games_in_group(
+    State(state): State<AppState>,
+    Path((group_id,)): Path<(String,)>,
+    AuthUser(user): AuthUser,
+) -> Result<impl IntoResponse, AppError> {
+    let group_id = group_id
+        .parse()
+        .map_err(|_| AppError::BadRequest("Invalid group ID".to_string()))?;
+
+    let games = services::group::get_games_in_group(&state, user.id, group_id).await?;
+
+    let response: Vec<GameResponse> = games.into_iter().map(|g| g.into()).collect();
+    Ok((StatusCode::CREATED, Json(response)))
+}
+
 pub async fn get_scoreboard(
     State(state): State<AppState>,
     Path((game_id,)): Path<(String,)>,
@@ -59,5 +74,6 @@ pub async fn get_scoreboard(
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/groups/:id/games", post(create_game))
+        .route("/groups/:id/games", get(get_games_in_group))
         .route("/games/:id/scoreboard", get(get_scoreboard))
 }

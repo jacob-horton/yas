@@ -23,7 +23,7 @@ async fn create_session(
 ) -> Result<impl IntoResponse, AppError> {
     let user = state
         .user_repo
-        .find_by_username(&state.pool, &payload.username)
+        .find_by_email(&state.pool, &payload.email)
         .await?
         .ok_or(AuthError::InvalidCredentials)?;
 

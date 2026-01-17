@@ -4,7 +4,7 @@ import { useAuth } from "./auth-provider";
 
 export const ProtectedRoute: ParentComponent = (props) => {
   const navigate = useNavigate();
-  const { loading, user } = useAuth()!;
+  const { loading, user } = useAuth();
 
   createEffect(() => {
     if (!loading() && !user()) {

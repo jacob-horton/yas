@@ -49,12 +49,15 @@ pub async fn get_stats(
         let matches_played = matches.len() as i64;
         let avg_score = matches.iter().map(|m| m.score).sum::<i32>() as f64 / matches_played as f64;
 
+        let user_name = matches[0].name.clone();
+
         let total_wins = matches.iter().filter(|m| m.rank_in_match == 1).count();
         let win_rate = total_wins as f64 / matches_played as f64;
 
         scoreboard.push(ScoreboardEntry {
             user_id,
             matches_played,
+            user_name,
             average_score: avg_score,
             wins: total_wins as i64,
             win_rate,

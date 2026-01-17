@@ -28,7 +28,7 @@ export const Register: Component = () => {
   }>({});
 
   const navigate = useNavigate();
-  const auth = useAuth()!;
+  const auth = useAuth();
 
   createEffect(() => {
     if (auth.user()) {
@@ -57,7 +57,10 @@ export const Register: Component = () => {
     );
     if (errorDetails) {
       for (const detail of errorDetails.details) {
-        setErrors(detail.property, ERROR_MESSAGES[detail.codes[0]]);
+        setErrors(
+          detail.property as "name" | "email" | "password" | "confirmPassword",
+          ERROR_MESSAGES[detail.codes[0] as keyof typeof ERROR_MESSAGES],
+        );
       }
     }
   };

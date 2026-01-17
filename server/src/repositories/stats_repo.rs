@@ -25,8 +25,9 @@ impl StatsRepo {
                 JOIN matches m ON m.id = ms.match_id
                 WHERE m.game_id = $1
             )
-            SELECT user_id, match_id, score, played_at, rank_in_match
-            FROM ranked_scores
+            SELECT u.name, rs.user_id, rs.match_id, rs.score, rs.played_at, rs.rank_in_match
+            FROM ranked_scores as rs
+            JOIN users u ON u.id = rs.user_id
             WHERE history_index <= $2
             ORDER BY user_id, played_at DESC
             "#,

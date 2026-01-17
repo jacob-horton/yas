@@ -9,7 +9,7 @@ import { Table } from "../components/table";
 
 const getScoreboardData = query(async (id) => {
   // TODO: try/catch
-  const res = await api.get(`/scoreboards/${id}/scores`);
+  const res = await api.get(`/games/${id}/scoreboard`);
   return res.data;
 }, "scoreboardData");
 
@@ -52,7 +52,7 @@ export const Scoreboard = () => {
         {
           text: "Record Game",
           variant: "primary",
-          onAction: () => navigate(`/scoreboards/${params.id}/record`),
+          onAction: () => navigate(`/games/${params.id}/record`),
         },
       ]}
     >
@@ -65,12 +65,12 @@ export const Scoreboard = () => {
               </For>
             }
           >
-            <For each={scoreboardData()?.scores?.slice(0, 3)}>
+            <For each={scoreboardData()?.slice(0, 3)}>
               {(score, index) => (
                 <PodiumCard
-                  name={score.name}
-                  winRate={score.win_percent}
-                  pointsPerGame={score.points_per_game}
+                  name={score.user_name}
+                  winRate={score.win_rate}
+                  pointsPerGame={score.average_score}
                   position={index() + 1}
                 />
               )}
@@ -82,22 +82,22 @@ export const Scoreboard = () => {
           caption="table"
         >
           <Suspense fallback={<LoadingRows numCols={4} />}>
-            <For each={scoreboardData()?.scores}>
+            <For each={scoreboardData()}>
               {(score, index) => (
                 <Table.Row>
                   <Table.Cell>
                     <span class="text-gray-400">{index() + 1}</span>
                   </Table.Cell>
-                  <Table.Cell>{score.name}</Table.Cell>
+                  <Table.Cell>{score.user_name}</Table.Cell>
                   <Table.Cell>
                     <span class="flex w-48 min-w-16 items-center">
-                      <ProgressBar percentage={score.win_percent} />
+                      <ProgressBar percentage={score.win_rate * 100} />
                       <span class="w-18 min-w-10 text-right">
-                        {score.win_percent}%
+                        {(score.win_rate * 100).toFixed(0)}%
                       </span>
                     </span>
                   </Table.Cell>
-                  <Table.Cell>{score.points_per_game.toFixed(2)}</Table.Cell>
+                  <Table.Cell>{score.average_score.toFixed(2)}</Table.Cell>
                 </Table.Row>
               )}
             </For>
