@@ -5,11 +5,12 @@ import SlidersHorizontalIcon from "lucide-solid/icons/sliders-horizontal";
 import NotebookTextIcon from "lucide-solid/icons/notebook-text";
 import UsersIcon from "lucide-solid/icons/users";
 import GamePadIcon from "lucide-solid/icons/gamepad-2";
-import { type Component, createSignal, For } from "solid-js";
+import { type Component, createSignal, For, Show } from "solid-js";
 import type { JSX } from "solid-js/jsx-runtime";
 import { api } from "../api";
 import { useAuth } from "../auth/auth-provider";
 import { Dropdown } from "./dropdown";
+import { useGroup } from "../group-provider";
 
 export const GROUPS_QUERY_KEY = "myGroups";
 export const GAMES_QUERY_KEY = "games";
@@ -41,7 +42,7 @@ export const getGames = query(async (id: string) => {
 type Route = {
   href: string;
   name: string;
-  icon: (props: LucideProps) => JSX.Element;
+  icon?: (props: LucideProps) => JSX.Element;
 };
 
 const NavItem: Component<Route> = (props) => {
@@ -55,7 +56,7 @@ const NavItem: Component<Route> = (props) => {
           location.pathname === props.href,
       }}
     >
-      <props.icon size={18} />
+      <Show when={props.icon}>{props.icon?.({ size: 18 })}</Show>
       {props.name}
     </A>
   );
@@ -65,7 +66,7 @@ export const Sidebar: Component = () => {
   const { user } = useAuth();
   const groups = createAsync(() => getGroups());
 
-  const [currentGroup, setCurrentGroup] = createSignal<string | null>(null);
+  const { group: currentGroup, setGroup: setCurrentGroup } = useGroup();
 
   // TODO: suspense properly
   const games = createAsync(async () => {
@@ -119,11 +120,7 @@ export const Sidebar: Component = () => {
 
           <For each={games()}>
             {(game) => (
-              <NavItem
-                href={`/games/${game.id}`}
-                icon={PlusIcon}
-                name={game.name}
-              />
+              <NavItem href={`/games/${game.id}/scoreboard`} name={game.name} />
             )}
           </For>
 

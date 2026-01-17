@@ -54,8 +54,8 @@ export const Dropdown: Component<{
         <div
           class="group flex w-full rounded-md border font-medium transition"
           classList={{
-            "border-orange-400": isOpen() && !props.error,
-            "focus-within:border-orange-400": !props.error,
+            "border-violet-500": isOpen() && !props.error,
+            "focus-within:border-violet-500": !props.error,
             "bg-red-100 border-red-500 focus-within:border-red-500":
               !!props.error,
           }}
@@ -63,8 +63,8 @@ export const Dropdown: Component<{
           <div
             class="w-2 rounded-l-sm bg-transparent transition"
             classList={{
-              "bg-orange-400": isOpen() && !props.error,
-              "group-focus-within:bg-orange-400": !props.error,
+              "bg-violet-500": isOpen() && !props.error,
+              "group-focus-within:bg-violet-500": !props.error,
               "bg-red-500": isOpen() && !!props.error,
               "group-focus-within:bg-red-500": !!props.error,
             }}

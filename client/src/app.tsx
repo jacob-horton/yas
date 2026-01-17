@@ -10,13 +10,16 @@ import { RecordGame } from "./pages/record-game";
 import { Register } from "./pages/register";
 import { Scoreboard } from "./pages/scoreboard";
 import { Settings } from "./pages/settings";
+import { GroupProvider } from "./group-provider";
 
 const Layout: ParentComponent = (props) => {
   return (
     <div class="flex h-screen max-h-screen min-h-screen">
       <ProtectedRoute>
-        <Sidebar />
-        <main class="h-full w-full">{props.children}</main>
+        <GroupProvider>
+          <Sidebar />
+          <main class="h-full w-full">{props.children}</main>
+        </GroupProvider>
       </ProtectedRoute>
     </div>
   );

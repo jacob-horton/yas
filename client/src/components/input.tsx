@@ -15,11 +15,11 @@ export const Input: Component<{
       classList={{ "text-red-500": !!props.error }}
     >
       <div
-        class="group flex max-w-96 rounded-md border font-medium transition focus-within:border-orange-400"
+        class="group flex max-w-96 rounded-md border font-medium transition focus-within:border-violet-500"
         classList={{ "bg-red-100 focus-within:border-red-500": !!props.error }}
       >
         <div
-          class="w-2 rounded-l-sm bg-transparent transition group-focus-within:bg-orange-400"
+          class="w-2 rounded-l-sm bg-transparent transition group-focus-within:bg-violet-500"
           classList={{ "group-focus-within:bg-red-500": !!props.error }}
         />
         <div class="px-3 py-2">

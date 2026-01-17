@@ -1,41 +1,26 @@
-import {
-  createAsync,
-  query,
-  revalidate,
-  useNavigate,
-  useSearchParams,
-} from "@solidjs/router";
+import { revalidate, useNavigate } from "@solidjs/router";
 import { createSignal } from "solid-js";
 import { api } from "../api";
 import { Button } from "../components/button";
 import { Input } from "../components/input";
 import { Page } from "../components/page";
-import { Dropdown } from "../components/dropdown";
-import { GROUPS_QUERY_KEY } from "../components/sidebar";
-
-export const getGroups = query(async () => {
-  // TODO: try/catch
-  const res = await api.get("/me/groups");
-  return res.data as { id: number; name: string; created_at: string }[];
-}, "myGroups");
+import { useGroup } from "../group-provider";
+import { GAMES_QUERY_KEY } from "../components/sidebar";
 
 export const CreateGame = () => {
   const navigate = useNavigate();
-  const groups = createAsync(() => getGroups());
-
-  const [query, setQuery] = useSearchParams();
 
   const [name, setName] = createSignal("");
   const [numPlayers, setNumPlayers] = createSignal("");
+  const { group } = useGroup();
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    const res = await api.post("/scoreboard", {
+    const res = await api.post(`/groups/${group()}/games`, {
       name: name(),
-      group_id: Number.parseInt(query.group as string, 10),
-      players_per_game: Number.parseInt(numPlayers(), 10),
+      players_per_match: Number.parseInt(numPlayers(), 10),
     });
-    revalidate(GROUPS_QUERY_KEY);
+    revalidate(GAMES_QUERY_KEY);
 
     navigate(`/games/${res.data.id}/scoreboard`);
   }
@@ -55,17 +40,6 @@ export const CreateGame = () => {
           value={numPlayers()}
           onChange={setNumPlayers}
           placeholder="e.g. 4"
-        />
-        <Dropdown
-          label="Group"
-          // TODO: handle when not string
-          value={(query.group as string | undefined) ?? ""}
-          onChange={(value) => setQuery({ group: value })}
-          fallback="No groups available"
-          options={
-            groups()?.map((g) => ({ label: g.name, value: g.id.toString() })) ??
-            []
-          }
         />
         <span class="flex gap-4">
           <Button type="submit">Create</Button>
