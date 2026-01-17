@@ -27,7 +27,7 @@ const getMembers = query(async (group_id) => {
 
 export const RecordGame = () => {
   const params = useParams();
-  const scoreboard = createAsync(() => getScoreboard(params.id));
+  const scoreboard = createAsync(() => getScoreboard(params.gameId));
   const members = createAsync(() => {
     const sb = scoreboard();
     return sb ? getMembers(sb.group_id) : Promise.resolve(undefined);

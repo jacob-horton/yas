@@ -6,6 +6,7 @@ import { Page } from "../components/page";
 import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { Table } from "../components/table";
+import { useGroup } from "../group-provider";
 
 const getScoreboardData = query(async (id) => {
   // TODO: try/catch
@@ -41,7 +42,8 @@ const LoadingRows: Component<{ numCols: number; numRows?: number }> = (
 
 export const Scoreboard = () => {
   const params = useParams();
-  const scoreboardData = createAsync(() => getScoreboardData(params.id));
+  const group = useGroup();
+  const scoreboardData = createAsync(() => getScoreboardData(params.gameId));
   const navigate = useNavigate();
 
   // TODO: proper loading for scoreboard name
@@ -52,7 +54,8 @@ export const Scoreboard = () => {
         {
           text: "Record Game",
           variant: "primary",
-          onAction: () => navigate(`/games/${params.id}/record`),
+          onAction: () =>
+            navigate(`/groups/${group}/games/${params.gameId}/record`),
         },
       ]}
     >

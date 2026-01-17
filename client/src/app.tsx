@@ -30,15 +30,18 @@ export default function App() {
     <AuthProvider>
       <Router>
         {/* Protected routes */}
-        <Route path="/" component={Layout}>
+        <Route path="/groups/:groupId" component={Layout}>
           {/* TODO: home/welcome page */}
           <Route path="/" component={Settings} />
-          <Route path="/games/:id/scoreboard" component={Scoreboard} />
-          <Route path="/games/:id/record" component={RecordGame} />
+          <Route path="/games/:gameId/scoreboard" component={Scoreboard} />
+          <Route path="/games/:gameId/record" component={RecordGame} />
 
           <Route path="/games/create" component={CreateGame} />
           <Route path="/groups/create" component={CreateGroup} />
           <Route path="/settings" component={Settings} />
+
+          <Route path="/details" component={CreateGame} />
+          <Route path="/members" component={CreateGroup} />
         </Route>
 
         <Route path="/login" component={Login} />

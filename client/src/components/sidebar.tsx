@@ -1,4 +1,10 @@
-import { A, createAsync, query, useLocation } from "@solidjs/router";
+import {
+  A,
+  createAsync,
+  query,
+  useLocation,
+  useNavigate,
+} from "@solidjs/router";
 import type { LucideProps } from "lucide-solid";
 import PlusIcon from "lucide-solid/icons/plus";
 import SlidersHorizontalIcon from "lucide-solid/icons/sliders-horizontal";
@@ -63,14 +69,14 @@ const NavItem: Component<Route> = (props) => {
 };
 
 export const Sidebar: Component = () => {
+  // TODO: what if no group - types say it's always defined
+  const group = useGroup();
   const { user } = useAuth();
   const groups = createAsync(() => getGroups());
-
-  const { group: currentGroup, setGroup: setCurrentGroup } = useGroup();
+  const navigate = useNavigate();
 
   // TODO: suspense properly
   const games = createAsync(async () => {
-    const group = currentGroup();
     if (!group) {
       return [];
     }
@@ -94,8 +100,8 @@ export const Sidebar: Component = () => {
       <Dropdown
         label="Group"
         // TODO: default value
-        value={currentGroup() ?? ""}
-        onChange={setCurrentGroup}
+        value={group ?? ""}
+        onChange={(group) => navigate(`/groups/${group}`)}
         options={groups()?.map((g) => ({ label: g.name, value: g.id })) ?? []}
       />
 
@@ -107,8 +113,16 @@ export const Sidebar: Component = () => {
             <div class="flex-grow border-t" />
           </span>
 
-          <NavItem name="Details" href="/details" icon={NotebookTextIcon} />
-          <NavItem name="Members" href="/members" icon={UsersIcon} />
+          <NavItem
+            name="Details"
+            href={`/groups/${group}/details`}
+            icon={NotebookTextIcon}
+          />
+          <NavItem
+            name="Members"
+            href={`/groups/${group}/members`}
+            icon={UsersIcon}
+          />
         </div>
 
         <div class="flex flex-col gap-1">
@@ -120,11 +134,18 @@ export const Sidebar: Component = () => {
 
           <For each={games()}>
             {(game) => (
-              <NavItem href={`/games/${game.id}/scoreboard`} name={game.name} />
+              <NavItem
+                href={`/groups/${group}/games/${game.id}/scoreboard`}
+                name={game.name}
+              />
             )}
           </For>
 
-          <NavItem href="/games/create" icon={PlusIcon} name="Create game" />
+          <NavItem
+            href={`/groups/${group}/games/create`}
+            icon={PlusIcon}
+            name="Create game"
+          />
         </div>
       </div>
     </nav>

@@ -4,28 +4,27 @@ import { api } from "../api";
 import { Button } from "../components/button";
 import { Input } from "../components/input";
 import { Page } from "../components/page";
-import { useGroup } from "../group-provider";
 import { GAMES_QUERY_KEY } from "../components/sidebar";
+import { useGroup } from "../group-provider";
 
 export const CreateGame = () => {
   const navigate = useNavigate();
+  const group = useGroup();
 
   const [name, setName] = createSignal("");
   const [numPlayers, setNumPlayers] = createSignal("");
-  const { group } = useGroup();
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    const res = await api.post(`/groups/${group()}/games`, {
+    const res = await api.post(`/groups/${group}/games`, {
       name: name(),
       players_per_match: Number.parseInt(numPlayers(), 10),
     });
     revalidate(GAMES_QUERY_KEY);
 
-    navigate(`/games/${res.data.id}/scoreboard`);
+    navigate(`/groups/${group}/games/${res.data.id}/scoreboard`);
   }
 
-  // TODO: handle no groups
   return (
     <Page title="Create Game">
       <form class="flex flex-col gap-6" onSubmit={handleSubmit}>

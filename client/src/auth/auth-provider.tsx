@@ -47,6 +47,7 @@ export const AuthProvider: ParentComponent = (props) => {
         email,
         password,
       });
+      console.log(res.data);
 
       setUser(res.data as User);
     } catch {
@@ -55,6 +56,7 @@ export const AuthProvider: ParentComponent = (props) => {
   }
 
   async function logout() {
+    console.log("loggin out");
     await api.delete("/sessions");
     setUser(null);
   }
@@ -86,8 +88,10 @@ export const AuthProvider: ParentComponent = (props) => {
   onMount(async () => {
     try {
       const res = await api.get("/users/me");
+      console.log(res.data);
       setUser(res.data);
-    } catch {
+    } catch (err) {
+      console.log("errrrrorrrrr", err);
       setUser(null);
     } finally {
       setLoading(false);
