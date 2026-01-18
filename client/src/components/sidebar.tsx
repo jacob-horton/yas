@@ -49,18 +49,16 @@ type Route = {
   href: string;
   name: string;
   icon?: (props: LucideProps) => JSX.Element;
+  end?: boolean; // Whether path has to be exact
 };
 
 const NavItem: Component<Route> = (props) => {
-  const location = useLocation();
   return (
     <A
       href={props.href}
+      end={props.end}
       class="flex items-center gap-2 rounded-md px-2 py-1 transition hover:bg-gray-50"
-      classList={{
-        "bg-violet-50 text-violet-800 hover:bg-violet-100":
-          location.pathname === props.href,
-      }}
+      activeClass="bg-violet-50 text-violet-800 hover:bg-violet-100"
     >
       <Show when={props.icon}>{props.icon?.({ size: 18 })}</Show>
       {props.name}
@@ -77,11 +75,12 @@ export const Sidebar: Component = () => {
 
   // TODO: suspense properly
   const games = createAsync(async () => {
-    if (!group) {
+    const g = group();
+    if (!g) {
       return [];
     }
 
-    return getGames(group);
+    return getGames(g);
   });
 
   return (
@@ -100,7 +99,7 @@ export const Sidebar: Component = () => {
       <Dropdown
         label="Group"
         // TODO: default value
-        value={group ?? ""}
+        value={group() ?? ""}
         onChange={(group) => navigate(`/groups/${group}`)}
         options={groups()?.map((g) => ({ label: g.name, value: g.id })) ?? []}
       />
@@ -113,16 +112,8 @@ export const Sidebar: Component = () => {
             <div class="flex-grow border-t" />
           </span>
 
-          <NavItem
-            name="Details"
-            href={`/groups/${group}/details`}
-            icon={NotebookTextIcon}
-          />
-          <NavItem
-            name="Members"
-            href={`/groups/${group}/members`}
-            icon={UsersIcon}
-          />
+          <NavItem name="Details" href="" icon={NotebookTextIcon} end />
+          <NavItem name="Members" href="members" icon={UsersIcon} />
         </div>
 
         <div class="flex flex-col gap-1">
@@ -133,19 +124,10 @@ export const Sidebar: Component = () => {
           </span>
 
           <For each={games()}>
-            {(game) => (
-              <NavItem
-                href={`/groups/${group}/games/${game.id}/scoreboard`}
-                name={game.name}
-              />
-            )}
+            {(game) => <NavItem href={`games/${game.id}`} name={game.name} />}
           </For>
 
-          <NavItem
-            href={`/groups/${group}/games/create`}
-            icon={PlusIcon}
-            name="Create game"
-          />
+          <NavItem href="games/create" icon={PlusIcon} name="Create game" />
         </div>
       </div>
     </nav>

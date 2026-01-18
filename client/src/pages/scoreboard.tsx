@@ -49,13 +49,13 @@ export const Scoreboard = () => {
   // TODO: proper loading for scoreboard name
   return (
     <Page
-      title={scoreboardData()?.game?.name ?? "Loading"}
+      title={scoreboardData()?.game.name ?? "Loading"}
       actions={[
         {
           text: "Record Game",
           variant: "primary",
           onAction: () =>
-            navigate(`/groups/${group}/games/${params.gameId}/record`),
+            navigate(`/groups/${group()}/games/${params.gameId}/record`),
         },
       ]}
     >
@@ -82,7 +82,7 @@ export const Scoreboard = () => {
         </div>
         <Table
           headings={["No.", "Name", "Win Rate", "Points/Game"]}
-          caption="table"
+          caption="Stats of all players playing this game"
         >
           <Suspense fallback={<LoadingRows numCols={4} />}>
             <For each={scoreboardData()?.entries}>

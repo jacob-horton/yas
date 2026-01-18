@@ -1,13 +1,19 @@
 import { useParams } from "@solidjs/router";
-import { createContext, type ParentComponent, useContext } from "solid-js";
+import {
+  createContext,
+  type ParentComponent,
+  useContext,
+  type Accessor,
+} from "solid-js";
 
-const GroupContext = createContext<string>();
+const GroupContext = createContext<Accessor<string>>();
 
 export const GroupProvider: ParentComponent = (props) => {
   const params = useParams();
+  const groupId = () => params.groupId;
 
   return (
-    <GroupContext.Provider value={params.groupId}>
+    <GroupContext.Provider value={groupId}>
       {props.children}
     </GroupContext.Provider>
   );

@@ -3,6 +3,7 @@ import { For, Suspense } from "solid-js";
 import { api } from "../api";
 import { Page } from "../components/page";
 import { useGroup } from "../group-provider";
+import { Table } from "../components/table";
 
 const getMembers = query(async (id) => {
   // TODO: try/catch
@@ -17,22 +18,27 @@ const getMembers = query(async (id) => {
 
 export const GroupMembers = () => {
   const group = useGroup();
-  const members = createAsync(async () => getMembers(group));
+  const members = createAsync(async () => getMembers(group()));
 
   return (
     <Page title="Group Members">
-      <Suspense>
-        <For each={members()}>
-          {(member) => (
-            <div class="flex gap-3">
-              <p>{member.id}</p>
-              <p>{member.name}</p>
-              <p>{member.created_at}</p>
-              <p>{member.email}</p>
-            </div>
-          )}
-        </For>
-      </Suspense>
+      <Table
+        headings={["ID", "Name", "Email", "Created At"]}
+        caption="All members of this group"
+      >
+        <Suspense>
+          <For each={members()}>
+            {(member) => (
+              <Table.Row>
+                <Table.Cell>{member.id}</Table.Cell>
+                <Table.Cell>{member.name}</Table.Cell>
+                <Table.Cell>{member.email}</Table.Cell>
+                <Table.Cell>{member.created_at}</Table.Cell>
+              </Table.Row>
+            )}
+          </For>
+        </Suspense>
+      </Table>
     </Page>
   );
 };

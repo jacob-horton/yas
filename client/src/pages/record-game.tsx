@@ -1,50 +1,65 @@
-import { createAsync, query, useParams } from "@solidjs/router";
+import { createAsync, query, useNavigate, useParams } from "@solidjs/router";
 import { createSignal, For, Suspense } from "solid-js";
 import { api } from "../api";
 import type { User } from "../auth/auth-provider";
 import { Dropdown } from "../components/dropdown";
 import { Page } from "../components/page";
+import { useGroup } from "../group-provider";
+import { Input } from "../components/input";
+import { Button } from "../components/button";
 
 const GET_SCOREBOARD_QUERY_KEY = "getScoreboard";
 const GET_MEMBERS_QUERY_KEY = "getMembers";
 
-const getScoreboard = query(async (id) => {
+const getGame = query(async (id) => {
   // TODO: try/catch
-  const res = await api.get(`/games/${id}/scoreboard`);
-  return res.data as {
-    id: number;
-    name: string;
-    players_per_game: number;
-    group_id: number;
-  };
+  const res = await api.get(`/games/${id}`);
+  return res.data;
 }, GET_SCOREBOARD_QUERY_KEY);
 
 const getMembers = query(async (group_id) => {
   // TODO: try/catch
-  const res = await api.get(`/group/${group_id}/members`);
+  const res = await api.get(`/groups/${group_id}/members`);
   return res.data as User[];
 }, GET_MEMBERS_QUERY_KEY);
 
 export const RecordGame = () => {
   const params = useParams();
-  const scoreboard = createAsync(() => getScoreboard(params.gameId));
-  const members = createAsync(() => {
-    const sb = scoreboard();
-    return sb ? getMembers(sb.group_id) : Promise.resolve(undefined);
-  });
+  const group = useGroup();
+  const game = createAsync(() => getGame(params.gameId));
+  const members = createAsync(() => getMembers(group()));
+  const navigate = useNavigate();
+
+  // TODO: defaults
   const [selected, setSelected] = createSignal<(string | undefined)[]>([]);
+  const [points, setPoints] = createSignal<(string | undefined)[]>([]);
+
+  const handleSubmit = async (e: Event) => {
+    e.preventDefault();
+
+    const p = points();
+    const scores = selected().map((x, i) => ({
+      user_id: x,
+      score: parseInt(p[i] ?? "0"),
+    }));
+
+    // TODO: handle error
+    await api.post(`/games/${game().id}/matches`, { scores });
+    navigate("..");
+  };
 
   return (
     <Page title="Record Game">
       <Suspense>
         <p>
-          Recording game for <b>{scoreboard()?.name}</b>
+          Recording game for <b>{game()?.name}</b>
         </p>
-        <div class="flex flex-col gap-4">
-          <For each={Array.from(Array(scoreboard()?.players_per_game).keys())}>
+        <form class="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <For each={Array.from(Array(game()?.players_per_match).keys())}>
             {(i) => (
-              <>
+              <div class="flex gap-4">
                 <Dropdown
+                  class="flex-1"
                   value={selected()[i] ?? ""}
                   onChange={(value) =>
                     setSelected((prev) => {
@@ -61,11 +76,24 @@ export const RecordGame = () => {
                   }
                   label={`Player ${i + 1}`}
                 />
-                <div></div>
-              </>
+                <Input
+                  class="w-32"
+                  type="number"
+                  value={points()[i] ?? ""}
+                  onChange={(value) => {
+                    setPoints((prev) => {
+                      const next = [...prev];
+                      next[i] = value;
+                      return next;
+                    });
+                  }}
+                  label="Points"
+                />
+              </div>
             )}
           </For>
-        </div>
+          <Button type="submit">Submit</Button>
+        </form>
       </Suspense>
     </Page>
   );

@@ -56,7 +56,7 @@ pub async fn get_scoreboard(
 ) -> Result<impl IntoResponse, AppError> {
     let game_id = game_id
         .parse()
-        .map_err(|_| AppError::BadRequest("Invalid group ID".to_string()))?;
+        .map_err(|_| AppError::BadRequest("Invalid game ID".to_string()))?;
 
     let scoreboard = services::stats::get_stats(
         &state,
@@ -69,7 +69,22 @@ pub async fn get_scoreboard(
 
     let response: ScoreboardResponse = scoreboard.into();
 
-    Ok((StatusCode::CREATED, Json(response)))
+    Ok((StatusCode::OK, Json(response)))
+}
+
+pub async fn get_game_details(
+    State(state): State<AppState>,
+    Path((game_id,)): Path<(String,)>,
+    AuthUser(user): AuthUser,
+) -> Result<impl IntoResponse, AppError> {
+    let game_id = game_id
+        .parse()
+        .map_err(|_| AppError::BadRequest("Invalid game ID".to_string()))?;
+
+    let game = services::game::get(&state, user.id, game_id).await?;
+    let response: GameResponse = game.into();
+
+    Ok((StatusCode::OK, Json(response)))
 }
 
 pub fn router() -> Router<AppState> {
@@ -77,4 +92,5 @@ pub fn router() -> Router<AppState> {
         .route("/groups/:id/games", post(create_game))
         .route("/groups/:id/games", get(get_games_in_group))
         .route("/games/:id/scoreboard", get(get_scoreboard))
+        .route("/games/:id", get(get_game_details))
 }

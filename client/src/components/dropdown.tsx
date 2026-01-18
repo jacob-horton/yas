@@ -8,8 +8,10 @@ import {
   onCleanup,
   Show,
 } from "solid-js";
+import { cn } from "../utils";
 
 export const Dropdown: Component<{
+  class?: string;
   label: string;
   value: string;
   fallback?: string;
@@ -47,10 +49,10 @@ export const Dropdown: Component<{
 
   return (
     <div
-      class="flex flex-col gap-1 transition"
+      class={cn("flex max-w-96 flex-col gap-1 transition", props.class)}
       classList={{ "text-red-500": !!props.error }}
     >
-      <div ref={dropdownWrapperRef} class="relative w-full max-w-96">
+      <div ref={dropdownWrapperRef} class="relative w-full">
         <div
           class="group flex w-full rounded-md border font-medium transition"
           classList={{

@@ -16,13 +16,13 @@ export const CreateGame = () => {
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    const res = await api.post(`/groups/${group}/games`, {
+    const res = await api.post(`/groups/${group()}/games`, {
       name: name(),
       players_per_match: Number.parseInt(numPlayers(), 10),
     });
     revalidate(GAMES_QUERY_KEY);
 
-    navigate(`/groups/${group}/games/${res.data.id}/scoreboard`);
+    navigate(`/groups/${group()}/games/${res.data.id}`);
   }
 
   return (

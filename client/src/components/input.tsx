@@ -1,7 +1,9 @@
 import CircleAlertIcon from "lucide-solid/icons/circle-alert";
 import type { Component } from "solid-js";
+import { cn } from "../utils";
 
 export const Input: Component<{
+  class?: string;
   label: string;
   placeholder?: string;
   type?: string;
@@ -11,7 +13,7 @@ export const Input: Component<{
 }> = (props) => {
   return (
     <div
-      class="flex flex-col gap-1 transition"
+      class={cn("flex flex-col gap-1 transition", props.class)}
       classList={{ "text-red-500": !!props.error }}
     >
       <div
@@ -22,7 +24,7 @@ export const Input: Component<{
           class="w-2 rounded-l-sm bg-transparent transition group-focus-within:bg-violet-500"
           classList={{ "group-focus-within:bg-red-500": !!props.error }}
         />
-        <div class="px-3 py-2">
+        <div class="w-full min-w-0 px-3 py-2">
           <p
             class="text-gray-400 text-xs transition"
             classList={{ "text-red-400": !!props.error }}
@@ -30,7 +32,7 @@ export const Input: Component<{
             {props.label}
           </p>
           <input
-            class="outline-none transition placeholder:text-gray-300"
+            class="w-full outline-none transition placeholder:text-gray-300"
             classList={{ "placeholder:text-red-300": !!props.error }}
             value={props.value}
             onChange={(e) => props.onChange(e.target.value)}

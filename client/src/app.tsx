@@ -1,4 +1,4 @@
-import { Route, Router } from "@solidjs/router";
+import { Navigate, Route, Router } from "@solidjs/router";
 import type { ParentComponent } from "solid-js";
 import { AuthProvider } from "./auth/auth-provider";
 import { ProtectedRoute } from "./auth/protected-route";
@@ -28,22 +28,22 @@ const Layout: ParentComponent = (props) => {
 };
 
 export default function App() {
+  // TODO: fix creating group and group provider wrapper
   return (
     <AuthProvider>
       <Router>
         {/* Protected routes */}
         <Route path="/groups/:groupId" component={Layout}>
           {/* TODO: home/welcome page */}
-          <Route path="/" component={Settings} />
-          <Route path="/games/:gameId/scoreboard" component={Scoreboard} />
+          <Route path="/" component={GroupDetails} />
+          <Route path="/members" component={GroupMembers} />
+
+          <Route path="/games/:gameId" component={Scoreboard} />
           <Route path="/games/:gameId/record" component={RecordGame} />
 
           <Route path="/games/create" component={CreateGame} />
           <Route path="/groups/create" component={CreateGroup} />
           <Route path="/settings" component={Settings} />
-
-          <Route path="/details" component={GroupDetails} />
-          <Route path="/members" component={GroupMembers} />
         </Route>
 
         <Route path="/login" component={Login} />

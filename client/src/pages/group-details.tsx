@@ -12,7 +12,7 @@ const getGroupDetails = query(async (id) => {
 
 export const GroupDetails = () => {
   const group = useGroup();
-  const groupDetails = createAsync(async () => getGroupDetails(group));
+  const groupDetails = createAsync(async () => getGroupDetails(group()));
 
   return (
     <Page title="Group Details">

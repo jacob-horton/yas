@@ -2,7 +2,7 @@ use sqlx::types::Uuid;
 
 use crate::AppState;
 
-use crate::errors::{AppError, GroupError};
+use crate::errors::{AppError, GameError, GroupError};
 use crate::models::game::{CreateGameReq, GameDb};
 use crate::policies::GroupAction;
 
@@ -31,7 +31,25 @@ pub async fn create_game(
             payload.players_per_match,
         )
         .await
-        .map_err(GroupError::Database)?;
+        .map_err(GameError::Database)?;
+
+    Ok(game)
+}
+
+pub async fn get(state: &AppState, user_id: Uuid, game_id: Uuid) -> Result<GameDb, AppError> {
+    let game = state
+        .game_repo
+        .get(&state.pool, game_id)
+        .await
+        .map_err(GameError::Database)?
+        .ok_or(GameError::NotFound)?;
+
+    // Check user is in group
+    state
+        .group_repo
+        .get_member(&state.pool, game.group_id, user_id)
+        .await?
+        .ok_or(GroupError::MemberNotFound)?;
 
     Ok(game)
 }
