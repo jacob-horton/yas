@@ -1,6 +1,6 @@
-import { useAuth } from "../auth/auth-provider";
-import { Button } from "../components/button";
-import { Page } from "../components/page";
+import { Page } from "@/components/layout/page";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/features/auth/context/auth-provider";
 
 export function Settings() {
   const auth = useAuth();

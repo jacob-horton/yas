@@ -1,8 +1,8 @@
 import { useNavigate } from "@solidjs/router";
 import { type Component, createEffect, createSignal } from "solid-js";
-import { useAuth } from "../auth/auth-provider";
-import { Button } from "../components/button";
-import { Input } from "../components/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "../context/auth-provider";
 
 export const Login: Component = () => {
   const [email, setEmail] = createSignal("jacob@email.com");

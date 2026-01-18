@@ -1,12 +1,12 @@
+import { Page } from "@/components/layout/page";
+import { Table } from "@/components/ui/table";
+import { useGroup } from "@/features/groups/context/group-provider";
+import { api } from "@/lib/api";
 import { createAsync, query, useNavigate, useParams } from "@solidjs/router";
 import type { Component } from "solid-js";
 import { For, Suspense } from "solid-js";
-import { api } from "../api";
-import { Page } from "../components/page";
 import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
-import { Table } from "../components/table";
-import { useGroup } from "../group-provider";
 
 const getScoreboardData = query(async (id) => {
   // TODO: try/catch

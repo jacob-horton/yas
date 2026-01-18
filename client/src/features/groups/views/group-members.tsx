@@ -1,9 +1,9 @@
+import { api } from "@/lib/api";
 import { createAsync, query } from "@solidjs/router";
 import { For, Suspense } from "solid-js";
-import { api } from "../api";
-import { Page } from "../components/page";
-import { useGroup } from "../group-provider";
-import { Table } from "../components/table";
+import { Page } from "@/components/layout/page";
+import { Table } from "@/components/ui/table";
+import { useGroup } from "../context/group-provider";
 
 const getMembers = query(async (id) => {
   // TODO: try/catch

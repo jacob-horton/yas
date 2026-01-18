@@ -1,6 +1,6 @@
 import { useNavigate } from "@solidjs/router";
-import { createEffect, Show, type ParentComponent } from "solid-js";
-import { useAuth } from "./auth-provider";
+import { createEffect, type ParentComponent, Show } from "solid-js";
+import { useAuth } from "../context/auth-provider";
 
 export const ProtectedRoute: ParentComponent = (props) => {
   const navigate = useNavigate();

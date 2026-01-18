@@ -1,19 +1,19 @@
-import { Navigate, Route, Router } from "@solidjs/router";
+import { Route, Router } from "@solidjs/router";
 import type { ParentComponent } from "solid-js";
-import { AuthProvider } from "./auth/auth-provider";
-import { ProtectedRoute } from "./auth/protected-route";
-import { Sidebar } from "./components/sidebar";
-import { CreateGroup } from "./pages/create-group";
-import { CreateGame } from "./pages/create-game";
-import { Login } from "./pages/login";
-import { RecordGame } from "./pages/record-game";
-import { Register } from "./pages/register";
-import { Scoreboard } from "./pages/scoreboard";
-import { Settings } from "./pages/settings";
-import { GroupProvider } from "./group-provider";
-import { GroupDetails } from "./pages/group-details";
-import { GroupMembers } from "./pages/group-members";
-import { HomePage } from "./pages/home-page";
+import { Sidebar } from "@/components/layout/sidebar";
+import { ProtectedRoute } from "@/features/auth/components/protected-route";
+import { AuthProvider } from "@/features/auth/context/auth-provider";
+import { Login } from "@/features/auth/views/login";
+import { Register } from "@/features/auth/views/register";
+import { CreateGame } from "@/features/games/views/create-game";
+import { RecordGame } from "@/features/games/views/record-match";
+import { Scoreboard } from "@/features/games/views/scoreboard";
+import { GroupProvider } from "@/features/groups/context/group-provider";
+import { CreateGroup } from "@/features/groups/views/create-group";
+import { GroupDetails } from "@/features/groups/views/group-details";
+import { GroupMembers } from "@/features/groups/views/group-members";
+import { Settings } from "@/features/user/views/settings";
+import { HomePage } from "@/pages/home-page";
 
 const WithSidebar: ParentComponent = (props) => {
   return (

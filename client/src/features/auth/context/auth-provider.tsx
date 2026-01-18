@@ -7,7 +7,7 @@ import {
   type ParentComponent,
   useContext,
 } from "solid-js";
-import { api, setupAxiosInterceptors } from "../api";
+import { api, setupAxiosInterceptors } from "@/lib/api";
 
 type DetailedStatusError = {
   message: string;
@@ -86,7 +86,7 @@ export const AuthProvider: ParentComponent = (props) => {
     try {
       const res = await api.get("/users/me");
       setUser(res.data);
-    } catch (err) {
+    } catch (_err) {
       setUser(null);
     } finally {
       setLoading(false);

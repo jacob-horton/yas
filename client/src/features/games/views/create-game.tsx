@@ -1,11 +1,11 @@
+import { Page } from "@/components/layout/page";
+import { GAMES_QUERY_KEY } from "@/components/layout/sidebar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useGroup } from "@/features/groups/context/group-provider";
+import { api } from "@/lib/api";
 import { revalidate, useNavigate } from "@solidjs/router";
 import { createSignal } from "solid-js";
-import { api } from "../api";
-import { Button } from "../components/button";
-import { Input } from "../components/input";
-import { Page } from "../components/page";
-import { GAMES_QUERY_KEY } from "../components/sidebar";
-import { useGroup } from "../group-provider";
 
 export const CreateGame = () => {
   const navigate = useNavigate();

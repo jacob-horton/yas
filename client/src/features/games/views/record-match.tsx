@@ -1,12 +1,12 @@
+import { Page } from "@/components/layout/page";
+import { Button } from "@/components/ui/button";
+import { Dropdown } from "@/components/ui/dropdown";
+import { Input } from "@/components/ui/input";
+import type { User } from "@/features/auth/context/auth-provider";
+import { useGroup } from "@/features/groups/context/group-provider";
+import { api } from "@/lib/api";
 import { createAsync, query, useNavigate, useParams } from "@solidjs/router";
 import { createSignal, For, Suspense } from "solid-js";
-import { api } from "../api";
-import type { User } from "../auth/auth-provider";
-import { Dropdown } from "../components/dropdown";
-import { Page } from "../components/page";
-import { useGroup } from "../group-provider";
-import { Input } from "../components/input";
-import { Button } from "../components/button";
 
 const GET_SCOREBOARD_QUERY_KEY = "getScoreboard";
 const GET_MEMBERS_QUERY_KEY = "getMembers";
@@ -40,7 +40,7 @@ export const RecordGame = () => {
     const p = points();
     const scores = selected().map((x, i) => ({
       user_id: x,
-      score: parseInt(p[i] ?? "0"),
+      score: parseInt(p[i] ?? "0", 10),
     }));
 
     // TODO: handle error

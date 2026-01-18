@@ -1,6 +1,6 @@
 import CircleAlertIcon from "lucide-solid/icons/circle-alert";
 import type { Component } from "solid-js";
-import { cn } from "../utils";
+import { cn } from "@/lib/classname";
 
 export const Input: Component<{
   class?: string;

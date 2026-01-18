@@ -1,7 +1,7 @@
 import { useNavigate } from "@solidjs/router";
 import { createEffect, createResource, Show } from "solid-js";
-import { api } from "../api";
-import { Button } from "../components/button";
+import { api } from "../lib/api";
+import { Button } from "@/components/ui/button";
 
 export const getGroups = async () => {
   // TODO: try/catch

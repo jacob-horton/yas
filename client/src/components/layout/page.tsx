@@ -1,5 +1,5 @@
 import { For, type ParentComponent } from "solid-js";
-import { Button, type Variant } from "./button";
+import { Button, type Variant } from "../ui/button";
 
 type Props = {
   title: string;

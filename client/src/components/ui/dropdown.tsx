@@ -8,7 +8,7 @@ import {
   onCleanup,
   Show,
 } from "solid-js";
-import { cn } from "../utils";
+import { cn } from "@/lib/classname";
 
 export const Dropdown: Component<{
   class?: string;

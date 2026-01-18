@@ -1,22 +1,16 @@
-import {
-  A,
-  createAsync,
-  query,
-  useLocation,
-  useNavigate,
-} from "@solidjs/router";
+import { A, createAsync, query, useNavigate } from "@solidjs/router";
 import type { LucideProps } from "lucide-solid";
+import GamePadIcon from "lucide-solid/icons/gamepad-2";
+import NotebookTextIcon from "lucide-solid/icons/notebook-text";
 import PlusIcon from "lucide-solid/icons/plus";
 import SlidersHorizontalIcon from "lucide-solid/icons/sliders-horizontal";
-import NotebookTextIcon from "lucide-solid/icons/notebook-text";
 import UsersIcon from "lucide-solid/icons/users";
-import GamePadIcon from "lucide-solid/icons/gamepad-2";
-import { type Component, createSignal, For, Show } from "solid-js";
+import { type Component, For, Show } from "solid-js";
 import type { JSX } from "solid-js/jsx-runtime";
-import { api } from "../api";
-import { useAuth } from "../auth/auth-provider";
-import { Dropdown } from "./dropdown";
-import { useGroup } from "../group-provider";
+import { useAuth } from "@/features/auth/context/auth-provider";
+import { useGroup } from "@/features/groups/context/group-provider";
+import { api } from "../../lib/api";
+import { Dropdown } from "../ui/dropdown";
 
 export const GROUPS_QUERY_KEY = "myGroups";
 export const GAMES_QUERY_KEY = "games";

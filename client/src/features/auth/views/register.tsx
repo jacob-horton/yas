@@ -1,9 +1,9 @@
 import { useNavigate } from "@solidjs/router";
 import { createEffect, type Component } from "solid-js";
 import { createStore } from "solid-js/store";
-import { useAuth } from "../auth/auth-provider";
-import { Button } from "../components/button";
-import { Input } from "../components/input";
+import { useAuth } from "../context/auth-provider";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const ERROR_MESSAGES = {
   length: "Invalid length",
