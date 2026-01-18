@@ -5,9 +5,11 @@ use axum::{
     response::IntoResponse,
     routing::{get, post},
 };
+use tower_sessions::Session;
 
 use crate::{
     AppState,
+    constants::SESSION_USER_KEY,
     errors::{AppError, GroupError, UserError},
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     models::{
@@ -19,6 +21,7 @@ use crate::{
 
 // Sign up
 async fn create_user(
+    session: Session,
     State(state): State<AppState>,
     ValidatedJson(payload): ValidatedJson<CreateUserReq>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -29,6 +32,12 @@ async fn create_user(
         .create(&state.pool, &payload.name, &payload.email, &hash)
         .await
         .map_err(|_| UserError::UserAlreadyExists)?;
+
+    // Create session (sets the cookie automatically)
+    session
+        .insert(SESSION_USER_KEY, user.id.to_string())
+        .await
+        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
 
     let response: UserResponse = user.into();
     Ok((StatusCode::CREATED, Json(response)))

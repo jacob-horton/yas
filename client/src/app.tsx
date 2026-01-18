@@ -13,16 +13,15 @@ import { Settings } from "./pages/settings";
 import { GroupProvider } from "./group-provider";
 import { GroupDetails } from "./pages/group-details";
 import { GroupMembers } from "./pages/group-members";
+import { HomePage } from "./pages/home-page";
 
-const Layout: ParentComponent = (props) => {
+const WithSidebar: ParentComponent = (props) => {
   return (
     <div class="flex h-screen max-h-screen min-h-screen">
-      <ProtectedRoute>
-        <GroupProvider>
-          <Sidebar />
-          <main class="h-full w-full">{props.children}</main>
-        </GroupProvider>
-      </ProtectedRoute>
+      <GroupProvider>
+        <Sidebar />
+        <main class="h-full w-full">{props.children}</main>
+      </GroupProvider>
     </div>
   );
 };
@@ -33,17 +32,20 @@ export default function App() {
     <AuthProvider>
       <Router>
         {/* Protected routes */}
-        <Route path="/groups/:groupId" component={Layout}>
+        <Route path="/" component={ProtectedRoute}>
+          <Route path="/groups/:groupId" component={WithSidebar}>
+            <Route path="/" component={GroupDetails} />
+            <Route path="/members" component={GroupMembers} />
+
+            <Route path="/games/:gameId" component={Scoreboard} />
+            <Route path="/games/:gameId/record" component={RecordGame} />
+            <Route path="/games/create" component={CreateGame} />
+            <Route path="/settings" component={Settings} />
+          </Route>
+
           {/* TODO: home/welcome page */}
-          <Route path="/" component={GroupDetails} />
-          <Route path="/members" component={GroupMembers} />
-
-          <Route path="/games/:gameId" component={Scoreboard} />
-          <Route path="/games/:gameId/record" component={RecordGame} />
-
-          <Route path="/games/create" component={CreateGame} />
+          <Route path="/" component={HomePage} />
           <Route path="/groups/create" component={CreateGroup} />
-          <Route path="/settings" component={Settings} />
         </Route>
 
         <Route path="/login" component={Login} />

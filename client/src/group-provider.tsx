@@ -4,6 +4,7 @@ import {
   type ParentComponent,
   useContext,
   type Accessor,
+  createEffect,
 } from "solid-js";
 
 const GroupContext = createContext<Accessor<string>>();
@@ -11,6 +12,10 @@ const GroupContext = createContext<Accessor<string>>();
 export const GroupProvider: ParentComponent = (props) => {
   const params = useParams();
   const groupId = () => params.groupId;
+
+  createEffect(() => {
+    localStorage.setItem("lastGroupId", groupId());
+  });
 
   return (
     <GroupContext.Provider value={groupId}>
