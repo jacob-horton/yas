@@ -5,6 +5,7 @@ use crate::AppState;
 use crate::errors::{AppError, GroupError};
 use crate::models::game::GameDb;
 use crate::models::group::{CreateGroupReq, GroupDb, GroupMemberRole};
+use crate::models::user::UserDb;
 
 pub async fn create_group(
     state: &AppState,
@@ -51,4 +52,47 @@ pub async fn get_games_in_group(
         .map_err(GroupError::Database)?;
 
     Ok(games)
+}
+
+pub async fn get_group(
+    state: &AppState,
+    user_id: Uuid,
+    group_id: Uuid,
+) -> Result<GroupDb, AppError> {
+    // Check user is a member
+    state
+        .group_repo
+        .get_member(&state.pool, group_id, user_id)
+        .await?
+        .ok_or(GroupError::MemberNotFound)?;
+
+    let group = state
+        .group_repo
+        .find_by_id(&state.pool, group_id)
+        .await
+        .map_err(GroupError::Database)?
+        .ok_or(GroupError::NotFound)?;
+
+    Ok(group)
+}
+
+pub async fn get_group_members(
+    state: &AppState,
+    user_id: Uuid,
+    group_id: Uuid,
+) -> Result<Vec<UserDb>, AppError> {
+    // Check user is a member
+    state
+        .group_repo
+        .get_member(&state.pool, group_id, user_id)
+        .await?
+        .ok_or(GroupError::MemberNotFound)?;
+
+    let group = state
+        .group_repo
+        .get_members(&state.pool, group_id)
+        .await
+        .map_err(GroupError::Database)?;
+
+    Ok(group)
 }

@@ -1,6 +1,9 @@
 use sqlx::{PgExecutor, Postgres, types::Uuid};
 
-use crate::models::group::{GroupDb, GroupMemberDb, GroupMemberRole};
+use crate::models::{
+    group::{GroupDb, GroupMemberDb, GroupMemberRole},
+    user::UserDb,
+};
 
 pub struct GroupRepo {}
 
@@ -23,7 +26,7 @@ impl GroupRepo {
     pub async fn find_by_id<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,
-        id: i32,
+        id: Uuid,
     ) -> Result<Option<GroupDb>, sqlx::Error> {
         sqlx::query_as::<_, GroupDb>("SELECT * FROM groups WHERE id = $1")
             .bind(id)
@@ -92,6 +95,19 @@ impl GroupRepo {
             "SELECT groups.* FROM groups JOIN group_members ON groups.id = group_members.group_id WHERE group_members.user_id = $1",
         )
         .bind(user_id)
+        .fetch_all(executor)
+        .await
+    }
+
+    pub async fn get_members<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        group_id: Uuid,
+    ) -> Result<Vec<UserDb>, sqlx::Error> {
+        sqlx::query_as::<_, UserDb>(
+            "SELECT users.* FROM group_members JOIN users ON users.id = group_members.user_id WHERE group_members.group_id = $1",
+        )
+        .bind(group_id)
         .fetch_all(executor)
         .await
     }

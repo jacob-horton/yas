@@ -17,7 +17,7 @@ pub struct UserResponse {
     pub id: String,
     pub email: String,
     pub name: String,
-    pub joined_at: String,
+    pub created_at: String,
 }
 
 impl From<UserDb> for UserResponse {
@@ -26,7 +26,7 @@ impl From<UserDb> for UserResponse {
             id: user.id.to_string(),
             name: user.name,
             email: user.email,
-            joined_at: user.created_at.to_rfc3339(),
+            created_at: user.created_at.to_rfc3339(),
         }
     }
 }

@@ -37,6 +37,9 @@ pub enum GroupError {
     #[error("Group member not found")]
     MemberNotFound,
 
+    #[error("Group not found")]
+    NotFound,
+
     #[error(transparent)]
     Database(#[from] sqlx::Error),
 }
@@ -139,6 +142,7 @@ impl IntoResponse for AppError {
                 GroupError::Forbidden => (StatusCode::FORBIDDEN, err.to_string()),
                 GroupError::UserAlreadyMember => (StatusCode::CONFLICT, err.to_string()),
                 GroupError::MemberNotFound => (StatusCode::NOT_FOUND, err.to_string()),
+                GroupError::NotFound => (StatusCode::NOT_FOUND, err.to_string()),
                 GroupError::Database(e) => {
                     eprintln!("Group DB error: {:?}", e);
                     (

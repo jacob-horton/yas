@@ -11,6 +11,8 @@ import { Register } from "./pages/register";
 import { Scoreboard } from "./pages/scoreboard";
 import { Settings } from "./pages/settings";
 import { GroupProvider } from "./group-provider";
+import { GroupDetails } from "./pages/group-details";
+import { GroupMembers } from "./pages/group-members";
 
 const Layout: ParentComponent = (props) => {
   return (
@@ -40,8 +42,8 @@ export default function App() {
           <Route path="/groups/create" component={CreateGroup} />
           <Route path="/settings" component={Settings} />
 
-          <Route path="/details" component={CreateGame} />
-          <Route path="/members" component={CreateGroup} />
+          <Route path="/details" component={GroupDetails} />
+          <Route path="/members" component={GroupMembers} />
         </Route>
 
         <Route path="/login" component={Login} />
