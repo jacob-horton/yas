@@ -3,7 +3,7 @@ use sqlx::types::Uuid;
 use crate::{
     AppState,
     errors::{AppError, GameError, GroupError},
-    models::stats::{OrderBy, RawMatchStats, ScoreboardEntry},
+    models::stats::{OrderBy, RawMatchStats, Scoreboard, ScoreboardEntry},
 };
 use std::{cmp::Ordering, collections::HashMap};
 
@@ -13,7 +13,7 @@ pub async fn get_stats(
     game_id: Uuid,
     num_matches: i32,
     order_by: OrderBy,
-) -> Result<Vec<ScoreboardEntry>, AppError> {
+) -> Result<Scoreboard, AppError> {
     let game = state
         .game_repo
         .get(&state.pool, game_id)
@@ -42,7 +42,7 @@ pub async fn get_stats(
         user_groups.entry(row.user_id).or_default().push(row);
     }
 
-    let mut scoreboard = Vec::new();
+    let mut entries = Vec::new();
 
     // Calculate stats
     for (user_id, matches) in user_groups {
@@ -54,7 +54,7 @@ pub async fn get_stats(
         let total_wins = matches.iter().filter(|m| m.rank_in_match == 1).count();
         let win_rate = total_wins as f64 / matches_played as f64;
 
-        scoreboard.push(ScoreboardEntry {
+        entries.push(ScoreboardEntry {
             user_id,
             matches_played,
             user_name,
@@ -65,7 +65,7 @@ pub async fn get_stats(
     }
 
     // Sort
-    scoreboard.sort_by(|a, b| {
+    entries.sort_by(|a, b| {
         let key = |s: &ScoreboardEntry| match order_by {
             OrderBy::WinRate => (s.win_rate, s.matches_played, s.average_score),
             OrderBy::AverageScore => (s.average_score, s.matches_played, s.win_rate),
@@ -88,6 +88,8 @@ pub async fn get_stats(
                     .unwrap_or(Ordering::Equal)
             })
     });
+
+    let scoreboard = Scoreboard { entries, game };
 
     Ok(scoreboard)
 }

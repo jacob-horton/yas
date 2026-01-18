@@ -49,7 +49,7 @@ export const Scoreboard = () => {
   // TODO: proper loading for scoreboard name
   return (
     <Page
-      title={scoreboardData()?.name ?? "Loading"}
+      title={scoreboardData()?.game?.name ?? "Loading"}
       actions={[
         {
           text: "Record Game",
@@ -68,7 +68,7 @@ export const Scoreboard = () => {
               </For>
             }
           >
-            <For each={scoreboardData()?.slice(0, 3)}>
+            <For each={scoreboardData()?.entries?.slice(0, 3)}>
               {(score, index) => (
                 <PodiumCard
                   name={score.user_name}
@@ -85,7 +85,7 @@ export const Scoreboard = () => {
           caption="table"
         >
           <Suspense fallback={<LoadingRows numCols={4} />}>
-            <For each={scoreboardData()}>
+            <For each={scoreboardData()?.entries}>
               {(score, index) => (
                 <Table.Row>
                   <Table.Cell>

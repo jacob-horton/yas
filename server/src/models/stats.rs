@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use sqlx::types::Uuid;
 
+use crate::models::game::{GameDb, GameResponse};
+
 #[derive(sqlx::FromRow, Debug)]
 pub struct RawMatchStats {
     pub user_id: Uuid,
@@ -33,9 +35,15 @@ pub enum OrderBy {
     AverageScore,
 }
 
+pub struct Scoreboard {
+    pub entries: Vec<ScoreboardEntry>,
+    pub game: GameDb,
+}
+
 #[derive(Serialize)]
 pub struct ScoreboardResponse {
-    entries: Vec<ScoreboardEntryResponse>,
+    pub entries: Vec<ScoreboardEntryResponse>,
+    pub game: GameResponse,
 }
 
 #[derive(Serialize)]
@@ -57,6 +65,15 @@ impl From<ScoreboardEntry> for ScoreboardEntryResponse {
             average_score: entry.average_score,
             wins: entry.wins,
             win_rate: entry.win_rate,
+        }
+    }
+}
+
+impl From<Scoreboard> for ScoreboardResponse {
+    fn from(scoreboard: Scoreboard) -> Self {
+        Self {
+            entries: scoreboard.entries.into_iter().map(|s| s.into()).collect(),
+            game: scoreboard.game.into(),
         }
     }
 }

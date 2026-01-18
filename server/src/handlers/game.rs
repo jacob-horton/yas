@@ -12,7 +12,7 @@ use crate::{
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     models::{
         game::{CreateGameReq, GameResponse},
-        stats::{OrderBy, ScoreboardEntryResponse, StatsParams},
+        stats::{OrderBy, ScoreboardResponse, StatsParams},
     },
     services,
 };
@@ -58,7 +58,7 @@ pub async fn get_scoreboard(
         .parse()
         .map_err(|_| AppError::BadRequest("Invalid group ID".to_string()))?;
 
-    let stats = services::stats::get_stats(
+    let scoreboard = services::stats::get_stats(
         &state,
         user.id,
         game_id,
@@ -67,7 +67,8 @@ pub async fn get_scoreboard(
     )
     .await?;
 
-    let response: Vec<ScoreboardEntryResponse> = stats.into_iter().map(|s| s.into()).collect();
+    let response: ScoreboardResponse = scoreboard.into();
+
     Ok((StatusCode::CREATED, Json(response)))
 }
 
