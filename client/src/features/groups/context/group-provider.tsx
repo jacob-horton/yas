@@ -1,10 +1,10 @@
 import { useParams } from "@solidjs/router";
 import {
+  type Accessor,
   createContext,
+  createEffect,
   type ParentComponent,
   useContext,
-  type Accessor,
-  createEffect,
 } from "solid-js";
 
 const GroupContext = createContext<Accessor<string>>();

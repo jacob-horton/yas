@@ -27,7 +27,6 @@ const WithSidebar: ParentComponent = (props) => {
 };
 
 export default function App() {
-  // TODO: fix creating group and group provider wrapper
   return (
     <AuthProvider>
       <Router>

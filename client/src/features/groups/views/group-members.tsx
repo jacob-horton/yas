@@ -1,24 +1,12 @@
-import { api } from "@/lib/api";
-import { createAsync, query } from "@solidjs/router";
 import { For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Table } from "@/components/ui/table";
 import { useGroup } from "../context/group-provider";
-
-const getMembers = query(async (id) => {
-  // TODO: try/catch
-  const res = await api.get(`/groups/${id}/members`);
-  return res.data as {
-    id: string;
-    created_at: string;
-    email: string;
-    name: string;
-  }[];
-}, "groupMembers");
+import { useGroupMembers } from "../hooks/use-group-members";
 
 export const GroupMembers = () => {
   const group = useGroup();
-  const members = createAsync(async () => getMembers(group()));
+  const members = useGroupMembers(group);
 
   return (
     <Page title="Group Members">
