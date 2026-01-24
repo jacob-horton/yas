@@ -7,6 +7,7 @@ import type { Component } from "solid-js";
 import { For, Suspense } from "solid-js";
 import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
+import type { GameRouteParams } from "../types";
 
 const getScoreboardData = query(async (id) => {
   // TODO: try/catch
@@ -41,7 +42,7 @@ const LoadingRows: Component<{ numCols: number; numRows?: number }> = (
 };
 
 export const Scoreboard = () => {
-  const params = useParams();
+  const params = useParams<GameRouteParams>();
   const group = useGroup();
   const scoreboardData = createAsync(() => getScoreboardData(params.gameId));
   const navigate = useNavigate();

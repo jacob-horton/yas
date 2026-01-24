@@ -6,11 +6,12 @@ import {
   type ParentComponent,
   useContext,
 } from "solid-js";
+import type { GroupRouteParams } from "../types/params";
 
 const GroupContext = createContext<Accessor<string>>();
 
 export const GroupProvider: ParentComponent = (props) => {
-  const params = useParams();
+  const params = useParams<GroupRouteParams>();
   const groupId = () => params.groupId;
 
   createEffect(() => {

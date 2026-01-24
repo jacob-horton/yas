@@ -1,3 +1,5 @@
+import { createAsync, query, useNavigate, useParams } from "@solidjs/router";
+import { createSignal, For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
@@ -5,8 +7,7 @@ import { Input } from "@/components/ui/input";
 import type { User } from "@/features/auth/context/auth-provider";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { api } from "@/lib/api";
-import { createAsync, query, useNavigate, useParams } from "@solidjs/router";
-import { createSignal, For, Suspense } from "solid-js";
+import type { GameRouteParams } from "../types";
 
 const GET_SCOREBOARD_QUERY_KEY = "getScoreboard";
 const GET_MEMBERS_QUERY_KEY = "getMembers";
@@ -24,7 +25,7 @@ const getMembers = query(async (group_id) => {
 }, GET_MEMBERS_QUERY_KEY);
 
 export const RecordGame = () => {
-  const params = useParams();
+  const params = useParams<GameRouteParams>();
   const group = useGroup();
   const game = createAsync(() => getGame(params.gameId));
   const members = createAsync(() => getMembers(group()));
