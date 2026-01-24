@@ -1,6 +1,6 @@
+import type { Group } from "@/features/groups/types";
 import { api } from "@/lib/api";
 import type { CreateUserRequest, User } from "../types";
-import type { Group } from "@/features/groups/types";
 
 export interface UserApiContract {
   create(payload: CreateUserRequest): Promise<User>;

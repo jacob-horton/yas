@@ -52,17 +52,7 @@ pub async fn accept_invite(
         .map_err(InviteError::Database)?
         .ok_or(InviteError::NotFound)?;
 
-    // If there is a max number of uses, and they've been used up, invite is no longer valid
-    if let Some(max_uses) = invite.max_uses {
-        if invite.uses >= max_uses {
-            return Err(InviteError::LimitReached.into());
-        }
-    }
-
-    // If the invite has expired, the invite is no longer valid
-    if Utc::now() >= invite.expires_at {
-        return Err(InviteError::Expired.into());
-    }
+    validate_invite(&invite)?;
 
     // Add user to group if they aren't already
     match state
@@ -84,6 +74,35 @@ pub async fn accept_invite(
         .await?;
 
     tx.commit().await?;
+
+    Ok(())
+}
+
+pub async fn get_invite(state: &AppState, invite_code: Uuid) -> Result<InviteDb, AppError> {
+    let invite = state
+        .invite_repo
+        .find_by_code_for_update(&state.pool, invite_code)
+        .await
+        .map_err(InviteError::Database)?
+        .ok_or(InviteError::NotFound)?;
+
+    validate_invite(&invite)?;
+
+    Ok(invite)
+}
+
+pub fn validate_invite(invite: &InviteDb) -> Result<(), AppError> {
+    // If there is a max number of uses, and they've been used up, invite is no longer valid
+    if let Some(max_uses) = invite.max_uses {
+        if invite.uses >= max_uses {
+            return Err(InviteError::LimitReached.into());
+        }
+    }
+
+    // If the invite has expired, the invite is no longer valid
+    if Utc::now() >= invite.expires_at {
+        return Err(InviteError::Expired.into());
+    }
 
     Ok(())
 }

@@ -11,6 +11,7 @@ import { setupAxiosInterceptors } from "@/lib/api";
 import { authApi } from "@/features/auth/api";
 import type { User } from "@/features/users/types";
 import { usersApi } from "@/features/users/api";
+import { LS_LAST_GROUP_ID } from "@/pages/home-page";
 
 type DetailedStatusError = {
   message: string;
@@ -47,6 +48,7 @@ export const AuthProvider: ParentComponent = (props) => {
   async function logout() {
     // TODO: try/catch
     await authApi.logout();
+    localStorage.removeItem(LS_LAST_GROUP_ID);
     setUser(null);
   }
 

@@ -66,6 +66,13 @@ pub async fn get_group(
         .await?
         .ok_or(GroupError::MemberNotFound)?;
 
+    get_group_without_auth_check(state, group_id).await
+}
+
+pub async fn get_group_without_auth_check(
+    state: &AppState,
+    group_id: Uuid,
+) -> Result<GroupDb, AppError> {
     let group = state
         .group_repo
         .find_by_id(&state.pool, group_id)

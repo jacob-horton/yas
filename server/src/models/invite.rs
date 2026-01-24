@@ -17,7 +17,7 @@ pub struct InviteDb {
 }
 
 #[derive(Debug, Serialize)]
-pub struct InviteResponse {
+pub struct InviteSummaryResponse {
     pub id: String,
     pub created_by: String,
 
@@ -28,7 +28,7 @@ pub struct InviteResponse {
     pub expires_at: DateTime<Utc>,
 }
 
-impl From<InviteDb> for InviteResponse {
+impl From<InviteDb> for InviteSummaryResponse {
     fn from(invite: InviteDb) -> Self {
         Self {
             id: invite.id.to_string(),
@@ -41,4 +41,16 @@ impl From<InviteDb> for InviteResponse {
             expires_at: invite.expires_at,
         }
     }
+}
+
+#[derive(Debug, Serialize)]
+pub struct InviteDetailResponse {
+    pub id: String,
+    pub created_by_name: String,
+    pub expires_at: DateTime<Utc>,
+
+    pub group_id: String,
+    pub group_name: String,
+
+    pub is_current_user_member: bool,
 }

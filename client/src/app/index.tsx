@@ -15,6 +15,7 @@ import { Invites } from "@/features/groups/views/group-invites";
 import { RecordGame } from "@/features/matches/views/record-match";
 import { UserSettings } from "@/features/users/views/settings";
 import { HomePage } from "@/pages/home-page";
+import { AcceptInvite } from "@/features/invites/views/accept-invite";
 
 const WithSidebar: ParentComponent = (props) => {
   return (
@@ -47,6 +48,7 @@ export default function App() {
           <Route path="/" component={HomePage} />
           <Route path="/groups/create" component={CreateGroup} />
           <Route path="/settings" component={UserSettings} />
+          <Route path="/invites/:inviteId/accept" component={AcceptInvite} />
         </Route>
 
         <Route path="/login" component={Login} />

@@ -3,13 +3,15 @@ import { createEffect, Show } from "solid-js";
 import { Button } from "@/components/ui/button";
 import { useMyGroups } from "@/features/users/hooks/use-my-groups";
 
+export const LS_LAST_GROUP_ID = "lastGroupId";
+
 export const HomePage = () => {
   const navigate = useNavigate();
   const groups = useMyGroups();
 
   createEffect(() => {
     // Check local storage for last viewed group
-    const lastGroupId = localStorage.getItem("lastGroupId");
+    const lastGroupId = localStorage.getItem(LS_LAST_GROUP_ID);
 
     // If we have a saved ID, view it
     if (lastGroupId) {

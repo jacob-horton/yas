@@ -7,6 +7,7 @@ import {
   useContext,
 } from "solid-js";
 import type { GroupRouteParams } from "../types/params";
+import { LS_LAST_GROUP_ID } from "@/pages/home-page";
 
 const GroupContext = createContext<Accessor<string>>();
 
@@ -15,7 +16,7 @@ export const GroupProvider: ParentComponent = (props) => {
   const groupId = () => params.groupId;
 
   createEffect(() => {
-    localStorage.setItem("lastGroupId", groupId());
+    localStorage.setItem(LS_LAST_GROUP_ID, groupId());
   });
 
   return (
