@@ -3,7 +3,6 @@ import type { Component } from "solid-js";
 import { For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Table } from "@/components/ui/table";
-import { useGroup } from "@/features/groups/context/group-provider";
 import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import type { GameRouteParams } from "../types";
@@ -38,8 +37,6 @@ const LoadingRows: Component<{ numCols: number; numRows?: number }> = (
 export const Scoreboard = () => {
   const params = useParams<GameRouteParams>();
   const scoreboardData = useScoreboardData(() => params.gameId);
-
-  const group = useGroup();
   const navigate = useNavigate();
 
   // TODO: proper loading for scoreboard name

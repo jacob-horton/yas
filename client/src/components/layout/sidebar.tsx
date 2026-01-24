@@ -3,6 +3,7 @@ import type { LucideProps } from "lucide-solid";
 import GamePadIcon from "lucide-solid/icons/gamepad-2";
 import NotebookTextIcon from "lucide-solid/icons/notebook-text";
 import PlusIcon from "lucide-solid/icons/plus";
+import SettingsIcon from "lucide-solid/icons/settings";
 import SlidersHorizontalIcon from "lucide-solid/icons/sliders-horizontal";
 import UsersIcon from "lucide-solid/icons/users";
 import { type Component, For, Show } from "solid-js";
@@ -46,7 +47,7 @@ export const Sidebar: Component = () => {
 
   return (
     <nav class="flex h-full w-80 min-w-80 flex-col gap-4 border-gray-200 border-r p-4 text-gray-800">
-      <span class="flex items-center gap-3 px-2 py-4">
+      <div class="flex items-center gap-3 px-2 py-4">
         <div class="flex size-10 min-h-10 min-w-10 items-center justify-center rounded-full border">
           <div class="size-5 rounded-full bg-gray-300" />
         </div>
@@ -56,7 +57,14 @@ export const Sidebar: Component = () => {
             {user()?.email}
           </p>
         </div>
-      </span>
+        <A
+          href="/settings"
+          class="ml-auto flex items-center gap-2 rounded-md px-2 py-1 text-gray-300 transition hover:bg-gray-50 hover:text-gray-400"
+          activeClass="bg-violet-50 text-violet-800 hover:bg-violet-100"
+        >
+          <SettingsIcon />
+        </A>
+      </div>
       <Dropdown
         label="Group"
         // TODO: default value

@@ -39,12 +39,11 @@ export default function App() {
             <Route path="/games/:gameId" component={Scoreboard} />
             <Route path="/games/:gameId/record" component={RecordGame} />
             <Route path="/games/create" component={CreateGame} />
-            <Route path="/settings" component={Settings} />
           </Route>
 
-          {/* TODO: home/welcome page */}
           <Route path="/" component={HomePage} />
           <Route path="/groups/create" component={CreateGroup} />
+          <Route path="/settings" component={Settings} />
         </Route>
 
         <Route path="/login" component={Login} />
