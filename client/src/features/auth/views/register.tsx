@@ -1,9 +1,10 @@
-import { useNavigate } from "@solidjs/router";
-import { createEffect, type Component } from "solid-js";
+import { A, useNavigate } from "@solidjs/router";
+import ArrowLeftIcon from "lucide-solid/icons/arrow-left";
+import { type Component, createEffect } from "solid-js";
 import { createStore } from "solid-js/store";
-import { useAuth } from "../context/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "../context/auth-provider";
 
 const ERROR_MESSAGES = {
   length: "Invalid length",
@@ -67,7 +68,7 @@ export const Register: Component = () => {
 
   return (
     <main class="flex h-screen max-h-screen min-h-screen overflow-clip">
-      <div class="flex flex-col justify-center gap-10 px-32">
+      <div class="flex min-w-[600px] flex-col justify-center gap-10 px-32">
         <h1 class="font-semibold text-3xl">Register</h1>
         <form onSubmit={register} class="flex flex-col gap-4">
           <Input
@@ -106,15 +107,21 @@ export const Register: Component = () => {
             }}
             placeholder="●●●●●●●●●●●●"
           />
-          <span class="flex gap-4">
-            <Button type="submit">Register</Button>
-            <Button variant="secondary" onClick={() => navigate("/login")}>
-              Login
-            </Button>
-          </span>
+
+          <Button type="submit">Register</Button>
+
+          <div class="text-center text-sm">
+            <span class="text-gray-500">Already have an account? </span>
+            <A
+              href="/login"
+              class="font-medium text-violet-600 hover:underline"
+            >
+              Log in
+            </A>
+          </div>
         </form>
       </div>
-      <div class="aurora-gradient flex w-full items-center justify-center px-16 font-semibold text-9xl text-white">
+      <div class="aurora-gradient flex flex-1 items-center justify-center px-16 font-semibold text-9xl text-white">
         Welcome!
       </div>
     </main>

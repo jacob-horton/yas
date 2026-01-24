@@ -1,3 +1,4 @@
+import { cn } from "@/lib/classname";
 import type { ParentComponent } from "solid-js";
 
 export type Variant = "primary" | "secondary";
@@ -15,7 +16,10 @@ export const Button: ParentComponent<{
 }> = (props) => {
   return (
     <button
-      class={`w-32 rounded-md py-1 font-medium hover:cursor-pointer ${COLOUR_MAP[props.variant ?? "primary"]}`}
+      class={cn(
+        "whitespace-nowrap rounded-md p-10 py-1 font-medium hover:cursor-pointer",
+        COLOUR_MAP[props.variant ?? "primary"],
+      )}
       onClick={props.onClick}
       type={props.type ?? "button"}
       disabled={props.disabled}

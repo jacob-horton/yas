@@ -1,4 +1,5 @@
-import { useNavigate } from "@solidjs/router";
+import { A, useNavigate } from "@solidjs/router";
+import ArrowRightIcon from "lucide-solid/icons/arrow-right";
 import { type Component, createEffect, createSignal } from "solid-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,7 +25,7 @@ export const Login: Component = () => {
 
   return (
     <main class="flex h-screen max-h-screen min-h-screen overflow-clip">
-      <div class="flex flex-col justify-center gap-10 px-32">
+      <div class="flex min-w-[600px] flex-col justify-center gap-10 px-32">
         <h1 class="font-semibold text-3xl">Login</h1>
         <form onSubmit={login} class="flex flex-col gap-4">
           <Input
@@ -40,12 +41,18 @@ export const Login: Component = () => {
             onChange={setPassword}
             placeholder="●●●●●●●●●●●●"
           />
-          <span class="flex gap-4">
-            <Button type="submit">Login</Button>
-            <Button variant="secondary" onClick={() => navigate("/register")}>
-              Register
-            </Button>
-          </span>
+
+          <Button type="submit">Login</Button>
+
+          <div class="text-center text-sm">
+            <span class="text-gray-500">Don't have an account? </span>
+            <A
+              href="/register"
+              class="font-medium text-violet-600 hover:underline"
+            >
+              Sign up
+            </A>
+          </div>
         </form>
       </div>
       <div class="aurora-gradient flex w-full items-center justify-center px-16 font-semibold text-9xl text-white">
