@@ -49,39 +49,46 @@ export const Dropdown: Component<{
 
   return (
     <div
-      class={cn("flex max-w-96 flex-col gap-1 transition", props.class)}
-      classList={{ "text-red-500": !!props.error }}
+      class={cn(
+        "flex max-w-96 flex-col gap-1 transition",
+        { "text-red-500": !!props.error },
+        props.class,
+      )}
     >
       <div ref={dropdownWrapperRef} class="relative w-full">
         <div
-          class="group flex w-full rounded-md border font-medium transition"
-          classList={{
-            "border-violet-500": isOpen() && !props.error,
-            "focus-within:border-violet-500": !props.error,
-            "bg-red-100 border-red-500 focus-within:border-red-500":
-              !!props.error,
-          }}
+          class={cn(
+            "group flex w-full rounded-md border font-medium transition",
+            {
+              "border-violet-500": isOpen() && !props.error,
+              "focus-within:border-violet-500": !props.error,
+              "border-red-500 bg-red-100 focus-within:border-red-500":
+                !!props.error,
+            },
+          )}
         >
           <div
-            class="w-2 rounded-l-sm bg-transparent transition"
-            classList={{
+            class={cn("w-2 rounded-l-sm bg-transparent transition", {
               "bg-violet-500": isOpen() && !props.error,
               "group-focus-within:bg-violet-500": !props.error,
               "bg-red-500": isOpen() && !!props.error,
               "group-focus-within:bg-red-500": !!props.error,
-            }}
+            })}
           />
           <div class="w-full px-3 py-2">
             <p
-              class="text-gray-400 text-xs transition"
-              classList={{ "text-red-400": !!props.error }}
+              class={cn("text-gray-400 text-xs transition", {
+                "text-red-400": !!props.error,
+              })}
             >
               {props.label}
             </p>
             <button
               type="button"
-              class="flex w-full items-center justify-between outline-none transition disabled:text-gray-300"
-              classList={{ "disabled:text-red-300": !!props.error }}
+              class={cn(
+                "flex w-full items-center justify-between outline-none transition disabled:text-gray-300",
+                { "disabled:text-red-300": !!props.error },
+              )}
               disabled={props.options.length === 0}
               onClick={() => setIsOpen(!isOpen())}
               aria-haspopup="listbox"
@@ -90,8 +97,9 @@ export const Dropdown: Component<{
               <span class="text-left">{currentLabel()}</span>
               <ChevronDownIcon
                 size={18}
-                class="text-gray-500 transition-transform"
-                classList={{ "rotate-180": isOpen() }}
+                class={cn("text-gray-500 transition-transform", {
+                  "rotate-180": isOpen(),
+                })}
               />
             </button>
           </div>
@@ -115,10 +123,10 @@ export const Dropdown: Component<{
                   role="option"
                   tabIndex={0}
                   aria-selected={props.value === option.value}
-                  class="cursor-pointer px-3 py-2 text-black transition hover:bg-gray-100"
-                  classList={{
-                    "font-semibold": props.value === option.value,
-                  }}
+                  class={cn(
+                    "cursor-pointer px-3 py-2 text-black transition hover:bg-gray-100",
+                    { "font-semibold": props.value === option.value },
+                  )}
                   onClick={() => {
                     props.onChange(option.value);
                     setIsOpen(false);

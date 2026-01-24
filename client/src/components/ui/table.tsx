@@ -1,5 +1,6 @@
 import { createUniqueId, For, type ParentComponent } from "solid-js";
 import type { JSX } from "solid-js/jsx-runtime";
+import { cn } from "@/lib/classname";
 
 export type TableProps = {
   headings: JSX.Element[];
@@ -25,11 +26,10 @@ export const Table: TableComponent = (props) => {
             {(heading, i) => (
               <th
                 scope="col"
-                class="bg-gray-100 px-5 py-3 text-start font-semibold"
-                classList={{
+                class={cn("bg-gray-100 px-5 py-3 text-start font-semibold", {
                   "rounded-s-md": i() === 0,
                   "rounded-e-md": i() === props.headings.length - 1,
-                }}
+                })}
               >
                 {heading}
               </th>

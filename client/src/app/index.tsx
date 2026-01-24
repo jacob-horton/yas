@@ -12,7 +12,7 @@ import { CreateGroup } from "@/features/groups/views/create-group";
 import { GroupDetails } from "@/features/groups/views/group-details";
 import { GroupMembers } from "@/features/groups/views/group-members";
 import { RecordGame } from "@/features/matches/views/record-match";
-import { Settings } from "@/features/users/views/settings";
+import { UserSettings } from "@/features/users/views/settings";
 import { HomePage } from "@/pages/home-page";
 
 const WithSidebar: ParentComponent = (props) => {
@@ -43,7 +43,7 @@ export default function App() {
 
           <Route path="/" component={HomePage} />
           <Route path="/groups/create" component={CreateGroup} />
-          <Route path="/settings" component={Settings} />
+          <Route path="/settings" component={UserSettings} />
         </Route>
 
         <Route path="/login" component={Login} />
