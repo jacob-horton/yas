@@ -1,5 +1,6 @@
 import { Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
+import { formatDate } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupDetails } from "../hooks/use-group-details";
 
@@ -12,7 +13,7 @@ export const GroupDetails = () => {
       <Suspense>
         <p>{groupDetails()?.id}</p>
         <p>{groupDetails()?.name}</p>
-        <p>{groupDetails()?.created_at}</p>
+        <p>{formatDate(groupDetails()?.created_at ?? "")}</p>
       </Suspense>
     </Page>
   );
