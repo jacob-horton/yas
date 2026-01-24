@@ -6,7 +6,7 @@ export function UserSettings() {
   const auth = useAuth();
 
   return (
-    <Page title="User Settings" narrow>
+    <Page title="User Settings" showBack narrow>
       <Button onClick={auth.logout}>Logout</Button>
     </Page>
   );

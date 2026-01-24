@@ -30,7 +30,7 @@ export const CreateGame = () => {
   }
 
   return (
-    <Page title="Create Game">
+    <Page title="Create Game" narrow>
       <form class="flex flex-col gap-6" onSubmit={handleSubmit}>
         <Input
           label="Name"

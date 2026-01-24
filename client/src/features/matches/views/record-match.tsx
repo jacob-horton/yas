@@ -45,7 +45,7 @@ export const RecordGame = () => {
   };
 
   return (
-    <Page title="Record Game">
+    <Page title="Record Match" showBack narrow>
       <Suspense>
         <p>
           Recording game for <b>{game()?.name}</b>

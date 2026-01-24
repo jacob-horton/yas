@@ -59,8 +59,7 @@ export const Sidebar: Component = () => {
         </div>
         <A
           href="/settings"
-          class="ml-auto flex items-center gap-2 rounded-md px-2 py-1 text-gray-300 transition hover:bg-gray-50 hover:text-gray-400"
-          activeClass="bg-violet-50 text-violet-800 hover:bg-violet-100"
+          class="ml-auto rounded-md px-2 py-1 text-gray-300 transition hover:bg-gray-50 hover:text-gray-400"
         >
           <SettingsIcon />
         </A>

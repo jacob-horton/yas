@@ -45,7 +45,7 @@ export const Scoreboard = () => {
       title={scoreboardData()?.game.name ?? "Loading"}
       actions={[
         {
-          text: "Record Game",
+          text: "Record Match",
           variant: "primary",
           onAction: () => navigate(`record`),
         },

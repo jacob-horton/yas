@@ -1,6 +1,8 @@
-import { For, type ParentComponent } from "solid-js";
+import ChevronLeftIcon from "lucide-solid/icons/chevron-left";
+import { For, type ParentComponent, Show } from "solid-js";
 import { cn } from "@/lib/classname";
 import { Button, type Variant } from "../ui/button";
+import { useNavigate } from "@solidjs/router";
 
 type Props = {
   title: string;
@@ -10,9 +12,12 @@ type Props = {
     onAction: () => void;
   }[];
   narrow?: boolean;
+  showBack?: boolean;
 };
 
 export const Page: ParentComponent<Props> = (props) => {
+  const navigate = useNavigate();
+
   return (
     <div
       class={cn("mx-auto h-full w-full max-w-7xl px-4", {
@@ -20,7 +25,18 @@ export const Page: ParentComponent<Props> = (props) => {
       })}
     >
       <header class="flex items-center justify-between">
-        <h1 class="py-6 font-semibold text-3xl text-gray-800">{props.title}</h1>
+        <h1 class="flex items-center gap-2 py-6 font-semibold text-3xl text-gray-800">
+          <Show when={props.showBack}>
+            <button
+              type="button"
+              class="rounded-md p-1 transition hover:bg-gray-50"
+              onClick={() => navigate(-1)}
+            >
+              <ChevronLeftIcon size={28} />
+            </button>
+          </Show>
+          {props.title}
+        </h1>
         <For each={props.actions ?? []}>
           {(action) => (
             <Button onClick={action.onAction} variant={action.variant}>
