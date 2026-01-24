@@ -5,8 +5,8 @@ import { Page } from "@/components/layout/page";
 import { Table } from "@/components/ui/table";
 import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
-import type { GameRouteParams } from "../types";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
+import type { GameRouteParams } from "../types/game";
 
 const LoadingText = () => {
   return (

@@ -1,4 +1,5 @@
-import type { CreateGameRequest, Game } from "@/features/games/types";
+import type { CreateGameRequest, Game } from "@/features/games/types/game";
+import type { Invite } from "@/features/groups/types/invite";
 import { api } from "@/lib/api";
 import type { Group, GroupMember } from "../types";
 
@@ -6,8 +7,10 @@ export interface GroupApiContract {
   get(): Promise<Group>;
   members(): Promise<GroupMember[]>;
   games(): Promise<Game[]>;
+  invites(): Promise<Invite[]>;
 
   createGame(payload: CreateGameRequest): Promise<Game>;
+  createInvite(): Promise<Invite>;
 }
 
 export class GroupApi implements GroupApiContract {
@@ -25,9 +28,19 @@ export class GroupApi implements GroupApiContract {
     return api.get(`/groups/${this.groupId}/games`).then((resp) => resp.data);
   }
 
+  public async invites(): Promise<Invite[]> {
+    return api.get(`/groups/${this.groupId}/invites`).then((resp) => resp.data);
+  }
+
   public async createGame(payload: CreateGameRequest): Promise<Game> {
     return api
       .post(`/groups/${this.groupId}/games`, payload)
+      .then((resp) => resp.data);
+  }
+
+  public async createInvite(): Promise<Invite> {
+    return api
+      .post(`/groups/${this.groupId}/invites`)
       .then((resp) => resp.data);
   }
 }

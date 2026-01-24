@@ -87,3 +87,24 @@ pub async fn accept_invite(
 
     Ok(())
 }
+
+pub async fn get_group_invites(
+    state: &AppState,
+    user_id: Uuid,
+    group_id: Uuid,
+) -> Result<Vec<InviteDb>, AppError> {
+    // Check user is a member
+    state
+        .group_repo
+        .get_member(&state.pool, group_id, user_id)
+        .await?
+        .ok_or(GroupError::MemberNotFound)?;
+
+    let group = state
+        .invite_repo
+        .get_invites_for_group(&state.pool, group_id)
+        .await
+        .map_err(GroupError::Database)?;
+
+    Ok(group)
+}

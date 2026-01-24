@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
 import { gamesApi } from "@/features/games/api";
-import type { GameRouteParams } from "@/features/games/types";
+import type { GameRouteParams } from "@/features/games/types/game";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { useGame } from "../hooks/use-game";
 import { useMembers } from "../hooks/use-members";

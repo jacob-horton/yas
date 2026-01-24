@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { groupsApi } from "@/features/groups/api";
 import { QK_GROUP_GAMES } from "@/features/groups/constants";
 import { useGroup } from "@/features/groups/context/group-provider";
-import type { CreateGameRequest } from "../types";
+import type { CreateGameRequest } from "../types/game";
 
 export const CreateGame = () => {
   const navigate = useNavigate();

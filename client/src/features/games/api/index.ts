@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import type { CreateGameRequest, Game } from "../types";
+import type { CreateGameRequest, Game } from "../types/game";
 import { GameApi, type GameApiContract } from "./game-api";
 
 export interface GamesApiContract {

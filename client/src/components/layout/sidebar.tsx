@@ -1,6 +1,7 @@
 import { A, useNavigate } from "@solidjs/router";
 import type { LucideProps } from "lucide-solid";
 import GamePadIcon from "lucide-solid/icons/gamepad-2";
+import MailPlusIcon from "lucide-solid/icons/mail-plus";
 import NotebookTextIcon from "lucide-solid/icons/notebook-text";
 import PlusIcon from "lucide-solid/icons/plus";
 import SettingsIcon from "lucide-solid/icons/settings";
@@ -82,6 +83,7 @@ export const Sidebar: Component = () => {
 
           <NavItem name="Details" href="" icon={NotebookTextIcon} end />
           <NavItem name="Members" href="members" icon={UsersIcon} />
+          <NavItem name="Invites" href="invites" icon={MailPlusIcon} />
         </div>
 
         <div class="flex flex-col gap-1">

@@ -11,6 +11,7 @@ import { GroupProvider } from "@/features/groups/context/group-provider";
 import { CreateGroup } from "@/features/groups/views/create-group";
 import { GroupDetails } from "@/features/groups/views/group-details";
 import { GroupMembers } from "@/features/groups/views/group-members";
+import { Invites } from "@/features/groups/views/group-invites";
 import { RecordGame } from "@/features/matches/views/record-match";
 import { UserSettings } from "@/features/users/views/settings";
 import { HomePage } from "@/pages/home-page";
@@ -39,6 +40,8 @@ export default function App() {
             <Route path="/games/:gameId" component={Scoreboard} />
             <Route path="/games/:gameId/record" component={RecordGame} />
             <Route path="/games/create" component={CreateGame} />
+
+            <Route path="/invites" component={Invites} />
           </Route>
 
           <Route path="/" component={HomePage} />

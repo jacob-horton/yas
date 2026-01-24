@@ -49,4 +49,15 @@ impl InviteRepo {
         .fetch_one(executor)
         .await
     }
+
+    pub async fn get_invites_for_group<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        group_id: Uuid,
+    ) -> Result<Vec<InviteDb>, sqlx::Error> {
+        sqlx::query_as::<_, InviteDb>("SELECT * FROM invites WHERE group_id = $1")
+            .bind(group_id)
+            .fetch_all(executor)
+            .await
+    }
 }
