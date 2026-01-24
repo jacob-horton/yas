@@ -10,12 +10,13 @@ import { Scoreboard } from "@/features/games/views/scoreboard";
 import { GroupProvider } from "@/features/groups/context/group-provider";
 import { CreateGroup } from "@/features/groups/views/create-group";
 import { GroupDetails } from "@/features/groups/views/group-details";
-import { GroupMembers } from "@/features/groups/views/group-members";
 import { Invites } from "@/features/groups/views/group-invites";
+import { GroupMembers } from "@/features/groups/views/group-members";
+import { AcceptInvite } from "@/features/invites/views/accept-invite";
+import { CreateInvite } from "@/features/invites/views/create-invite";
 import { RecordGame } from "@/features/matches/views/record-match";
 import { UserSettings } from "@/features/users/views/settings";
 import { HomePage } from "@/pages/home-page";
-import { AcceptInvite } from "@/features/invites/views/accept-invite";
 
 const WithSidebar: ParentComponent = (props) => {
   return (
@@ -43,11 +44,13 @@ export default function App() {
             <Route path="/games/create" component={CreateGame} />
 
             <Route path="/invites" component={Invites} />
+            <Route path="/invites/create" component={CreateInvite} />
           </Route>
 
           <Route path="/" component={HomePage} />
           <Route path="/groups/create" component={CreateGroup} />
           <Route path="/settings" component={UserSettings} />
+
           <Route path="/invites/:inviteId/accept" component={AcceptInvite} />
         </Route>
 

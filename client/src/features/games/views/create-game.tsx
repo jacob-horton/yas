@@ -26,7 +26,7 @@ export const CreateGame = () => {
     const res = await groupsApi.group(group()).createGame(game);
 
     revalidate(QK_GROUP_GAMES);
-    navigate(`games/${res.id}`);
+    navigate(`/groups/${group()}/games/${res.id}`);
   }
 
   return (

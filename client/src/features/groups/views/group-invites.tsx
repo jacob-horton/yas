@@ -1,10 +1,8 @@
-import { revalidate } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import { For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Table } from "@/components/ui/table";
 import { cn } from "@/lib/classname";
-import { groupsApi } from "../api";
-import { QK_GROUP_INVITES } from "../constants";
 import { useGroup } from "../context/group-provider";
 import { useGroupInvites } from "../hooks/use-group-invites";
 
@@ -19,6 +17,8 @@ export const Invites = () => {
   const group = useGroup();
   const invites = useGroupInvites(group);
 
+  const navigate = useNavigate();
+
   return (
     <Page
       title="Invites"
@@ -26,22 +26,19 @@ export const Invites = () => {
         {
           text: "Create Invite",
           variant: "primary",
-          onAction: async () => {
-            await groupsApi.group(group()).createInvite();
-            revalidate(QK_GROUP_INVITES);
-          },
+          onAction: () => navigate("create"),
         },
       ]}
     >
       <Table
-        headings={["ID", "Created By", "Uses", "Created At", "Expires At"]}
+        headings={["Name", "Created By", "Uses", "Created At", "Expires At"]}
         caption="All invites for this group"
       >
         <Suspense>
           <For each={invites()}>
             {(invite) => (
               <Table.Row>
-                <Table.Cell>{invite.id}</Table.Cell>
+                <Table.Cell>{invite.name}</Table.Cell>
                 <Table.Cell>{invite.created_by}</Table.Cell>
                 <Table.Cell>
                   {invite.uses}

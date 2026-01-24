@@ -11,14 +11,16 @@ impl InviteRepo {
         executor: impl PgExecutor<'e, Database = Postgres>,
         group_id: Uuid,
         created_by: Uuid,
+        name: String,
         max_uses: Option<i32>,
         expires_at: Option<DateTime<Utc>>,
     ) -> Result<InviteDb, sqlx::Error> {
         sqlx::query_as::<_, InviteDb>(
-            "INSERT INTO invites (group_id, created_by, max_uses, expires_at) VALUES ($1, $2, $3, $4) RETURNING *",
+            "INSERT INTO invites (group_id, created_by, name, max_uses, expires_at) VALUES ($1, $2, $3, $4, $5) RETURNING *",
         )
         .bind(group_id)
         .bind(created_by)
+        .bind(name)
         .bind(max_uses)
         .bind(expires_at)
         .fetch_one(executor)

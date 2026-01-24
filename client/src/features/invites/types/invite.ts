@@ -11,9 +11,16 @@ export type InviteDetail = {
 
 export type InviteSummary = {
   id: string;
+  name: string;
   created_by: string;
   max_uses: number | null;
   uses: number;
   created_at: string;
   expires_at: string;
+};
+
+export type CreateInviteRequest = {
+  name: string;
+  expires_at: string | null;
+  max_uses: number | null;
 };

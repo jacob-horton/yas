@@ -1,11 +1,13 @@
 use chrono::{DateTime, Utc};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, types::Uuid};
+use validator::Validate;
 
 #[derive(Debug, FromRow)]
 pub struct InviteDb {
     pub id: Uuid,
     pub group_id: Uuid,
+    pub name: String,
 
     pub created_by: Uuid,
 
@@ -20,6 +22,7 @@ pub struct InviteDb {
 pub struct InviteSummaryResponse {
     pub id: String,
     pub created_by: String,
+    pub name: String,
 
     pub max_uses: Option<i32>,
     pub uses: i32,
@@ -33,6 +36,7 @@ impl From<InviteDb> for InviteSummaryResponse {
         Self {
             id: invite.id.to_string(),
             created_by: invite.created_by.to_string(),
+            name: invite.name,
 
             max_uses: invite.max_uses,
             uses: invite.uses,
@@ -53,4 +57,15 @@ pub struct InviteDetailResponse {
     pub group_name: String,
 
     pub is_current_user_member: bool,
+}
+
+#[derive(Debug, Deserialize, Validate)]
+pub struct CreateInviteReq {
+    #[validate(length(min = 3, max = 50, message = "Name must be between 3 and 50 chars"))]
+    pub name: String,
+
+    pub expires_at: Option<String>,
+
+    #[validate(range(min = 1, message = "Must be able to use an invite at least once"))]
+    pub max_uses: Option<i32>,
 }

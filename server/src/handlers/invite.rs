@@ -9,8 +9,8 @@ use axum::{
 use crate::{
     AppState,
     errors::AppError,
-    extractors::auth::AuthUser,
-    models::invite::{InviteDetailResponse, InviteSummaryResponse},
+    extractors::{auth::AuthUser, validated_json::ValidatedJson},
+    models::invite::{CreateInviteReq, InviteDetailResponse, InviteSummaryResponse},
     services,
 };
 
@@ -18,12 +18,13 @@ pub async fn create_invite(
     Path((group_id,)): Path<(String,)>,
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
+    ValidatedJson(payload): ValidatedJson<CreateInviteReq>,
 ) -> Result<impl IntoResponse, AppError> {
     let group_id = group_id
         .parse()
         .map_err(|_| AppError::BadRequest("Invalid group ID".to_string()))?;
 
-    let invite = services::invite::create_link(&state, group_id, user.id).await?;
+    let invite = services::invite::create_link(&state, group_id, user.id, payload).await?;
 
     let response: InviteSummaryResponse = invite.into();
     Ok((StatusCode::CREATED, Json(response)))

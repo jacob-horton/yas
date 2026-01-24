@@ -1,10 +1,13 @@
-use chrono::{Months, Utc};
+use chrono::{DateTime, Months, Utc};
 use sqlx::types::Uuid;
 
 use crate::{
     AppState,
     errors::{AppError, GroupError, InviteError},
-    models::{group::GroupMemberRole, invite::InviteDb},
+    models::{
+        group::GroupMemberRole,
+        invite::{CreateInviteReq, InviteDb},
+    },
     policies::GroupAction,
 };
 
@@ -12,6 +15,7 @@ pub async fn create_link(
     state: &AppState,
     group_id: Uuid,
     creator_id: Uuid,
+    payload: CreateInviteReq,
 ) -> Result<InviteDb, AppError> {
     let member = state
         .group_repo
@@ -23,17 +27,27 @@ pub async fn create_link(
         return Err(GroupError::Forbidden.into());
     }
 
-    // Expires after 1 month
+    // Expires at - default to 1 month from now
     let expires_at =
-        Utc::now()
-            .checked_add_months(Months::new(1))
-            .ok_or(AppError::InternalServerError(
-                "Date calculation failed".to_string(),
-            ))?;
+        match payload.expires_at {
+            Some(date) => DateTime::parse_from_rfc3339(&date)
+                .map_err(|_| AppError::BadRequest("Invalid date format".to_string()))?
+                .to_utc(),
+            None => Utc::now().checked_add_months(Months::new(1)).ok_or(
+                AppError::InternalServerError("Date calculation failed".to_string()),
+            )?,
+        };
 
     Ok(state
         .invite_repo
-        .create(&state.pool, group_id, creator_id, None, Some(expires_at))
+        .create(
+            &state.pool,
+            group_id,
+            creator_id,
+            payload.name,
+            payload.max_uses,
+            Some(expires_at),
+        )
         .await
         .map_err(InviteError::Database)?)
 }
