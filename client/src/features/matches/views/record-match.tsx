@@ -1,34 +1,22 @@
-import { createAsync, query, useNavigate, useParams } from "@solidjs/router";
+import { useNavigate, useParams } from "@solidjs/router";
 import { createSignal, For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
-import type { User } from "@/features/auth/context/auth-provider";
+import { gamesApi } from "@/features/games/api";
+import type { GameRouteParams } from "@/features/games/types";
 import { useGroup } from "@/features/groups/context/group-provider";
-import { api } from "@/lib/api";
-import type { GameRouteParams } from "../types";
-
-const GET_SCOREBOARD_QUERY_KEY = "getScoreboard";
-const GET_MEMBERS_QUERY_KEY = "getMembers";
-
-const getGame = query(async (id) => {
-  // TODO: try/catch
-  const res = await api.get(`/games/${id}`);
-  return res.data;
-}, GET_SCOREBOARD_QUERY_KEY);
-
-const getMembers = query(async (group_id) => {
-  // TODO: try/catch
-  const res = await api.get(`/groups/${group_id}/members`);
-  return res.data as User[];
-}, GET_MEMBERS_QUERY_KEY);
+import { useGame } from "../hooks/use-game";
+import { useMembers } from "../hooks/use-members";
 
 export const RecordGame = () => {
   const params = useParams<GameRouteParams>();
+  const game = useGame(() => params.gameId);
+
   const group = useGroup();
-  const game = createAsync(() => getGame(params.gameId));
-  const members = createAsync(() => getMembers(group()));
+  const members = useMembers(group);
+
   const navigate = useNavigate();
 
   // TODO: defaults
@@ -38,14 +26,21 @@ export const RecordGame = () => {
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
 
+    // TODO: proper error
+    const g = game();
+    if (!g) {
+      return;
+    }
+
     const p = points();
     const scores = selected().map((x, i) => ({
-      user_id: x,
+      // biome-ignore lint/style/noNonNullAssertion: TODO: zod validation
+      user_id: x!,
       score: parseInt(p[i] ?? "0", 10),
     }));
 
-    // TODO: handle error
-    await api.post(`/games/${game().id}/matches`, { scores });
+    // TODO: try/catch
+    await gamesApi.game(g.id).createMatch({ scores });
     navigate("..");
   };
 

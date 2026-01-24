@@ -7,7 +7,10 @@ import {
   type ParentComponent,
   useContext,
 } from "solid-js";
-import { api, setupAxiosInterceptors } from "@/lib/api";
+import { setupAxiosInterceptors } from "@/lib/api";
+import { authApi } from "@/features/auth/api";
+import type { User } from "@/features/users/types";
+import { usersApi } from "@/features/users/api";
 
 type DetailedStatusError = {
   message: string;
@@ -17,12 +20,6 @@ type DetailedStatusError = {
 type ErrorDetail = {
   property: string;
   codes: string;
-};
-
-export type User = {
-  id: number;
-  name: string;
-  email: string;
 };
 
 const AuthContext = createContext<{
@@ -42,20 +39,14 @@ export const AuthProvider: ParentComponent = (props) => {
   const [loading, setLoading] = createSignal(true);
 
   async function login(email: string, password: string) {
-    try {
-      const res = await api.post("/sessions", {
-        email,
-        password,
-      });
-
-      setUser(res.data as User);
-    } catch {
-      // TODO: check axios error
-    }
+    // TODO: try/catch
+    const user = await authApi.login(email, password);
+    setUser(user);
   }
 
   async function logout() {
-    await api.delete("/sessions");
+    // TODO: try/catch
+    await authApi.logout();
     setUser(null);
   }
 
@@ -63,13 +54,8 @@ export const AuthProvider: ParentComponent = (props) => {
 
   async function register(name: string, email: string, password: string) {
     try {
-      const res = await api.post("/users", {
-        name,
-        email,
-        password,
-      });
-
-      setUser(res.data);
+      const user = await usersApi.create({ name, email, password });
+      setUser(user);
 
       return null;
     } catch (e) {
@@ -84,8 +70,8 @@ export const AuthProvider: ParentComponent = (props) => {
 
   onMount(async () => {
     try {
-      const res = await api.get("/users/me");
-      setUser(res.data);
+      const me = await usersApi.me();
+      setUser(me);
     } catch (_err) {
       setUser(null);
     } finally {

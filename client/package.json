@@ -10,13 +10,15 @@
     "serve": "vite preview",
     "lint": "biome lint",
     "lint:fix": "biome lint --write --unsafe",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "type-check": "tsc --noEmit"
   },
   "license": "MIT",
   "devDependencies": {
     "@biomejs/biome": "2.2.6",
     "@eslint/js": "^9.36.0",
     "@tailwindcss/vite": "^4.1.13",
+    "@types/node": "^25.0.10",
     "eslint": "^9.36.0",
     "eslint-plugin-solid": "^0.14.5",
     "solid-devtools": "^0.34.3",

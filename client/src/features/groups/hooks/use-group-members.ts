@@ -1,8 +1,7 @@
 import { createAsync, query } from "@solidjs/router";
 import type { Accessor } from "solid-js";
 import { groupsApi } from "../api";
-
-const QK_GROUP_MEMBERS = "group_members";
+import { QK_GROUP_MEMBERS } from "../constants";
 
 export const useGroupMembers = (id: Accessor<string>) => {
   const getGroupMembers = query(

@@ -1,19 +1,13 @@
+import { useNavigate, useParams } from "@solidjs/router";
+import type { Component } from "solid-js";
+import { For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Table } from "@/components/ui/table";
 import { useGroup } from "@/features/groups/context/group-provider";
-import { api } from "@/lib/api";
-import { createAsync, query, useNavigate, useParams } from "@solidjs/router";
-import type { Component } from "solid-js";
-import { For, Suspense } from "solid-js";
 import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import type { GameRouteParams } from "../types";
-
-const getScoreboardData = query(async (id) => {
-  // TODO: try/catch
-  const res = await api.get(`/games/${id}/scoreboard`);
-  return res.data;
-}, "scoreboardData");
+import { useScoreboardData } from "../hooks/use-scoreboard-data";
 
 const LoadingText = () => {
   return (
@@ -43,8 +37,9 @@ const LoadingRows: Component<{ numCols: number; numRows?: number }> = (
 
 export const Scoreboard = () => {
   const params = useParams<GameRouteParams>();
+  const scoreboardData = useScoreboardData(() => params.gameId);
+
   const group = useGroup();
-  const scoreboardData = createAsync(() => getScoreboardData(params.gameId));
   const navigate = useNavigate();
 
   // TODO: proper loading for scoreboard name
@@ -55,8 +50,7 @@ export const Scoreboard = () => {
         {
           text: "Record Game",
           variant: "primary",
-          onAction: () =>
-            navigate(`/groups/${group()}/games/${params.gameId}/record`),
+          onAction: () => navigate(`record`),
         },
       ]}
     >

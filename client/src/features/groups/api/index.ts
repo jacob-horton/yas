@@ -10,9 +10,9 @@ export interface GroupsApiContract {
 }
 
 class GroupsApi implements GroupsApiContract {
-  public create = async (payload: CreateGroupRequest): Promise<Group> => {
+  public async create(payload: CreateGroupRequest): Promise<Group> {
     return api.post("/groups", payload).then((resp) => resp.data);
-  };
+  }
 
   public async listForUser(): Promise<Group[]> {
     return api.get("/users/me/groups").then((resp) => resp.data);

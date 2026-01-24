@@ -1,4 +1,4 @@
-import { useNavigate, useSubmission } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import { createSignal } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";

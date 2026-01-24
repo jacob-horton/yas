@@ -1,4 +1,4 @@
-import { A, createAsync, query, useNavigate } from "@solidjs/router";
+import { A, useNavigate } from "@solidjs/router";
 import type { LucideProps } from "lucide-solid";
 import GamePadIcon from "lucide-solid/icons/gamepad-2";
 import NotebookTextIcon from "lucide-solid/icons/notebook-text";
@@ -9,35 +9,9 @@ import { type Component, For, Show } from "solid-js";
 import type { JSX } from "solid-js/jsx-runtime";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { useGroup } from "@/features/groups/context/group-provider";
-import { api } from "../../lib/api";
+import { useGroupGames } from "@/features/groups/hooks/use-group-games";
+import { useMyGroups } from "@/features/users/hooks/use-my-groups";
 import { Dropdown } from "../ui/dropdown";
-
-export const GROUPS_QUERY_KEY = "myGroups";
-export const GAMES_QUERY_KEY = "games";
-
-export const getGroups = query(async () => {
-  // TODO: try/catch
-  const res = await api.get("/users/me/groups");
-  return res.data as {
-    id: string;
-    name: string;
-    created_at: string;
-  }[];
-}, GROUPS_QUERY_KEY);
-
-type Game = {
-  id: string;
-  name: string;
-  group_id: string;
-  created_at: string;
-  players_per_match: number;
-};
-
-export const getGames = query(async (id: string) => {
-  // TODO: try/catch
-  const res = await api.get(`/groups/${id}/games`);
-  return res.data as Game[];
-}, GAMES_QUERY_KEY);
 
 type Route = {
   href: string;
@@ -62,20 +36,13 @@ const NavItem: Component<Route> = (props) => {
 
 export const Sidebar: Component = () => {
   // TODO: what if no group - types say it's always defined
-  const group = useGroup();
   const { user } = useAuth();
-  const groups = createAsync(() => getGroups());
+  const groups = useMyGroups();
+
+  const group = useGroup();
+  const games = useGroupGames(group);
+
   const navigate = useNavigate();
-
-  // TODO: suspense properly
-  const games = createAsync(async () => {
-    const g = group();
-    if (!g) {
-      return [];
-    }
-
-    return getGames(g);
-  });
 
   return (
     <nav class="flex h-full w-80 min-w-80 flex-col gap-4 border-gray-200 border-r p-4 text-gray-800">

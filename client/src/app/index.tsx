@@ -6,13 +6,13 @@ import { AuthProvider } from "@/features/auth/context/auth-provider";
 import { Login } from "@/features/auth/views/login";
 import { Register } from "@/features/auth/views/register";
 import { CreateGame } from "@/features/games/views/create-game";
-import { RecordGame } from "@/features/games/views/record-match";
 import { Scoreboard } from "@/features/games/views/scoreboard";
 import { GroupProvider } from "@/features/groups/context/group-provider";
 import { CreateGroup } from "@/features/groups/views/create-group";
 import { GroupDetails } from "@/features/groups/views/group-details";
 import { GroupMembers } from "@/features/groups/views/group-members";
-import { Settings } from "@/features/user/views/settings";
+import { RecordGame } from "@/features/matches/views/record-match";
+import { Settings } from "@/features/users/views/settings";
 import { HomePage } from "@/pages/home-page";
 
 const WithSidebar: ParentComponent = (props) => {

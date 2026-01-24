@@ -1,11 +1,12 @@
-import { Page } from "@/components/layout/page";
-import { GAMES_QUERY_KEY } from "@/components/layout/sidebar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useGroup } from "@/features/groups/context/group-provider";
-import { api } from "@/lib/api";
 import { revalidate, useNavigate } from "@solidjs/router";
 import { createSignal } from "solid-js";
+import { Page } from "@/components/layout/page";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { groupsApi } from "@/features/groups/api";
+import { QK_GROUP_GAMES } from "@/features/groups/constants";
+import { useGroup } from "@/features/groups/context/group-provider";
+import type { CreateGameRequest } from "../types";
 
 export const CreateGame = () => {
   const navigate = useNavigate();
@@ -16,13 +17,16 @@ export const CreateGame = () => {
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
-    const res = await api.post(`/groups/${group()}/games`, {
+
+    const game: CreateGameRequest = {
       name: name(),
       players_per_match: Number.parseInt(numPlayers(), 10),
-    });
-    revalidate(GAMES_QUERY_KEY);
+    };
 
-    navigate(`/groups/${group()}/games/${res.data.id}`);
+    const res = await groupsApi.group(group()).createGame(game);
+
+    revalidate(QK_GROUP_GAMES);
+    navigate(`games/${res.id}`);
   }
 
   return (

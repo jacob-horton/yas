@@ -16,7 +16,8 @@
 
     // Type Checking & Safety
     "strict": true,
-    "types": ["vite/client"],
+    "types": ["vite/client", "node"],
+    "skipLibCheck": true,
 
     "baseUrl": ".",
     "paths": {
