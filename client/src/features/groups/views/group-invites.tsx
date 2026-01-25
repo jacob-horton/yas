@@ -7,6 +7,7 @@ import { cn } from "@/lib/classname";
 import { formatDate, formatDateTime } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupInvites } from "../hooks/use-group-invites";
+import { Button } from "@/components/ui/button";
 
 function isExpired(expiry: string) {
   const expiryDate = new Date(expiry);
@@ -37,6 +38,12 @@ const ExpiryCell: Component<ExpiryCellProps> = ({ expiresAt }) => {
   );
 };
 
+function getInviteLink(id: string) {
+  // TODO: use .env
+  const site = "http://localhost:3000";
+  return `${site}/invites/${id}/accept`;
+}
+
 export const Invites = () => {
   const group = useGroup();
   const invites = useGroupInvites(group);
@@ -55,7 +62,7 @@ export const Invites = () => {
       ]}
     >
       <Table
-        headings={["Name", "Created By", "Uses", "Created On", "Expiry"]}
+        headings={["Name", "Created By", "Uses", "Created On", "Expiry", ""]}
         caption="All invites for this group"
       >
         <Suspense>
@@ -71,6 +78,15 @@ export const Invites = () => {
                 <Table.Cell>{formatDate(invite.created_at)}</Table.Cell>
                 <Table.Cell>
                   <ExpiryCell expiresAt={invite.expires_at} />
+                </Table.Cell>
+                <Table.Cell>
+                  <Button
+                    icon="copy"
+                    variant="ghost"
+                    onClick={() =>
+                      navigator.clipboard.writeText(getInviteLink(invite.id))
+                    }
+                  />
                 </Table.Cell>
               </Table.Row>
             )}

@@ -1,8 +1,8 @@
+import { useNavigate } from "@solidjs/router";
 import ChevronLeftIcon from "lucide-solid/icons/chevron-left";
 import { For, type ParentComponent, Show } from "solid-js";
 import { cn } from "@/lib/classname";
 import { Button, type Variant } from "../ui/button";
-import { useNavigate } from "@solidjs/router";
 
 type Props = {
   title: string;
@@ -27,13 +27,11 @@ export const Page: ParentComponent<Props> = (props) => {
       <header class="flex items-center justify-between">
         <h1 class="flex items-center gap-2 py-6 font-semibold text-3xl text-gray-800">
           <Show when={props.showBack}>
-            <button
-              type="button"
-              class="rounded-md p-1 transition hover:bg-gray-50"
+            <Button
+              variant="ghost"
               onClick={() => navigate(-1)}
-            >
-              <ChevronLeftIcon size={28} />
-            </button>
+              icon="chevronLeft"
+            />
           </Show>
           {props.title}
         </h1>

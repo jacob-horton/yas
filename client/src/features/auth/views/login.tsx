@@ -1,5 +1,4 @@
 import { A, useNavigate } from "@solidjs/router";
-import ArrowRightIcon from "lucide-solid/icons/arrow-right";
 import { type Component, createEffect, createSignal } from "solid-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,7 +41,9 @@ export const Login: Component = () => {
             placeholder="●●●●●●●●●●●●"
           />
 
-          <Button type="submit">Login</Button>
+          <Button type="submit" class="w-full">
+            Login
+          </Button>
 
           <div class="text-center text-sm">
             <span class="text-gray-500">Don't have an account? </span>

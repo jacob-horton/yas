@@ -108,7 +108,9 @@ export const Register: Component = () => {
             placeholder="●●●●●●●●●●●●"
           />
 
-          <Button type="submit">Register</Button>
+          <Button type="submit" class="w-full">
+            Register
+          </Button>
 
           <div class="text-center text-sm">
             <span class="text-gray-500">Already have an account? </span>

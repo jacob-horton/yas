@@ -60,7 +60,7 @@ export const Sidebar: Component = () => {
         </div>
         <A
           href="/settings"
-          class="ml-auto rounded-md p-1.5 text-gray-300 transition hover:bg-gray-50 hover:text-gray-400"
+          class="ml-auto rounded-md p-1.5 text-gray-300 transition hover:bg-gray-100 hover:text-gray-400"
         >
           <SettingsIcon />
         </A>
