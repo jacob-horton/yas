@@ -13,6 +13,7 @@ type Props = {
   }[];
   narrow?: boolean;
   showBack?: boolean;
+  class?: string;
 };
 
 export const Page: ParentComponent<Props> = (props) => {
@@ -20,9 +21,11 @@ export const Page: ParentComponent<Props> = (props) => {
 
   return (
     <div
-      class={cn("mx-auto h-full w-full max-w-7xl px-4", {
-        "max-w-3xl": props.narrow,
-      })}
+      class={cn(
+        "mx-auto h-full w-full max-w-7xl px-4",
+        { "max-w-3xl": props.narrow },
+        props.class,
+      )}
     >
       <header class="flex items-center justify-between">
         <h1 class="flex items-center gap-2 py-6 font-semibold text-3xl text-gray-800">

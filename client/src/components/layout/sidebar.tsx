@@ -14,6 +14,7 @@ import { useGroup } from "@/features/groups/context/group-provider";
 import { useGroupGames } from "@/features/groups/hooks/use-group-games";
 import { useMyGroups } from "@/features/users/hooks/use-my-groups";
 import { Dropdown } from "../ui/dropdown";
+import { Button } from "../ui/button";
 
 type Route = {
   href: string;
@@ -65,13 +66,23 @@ export const Sidebar: Component = () => {
           <SettingsIcon />
         </A>
       </div>
-      <Dropdown
-        label="Group"
-        // TODO: default value
-        value={group() ?? ""}
-        onChange={(group) => navigate(`/groups/${group}`)}
-        options={groups()?.map((g) => ({ label: g.name, value: g.id })) ?? []}
-      />
+
+      <div class="flex gap-2">
+        <Dropdown
+          label="Group"
+          // TODO: default value
+          value={group() ?? ""}
+          onChange={(group) => navigate(`/groups/${group}`)}
+          options={groups()?.map((g) => ({ label: g.name, value: g.id })) ?? []}
+          class="w-full"
+        />
+
+        <Button
+          variant="ghost"
+          icon="plus"
+          onClick={() => navigate("/groups/create")}
+        />
+      </div>
 
       <div class="flex flex-col gap-6">
         <div class="flex flex-col gap-1">

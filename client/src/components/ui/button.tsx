@@ -1,11 +1,12 @@
-import ClipboardIcon from "lucide-solid/icons/clipboard";
 import ChevronLeftIcon from "lucide-solid/icons/chevron-left";
+import ClipboardIcon from "lucide-solid/icons/clipboard";
+import PlusIcon from "lucide-solid/icons/plus";
 import type { Component, ParentComponent } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { cn } from "@/lib/classname";
 
 export type Variant = "primary" | "secondary" | "ghost";
-export type Icon = "copy" | "chevronLeft";
+export type Icon = "copy" | "chevronLeft" | "plus";
 
 const COLOUR_MAP: Record<Variant, string> = {
   primary: "bg-violet-500 text-white",
@@ -16,6 +17,7 @@ const COLOUR_MAP: Record<Variant, string> = {
 const ICON_MAP: Record<Icon, Component> = {
   copy: ClipboardIcon,
   chevronLeft: ChevronLeftIcon,
+  plus: PlusIcon,
 };
 
 export const Button: ParentComponent<{
@@ -31,10 +33,7 @@ export const Button: ParentComponent<{
       class={cn(
         "flex w-fit items-center justify-center gap-2 whitespace-nowrap rounded-md p-10 py-1 font-medium hover:cursor-pointer",
         COLOUR_MAP[props.variant ?? "primary"],
-        {
-          "p-1.5 text-gray-300 hover:text-gray-400":
-            props.icon && !props.children,
-        },
+        { "p-1.5": props.icon && !props.children },
         props.class,
       )}
       onClick={props.onClick}
