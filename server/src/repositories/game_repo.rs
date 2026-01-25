@@ -38,7 +38,7 @@ impl GameRepo {
         executor: impl PgExecutor<'e, Database = Postgres>,
         group_id: Uuid,
     ) -> Result<Vec<GameDb>, sqlx::Error> {
-        sqlx::query_as::<_, GameDb>("SELECT * FROM games WHERE group_id = $1")
+        sqlx::query_as::<_, GameDb>("SELECT * FROM games WHERE group_id = $1 ORDER BY name")
             .bind(group_id)
             .fetch_all(executor)
             .await

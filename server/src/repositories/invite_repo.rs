@@ -57,7 +57,7 @@ impl InviteRepo {
         executor: impl PgExecutor<'e, Database = Postgres>,
         group_id: Uuid,
     ) -> Result<Vec<InviteWithCreatedByNameDb>, sqlx::Error> {
-        sqlx::query_as::<_, InviteWithCreatedByNameDb>("SELECT invites.*, users.name as created_by_name FROM invites JOIN users ON invites.created_by = users.id WHERE group_id = $1")
+        sqlx::query_as::<_, InviteWithCreatedByNameDb>("SELECT invites.*, users.name as created_by_name FROM invites JOIN users ON invites.created_by = users.id WHERE group_id = $1 ORDER BY created_at")
             .bind(group_id)
             .fetch_all(executor)
             .await

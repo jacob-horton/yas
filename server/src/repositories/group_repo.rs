@@ -92,7 +92,7 @@ impl GroupRepo {
         user_id: Uuid,
     ) -> Result<Vec<GroupDb>, sqlx::Error> {
         sqlx::query_as::<_, GroupDb>(
-            "SELECT groups.* FROM groups JOIN group_members ON groups.id = group_members.group_id WHERE group_members.user_id = $1",
+            "SELECT groups.* FROM groups JOIN group_members ON groups.id = group_members.group_id WHERE group_members.user_id = $1 ORDER BY name",
         )
         .bind(user_id)
         .fetch_all(executor)
@@ -105,7 +105,7 @@ impl GroupRepo {
         group_id: Uuid,
     ) -> Result<Vec<UserDb>, sqlx::Error> {
         sqlx::query_as::<_, UserDb>(
-            "SELECT users.* FROM group_members JOIN users ON users.id = group_members.user_id WHERE group_members.group_id = $1",
+            "SELECT users.* FROM group_members JOIN users ON users.id = group_members.user_id WHERE group_members.group_id = $1 ORDER BY name",
         )
         .bind(group_id)
         .fetch_all(executor)
