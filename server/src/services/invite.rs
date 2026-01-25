@@ -6,7 +6,7 @@ use crate::{
     errors::{AppError, GroupError, InviteError},
     models::{
         group::GroupMemberRole,
-        invite::{CreateInviteReq, InviteDb},
+        invite::{CreateInviteReq, InviteDb, InviteWithCreatedByNameDb},
     },
     policies::GroupAction,
 };
@@ -92,7 +92,10 @@ pub async fn accept_invite(
     Ok(())
 }
 
-pub async fn get_invite(state: &AppState, invite_code: Uuid) -> Result<InviteDb, AppError> {
+pub async fn get_invite(
+    state: &AppState,
+    invite_code: Uuid,
+) -> Result<InviteWithCreatedByNameDb, AppError> {
     let invite = state
         .invite_repo
         .find_by_code_for_update(&state.pool, invite_code)
@@ -105,7 +108,7 @@ pub async fn get_invite(state: &AppState, invite_code: Uuid) -> Result<InviteDb,
     Ok(invite)
 }
 
-pub fn validate_invite(invite: &InviteDb) -> Result<(), AppError> {
+pub fn validate_invite(invite: &InviteWithCreatedByNameDb) -> Result<(), AppError> {
     // If there is a max number of uses, and they've been used up, invite is no longer valid
     if let Some(max_uses) = invite.max_uses {
         if invite.uses >= max_uses {
@@ -125,7 +128,7 @@ pub async fn get_group_invites(
     state: &AppState,
     user_id: Uuid,
     group_id: Uuid,
-) -> Result<Vec<InviteDb>, AppError> {
+) -> Result<Vec<InviteWithCreatedByNameDb>, AppError> {
     // Check user is a member
     state
         .group_repo

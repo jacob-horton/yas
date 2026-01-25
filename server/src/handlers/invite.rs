@@ -10,7 +10,9 @@ use crate::{
     AppState,
     errors::AppError,
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
-    models::invite::{CreateInviteReq, InviteDetailResponse, InviteSummaryResponse},
+    models::invite::{
+        CreateInviteReq, InviteBasicResponse, InviteDetailResponse, InviteSummaryResponse,
+    },
     services,
 };
 
@@ -26,7 +28,7 @@ pub async fn create_invite(
 
     let invite = services::invite::create_link(&state, group_id, user.id, payload).await?;
 
-    let response: InviteSummaryResponse = invite.into();
+    let response: InviteBasicResponse = invite.into();
     Ok((StatusCode::CREATED, Json(response)))
 }
 

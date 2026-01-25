@@ -28,7 +28,7 @@ export const CreateGroup = () => {
       />
       <span class="flex gap-4">
         <Button type="submit">Create</Button>
-        <Button variant="secondary" onClick={() => navigate("..")}>
+        <Button variant="secondary" onClick={() => navigate("/")}>
           Cancel
         </Button>
       </span>

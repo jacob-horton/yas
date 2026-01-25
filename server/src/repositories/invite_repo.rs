@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use sqlx::{PgExecutor, Postgres, types::Uuid};
 
-use crate::models::invite::InviteDb;
+use crate::models::invite::{InviteDb, InviteWithCreatedByNameDb};
 
 pub struct InviteRepo {}
 
@@ -32,8 +32,8 @@ impl InviteRepo {
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,
         code: Uuid,
-    ) -> Result<Option<InviteDb>, sqlx::Error> {
-        sqlx::query_as::<_, InviteDb>("SELECT invites.*, users.name as created_by_name FROM invites JOIN users ON invites.created_by = users.id WHERE invites.id = $1 FOR UPDATE")
+    ) -> Result<Option<InviteWithCreatedByNameDb>, sqlx::Error> {
+        sqlx::query_as::<_, InviteWithCreatedByNameDb>("SELECT invites.*, users.name as created_by_name FROM invites JOIN users ON invites.created_by = users.id WHERE invites.id = $1 FOR UPDATE")
             .bind(code)
             .fetch_optional(executor)
             .await
@@ -56,8 +56,8 @@ impl InviteRepo {
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,
         group_id: Uuid,
-    ) -> Result<Vec<InviteDb>, sqlx::Error> {
-        sqlx::query_as::<_, InviteDb>("SELECT invites.*, users.name as created_by_name FROM invites JOIN users ON invites.created_by = users.id WHERE group_id = $1")
+    ) -> Result<Vec<InviteWithCreatedByNameDb>, sqlx::Error> {
+        sqlx::query_as::<_, InviteWithCreatedByNameDb>("SELECT invites.*, users.name as created_by_name FROM invites JOIN users ON invites.created_by = users.id WHERE group_id = $1")
             .bind(group_id)
             .fetch_all(executor)
             .await
