@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "@solidjs/router";
 import { createSignal, For, Suspense } from "solid-js";
-import { Page } from "@/components/layout/page";
+import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
@@ -45,52 +45,50 @@ export const RecordGame = () => {
   };
 
   return (
-    <Page title="Record Match" showBack narrow>
+    <FormPage title="Record Match" onSubmit={handleSubmit}>
       <Suspense>
         <p>
           Recording game for <b>{game()?.name}</b>
         </p>
-        <form class="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <For each={Array.from(Array(game()?.players_per_match).keys())}>
-            {(i) => (
-              <div class="flex gap-4">
-                <Dropdown
-                  class="flex-1"
-                  value={selected()[i] ?? ""}
-                  onChange={(value) =>
-                    setSelected((prev) => {
-                      const next = [...prev];
-                      next[i] = value;
-                      return next;
-                    })
-                  }
-                  options={
-                    members()?.map((m) => ({
-                      label: m.name,
-                      value: m.id.toString(),
-                    })) ?? []
-                  }
-                  label={`Player ${i + 1}`}
-                />
-                <Input
-                  class="w-32"
-                  type="number"
-                  value={points()[i] ?? ""}
-                  onChange={(value) => {
-                    setPoints((prev) => {
-                      const next = [...prev];
-                      next[i] = value;
-                      return next;
-                    });
-                  }}
-                  label="Points"
-                />
-              </div>
-            )}
-          </For>
-          <Button type="submit">Submit</Button>
-        </form>
+        <For each={Array.from(Array(game()?.players_per_match).keys())}>
+          {(i) => (
+            <div class="flex gap-4">
+              <Dropdown
+                class="flex-1"
+                value={selected()[i] ?? ""}
+                onChange={(value) =>
+                  setSelected((prev) => {
+                    const next = [...prev];
+                    next[i] = value;
+                    return next;
+                  })
+                }
+                options={
+                  members()?.map((m) => ({
+                    label: m.name,
+                    value: m.id.toString(),
+                  })) ?? []
+                }
+                label={`Player ${i + 1}`}
+              />
+              <Input
+                class="w-32"
+                type="number"
+                value={points()[i] ?? ""}
+                onChange={(value) => {
+                  setPoints((prev) => {
+                    const next = [...prev];
+                    next[i] = value;
+                    return next;
+                  });
+                }}
+                label="Points"
+              />
+            </div>
+          )}
+        </For>
+        <Button type="submit">Submit</Button>
       </Suspense>
-    </Page>
+    </FormPage>
   );
 };

@@ -1,6 +1,6 @@
 import { revalidate, useNavigate } from "@solidjs/router";
 import { createSignal } from "solid-js";
-import { Page } from "@/components/layout/page";
+import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { groupsApi } from "@/features/groups/api";
@@ -30,25 +30,23 @@ export const CreateGame = () => {
   }
 
   return (
-    <Page title="Create Game" narrow>
-      <form class="flex flex-col gap-6" onSubmit={handleSubmit}>
-        <Input
-          label="Name"
-          value={name()}
-          onChange={setName}
-          placeholder="e.g. Mario Kart Wii"
-        />
-        <Input
-          label="Number of players per match"
-          value={numPlayers()}
-          onChange={setNumPlayers}
-          placeholder="e.g. 4"
-        />
-        <span class="flex gap-4">
-          <Button type="submit">Create</Button>
-          <Button variant="secondary">Cancel</Button>
-        </span>
-      </form>
-    </Page>
+    <FormPage title="Create Game" onSubmit={handleSubmit}>
+      <Input
+        label="Name"
+        value={name()}
+        onChange={setName}
+        placeholder="e.g. Mario Kart Wii"
+      />
+      <Input
+        label="Number of players per match"
+        value={numPlayers()}
+        onChange={setNumPlayers}
+        placeholder="e.g. 4"
+      />
+      <span class="flex gap-4">
+        <Button type="submit">Create</Button>
+        <Button variant="secondary">Cancel</Button>
+      </span>
+    </FormPage>
   );
 };
