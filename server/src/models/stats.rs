@@ -13,6 +13,33 @@ pub struct RawMatchStats {
     pub rank_in_match: i64,
 }
 
+#[derive(sqlx::FromRow, Debug)]
+pub struct PlayerMatchDb {
+    pub match_id: Uuid,
+    pub score: i32,
+    pub played_at: chrono::DateTime<chrono::Utc>,
+    pub rank_in_match: i64,
+}
+
+#[derive(Debug, Serialize)]
+pub struct PlayerMatchResponse {
+    pub match_id: String,
+    pub score: i32,
+    pub played_at: String,
+    pub rank_in_match: i64,
+}
+
+impl From<PlayerMatchDb> for PlayerMatchResponse {
+    fn from(stats: PlayerMatchDb) -> Self {
+        Self {
+            match_id: stats.match_id.to_string(),
+            score: stats.score,
+            played_at: stats.played_at.to_rfc3339(),
+            rank_in_match: stats.rank_in_match,
+        }
+    }
+}
+
 pub struct ScoreboardEntry {
     pub user_id: Uuid,
     pub user_name: String,

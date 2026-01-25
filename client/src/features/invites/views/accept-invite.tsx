@@ -7,8 +7,8 @@ import { invitesApi } from "../api";
 import { useInvite } from "../hooks/use-invite";
 
 export const AcceptInvite = () => {
-  const { inviteId } = useParams<{ inviteId: string }>();
-  const invite = useInvite(() => inviteId);
+  const params = useParams<{ inviteId: string }>();
+  const invite = useInvite(() => params.inviteId);
   const me = useMe();
 
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ export const AcceptInvite = () => {
     }
 
     if (!i.is_current_user_member) {
-      await invitesApi.invite(inviteId).accept();
+      await invitesApi.invite(params.inviteId).accept();
     }
 
     navigate(`/groups/${i.group_id}`);

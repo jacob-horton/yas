@@ -7,6 +7,7 @@ mod game;
 mod game_match;
 mod group;
 mod invite;
+mod stats;
 mod user;
 
 // Combines all sub-modules into one router
@@ -18,4 +19,5 @@ pub fn api_router() -> Router<AppState> {
         .merge(invite::router())
         .merge(game::router())
         .merge(game_match::router())
+        .merge(stats::router())
 }

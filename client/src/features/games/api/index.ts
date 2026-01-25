@@ -1,5 +1,3 @@
-import { api } from "@/lib/api";
-import type { CreateGameRequest, Game } from "../types/game";
 import { GameApi, type GameApiContract } from "./game-api";
 
 export interface GamesApiContract {
@@ -7,10 +5,6 @@ export interface GamesApiContract {
 }
 
 class GamesApi implements GamesApiContract {
-  public async create(payload: CreateGameRequest): Promise<Game> {
-    return api.post("/games", payload).then((resp) => resp.data);
-  }
-
   public game(gameId: string): GameApiContract {
     return new GameApi(gameId);
   }

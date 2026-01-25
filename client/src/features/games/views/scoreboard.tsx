@@ -5,8 +5,8 @@ import { Page } from "@/components/layout/page";
 import { Table } from "@/components/ui/table";
 import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
-import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams } from "../types/game";
+import { useScoreboardData } from "../hooks/use-scoreboard-data";
 
 const LoadingText = () => {
   return (
@@ -79,7 +79,7 @@ export const Scoreboard = () => {
           <Suspense fallback={<LoadingRows numCols={4} />}>
             <For each={scoreboardData()?.entries}>
               {(score, index) => (
-                <Table.Row>
+                <Table.Row onClick={() => navigate(`player/${score.user_id}`)}>
                   <Table.Cell>
                     <span class="text-gray-400">{index() + 1}</span>
                   </Table.Cell>

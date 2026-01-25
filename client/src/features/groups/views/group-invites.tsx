@@ -18,13 +18,13 @@ function isExpired(expiry: string) {
 
 type ExpiryCellProps = { expiresAt: string };
 
-const ExpiryCell: Component<ExpiryCellProps> = ({ expiresAt }) => {
-  const expired = isExpired(expiresAt);
+const ExpiryCell: Component<ExpiryCellProps> = (props) => {
+  const expired = isExpired(props.expiresAt);
 
   return (
     <div class="flex flex-col">
       <span class={cn({ "text-red-500": expired })}>
-        {formatDateTime(expiresAt)}
+        {formatDateTime(props.expiresAt)}
       </span>
       <span
         class={cn("text-sm", {
@@ -32,7 +32,7 @@ const ExpiryCell: Component<ExpiryCellProps> = ({ expiresAt }) => {
           "text-red-400": expired,
         })}
       >
-        {formatDistanceToNow(expiresAt, { addSuffix: true })}
+        {formatDistanceToNow(props.expiresAt, { addSuffix: true })}
       </span>
     </div>
   );

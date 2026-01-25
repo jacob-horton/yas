@@ -1,6 +1,6 @@
 use sqlx::types::Uuid;
 
-use crate::models::stats::RawMatchStats;
+use crate::models::stats::{PlayerMatchDb, RawMatchStats};
 
 pub struct StatsRepo {}
 
@@ -33,6 +33,39 @@ impl StatsRepo {
             "#,
         )
         .bind(game_id)
+        .bind(n as i64)
+        .fetch_all(pool)
+        .await
+    }
+
+    pub async fn get_last_n_matches_single_player(
+        &self,
+        pool: &sqlx::PgPool,
+        game_id: Uuid,
+        user_id: Uuid,
+        n: i32,
+    ) -> Result<Vec<PlayerMatchDb>, sqlx::Error> {
+        sqlx::query_as::<_, PlayerMatchDb>(
+            r#"
+            SELECT
+                ms.match_id,
+                ms.score,
+                m.played_at,
+                (
+                    SELECT COUNT(*) + 1
+                    FROM match_scores ms2
+                    WHERE ms2.match_id = ms.match_id
+                    AND ms2.score > ms.score
+                ) as rank_in_match
+            FROM matches m
+            JOIN match_scores ms ON m.id = ms.match_id
+            WHERE m.game_id = $1 AND ms.user_id = $2
+            ORDER BY m.played_at DESC
+            LIMIT $3
+            "#,
+        )
+        .bind(game_id)
+        .bind(user_id)
         .bind(n as i64)
         .fetch_all(pool)
         .await

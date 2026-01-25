@@ -3,11 +3,11 @@ use sqlx::types::Uuid;
 use crate::{
     AppState,
     errors::{AppError, GameError, GroupError},
-    models::stats::{OrderBy, RawMatchStats, Scoreboard, ScoreboardEntry},
+    models::stats::{OrderBy, PlayerMatchDb, RawMatchStats, Scoreboard, ScoreboardEntry},
 };
 use std::{cmp::Ordering, collections::HashMap};
 
-pub async fn get_stats(
+pub async fn get_scoreboard(
     state: &AppState,
     user_id: Uuid,
     game_id: Uuid,
@@ -92,4 +92,36 @@ pub async fn get_stats(
     let scoreboard = Scoreboard { entries, game };
 
     Ok(scoreboard)
+}
+
+pub async fn get_player_stats(
+    state: &AppState,
+    user_id: Uuid,
+    game_id: Uuid,
+    player_id: Uuid,
+    num_matches: i32,
+) -> Result<Vec<PlayerMatchDb>, AppError> {
+    let game = state
+        .game_repo
+        .get(&state.pool, game_id)
+        .await?
+        .ok_or(GameError::NotFound)?;
+
+    // Check user is in group
+    let is_member = state
+        .group_repo
+        .are_members(&state.pool, game.group_id, &[user_id])
+        .await?;
+
+    if !is_member {
+        return Err(GroupError::MemberNotFound.into());
+    }
+
+    // Get last `n` games
+    let last_n_games = state
+        .stats_repo
+        .get_last_n_matches_single_player(&state.pool, game_id, player_id, num_matches)
+        .await?;
+
+    Ok(last_n_games)
 }

@@ -7,8 +7,12 @@ export type TableProps = {
   caption: string;
 };
 
+export type TableRowProps = {
+  onClick?: () => void;
+};
+
 type TableComponent = ParentComponent<TableProps> & {
-  Row: ParentComponent;
+  Row: ParentComponent<TableRowProps>;
   Cell: ParentComponent;
 };
 
@@ -42,8 +46,17 @@ export const Table: TableComponent = (props) => {
   );
 };
 
-export const Row: ParentComponent = (props) => {
-  return <tr>{props.children}</tr>;
+export const Row: ParentComponent<TableRowProps> = (props) => {
+  return (
+    <tr
+      class={cn({
+        "cursor-pointer transition hover:bg-gray-50": props.onClick,
+      })}
+      onClick={props.onClick}
+    >
+      {props.children}
+    </tr>
+  );
 };
 
 export const Cell: ParentComponent = (props) => {

@@ -1,13 +1,13 @@
 import type { CreateMatchRequest, Match } from "@/features/matches/types";
+import { StatsApi, type StatsApiContract } from "@/features/stats/api";
 import { api } from "@/lib/api";
 import type { Game } from "../types/game";
-import type { Scoreboard } from "../types/scoreboard";
 
 export interface GameApiContract {
   get(): Promise<Game>;
-  getScoreboard(): Promise<Scoreboard>;
-
   createMatch(match: CreateMatchRequest): Promise<Match>;
+
+  stats(): StatsApiContract;
 }
 
 export class GameApi implements GameApiContract {
@@ -17,15 +17,13 @@ export class GameApi implements GameApiContract {
     return api.get(`/games/${this.gameId}`).then((resp) => resp.data);
   }
 
-  public async getScoreboard(): Promise<Scoreboard> {
-    return api
-      .get(`/games/${this.gameId}/scoreboard`)
-      .then((resp) => resp.data);
-  }
-
   public async createMatch(match: CreateMatchRequest): Promise<Match> {
     return api
       .post(`/games/${this.gameId}/matches`, match)
       .then((resp) => resp.data);
+  }
+
+  public stats(): StatsApiContract {
+    return new StatsApi(this.gameId);
   }
 }

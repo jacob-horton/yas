@@ -15,6 +15,7 @@ import { GroupMembers } from "@/features/groups/views/group-members";
 import { AcceptInvite } from "@/features/invites/views/accept-invite";
 import { CreateInvite } from "@/features/invites/views/create-invite";
 import { RecordGame } from "@/features/matches/views/record-match";
+import { PlayerStats } from "@/features/stats/views/player-stats";
 import { UserSettings } from "@/features/users/views/settings";
 import { HomePage } from "@/pages/home-page";
 
@@ -42,6 +43,11 @@ export default function App() {
             <Route path="/games/:gameId" component={Scoreboard} />
             <Route path="/games/:gameId/record" component={RecordGame} />
             <Route path="/games/create" component={CreateGame} />
+
+            <Route
+              path="/games/:gameId/player/:playerId"
+              component={PlayerStats}
+            />
 
             <Route path="/invites" component={Invites} />
             <Route path="/invites/create" component={CreateInvite} />

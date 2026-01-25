@@ -58,7 +58,7 @@ pub async fn get_scoreboard(
         .parse()
         .map_err(|_| AppError::BadRequest("Invalid game ID".to_string()))?;
 
-    let scoreboard = services::stats::get_stats(
+    let scoreboard = services::stats::get_scoreboard(
         &state,
         user.id,
         game_id,
