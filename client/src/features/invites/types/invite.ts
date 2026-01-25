@@ -12,7 +12,7 @@ export type InviteDetail = {
 export type InviteSummary = {
   id: string;
   name: string;
-  created_by: string;
+  created_by_name: string;
   max_uses: number | null;
   uses: number;
   created_at: string;

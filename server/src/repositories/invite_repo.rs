@@ -33,7 +33,7 @@ impl InviteRepo {
         executor: impl PgExecutor<'e, Database = Postgres>,
         code: Uuid,
     ) -> Result<Option<InviteDb>, sqlx::Error> {
-        sqlx::query_as::<_, InviteDb>("SELECT * FROM invites WHERE id = $1 FOR UPDATE")
+        sqlx::query_as::<_, InviteDb>("SELECT invites.*, users.name as created_by_name FROM invites JOIN users ON invites.created_by = users.id WHERE invites.id = $1 FOR UPDATE")
             .bind(code)
             .fetch_optional(executor)
             .await
@@ -57,7 +57,7 @@ impl InviteRepo {
         executor: impl PgExecutor<'e, Database = Postgres>,
         group_id: Uuid,
     ) -> Result<Vec<InviteDb>, sqlx::Error> {
-        sqlx::query_as::<_, InviteDb>("SELECT * FROM invites WHERE group_id = $1")
+        sqlx::query_as::<_, InviteDb>("SELECT invites.*, users.name as created_by_name FROM invites JOIN users ON invites.created_by = users.id WHERE group_id = $1")
             .bind(group_id)
             .fetch_all(executor)
             .await

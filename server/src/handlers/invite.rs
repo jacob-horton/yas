@@ -55,18 +55,8 @@ async fn get_invite(
         .parse()
         .map_err(|_| AppError::BadRequest("Invalid invite code".to_string()))?;
 
-    // TODO: return the following:
-    // Whether user is already in the group
-    // Group details
     let invite = services::invite::get_invite(&state, code).await?;
     let group = services::group::get_group_without_auth_check(&state, invite.group_id).await?;
-    let invite_created_by = state
-        .user_repo
-        .find_by_id(&state.pool, invite.created_by)
-        .await?
-        .ok_or(AppError::InternalServerError(
-            "User that created invite no longer exists".to_string(),
-        ))?;
 
     let in_group = state
         .group_repo
@@ -75,7 +65,7 @@ async fn get_invite(
 
     let response = InviteDetailResponse {
         id: invite.id.to_string(),
-        created_by_name: invite_created_by.name,
+        created_by_name: invite.created_by_name,
         expires_at: invite.expires_at,
 
         group_id: group.id.to_string(),

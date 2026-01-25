@@ -63,7 +63,7 @@ export const Invites = () => {
             {(invite) => (
               <Table.Row>
                 <Table.Cell>{invite.name}</Table.Cell>
-                <Table.Cell>{invite.created_by}</Table.Cell>
+                <Table.Cell>{invite.created_by_name}</Table.Cell>
                 <Table.Cell>
                   {invite.uses}
                   {invite.max_uses && <>/{invite.max_uses}</>}

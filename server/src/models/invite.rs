@@ -10,6 +10,7 @@ pub struct InviteDb {
     pub name: String,
 
     pub created_by: Uuid,
+    pub created_by_name: String,
 
     pub max_uses: Option<i32>,
     pub uses: i32,
@@ -21,7 +22,7 @@ pub struct InviteDb {
 #[derive(Debug, Serialize)]
 pub struct InviteSummaryResponse {
     pub id: String,
-    pub created_by: String,
+    pub created_by_name: String,
     pub name: String,
 
     pub max_uses: Option<i32>,
@@ -35,7 +36,7 @@ impl From<InviteDb> for InviteSummaryResponse {
     fn from(invite: InviteDb) -> Self {
         Self {
             id: invite.id.to_string(),
-            created_by: invite.created_by.to_string(),
+            created_by_name: invite.created_by_name.to_string(),
             name: invite.name,
 
             max_uses: invite.max_uses,
