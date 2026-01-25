@@ -1,3 +1,4 @@
+import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import Chart, { type ScriptableContext } from "chart.js/auto";
 import {
   type Component,
@@ -99,7 +100,7 @@ export const ChartComponent: Component<ChartProps> = (props) => {
             callbacks: {
               title: (tooltipItems) => {
                 const raw = tooltipItems[0].raw as { rank: number };
-                return `Rank #${raw.rank}`;
+                return ordinalSuffix(raw.rank);
               },
 
               label: (context) => {

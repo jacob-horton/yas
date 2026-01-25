@@ -1,16 +1,7 @@
 import type { Component } from "solid-js";
-
-const COLOUR_MAP: Record<number, string> = {
-  1: "from-amber-200 to-orange-400",
-  2: "from-slate-200 to-slate-400",
-  3: "from-orange-300 to-red-400",
-} as const;
-
-const POSITION_MAP: Record<number, string> = {
-  1: "1st",
-  2: "2nd",
-  3: "3rd",
-} as const;
+import { ordinalSuffix } from "@/lib/ordinal-suffix";
+import { RANK_BG_GRADIENTS } from "@/lib/rank-colours";
+import { cn } from "@/lib/classname";
 
 export const PodiumCard: Component<{
   name: string;
@@ -21,9 +12,12 @@ export const PodiumCard: Component<{
   return (
     <div class="w-68 overflow-clip rounded-md border pb-8">
       <div
-        class={`relative border-black border-b bg-gradient-to-br px-6 py-4 text-end font-semibold text-4xl text-white ${COLOUR_MAP[props.position]}`}
+        class={cn(
+          "relative border-black border-b bg-gradient-to-br px-6 py-4 text-end font-semibold text-4xl text-white",
+          RANK_BG_GRADIENTS[props.position],
+        )}
       >
-        {POSITION_MAP[props.position]}
+        {ordinalSuffix(props.position)}
         <div class="-translate-y-1/2 absolute top-full flex size-20 items-center justify-center rounded-full border border-black bg-white">
           <div class="size-10 rounded-full bg-gray-300" />
         </div>
@@ -53,9 +47,12 @@ export const PodiumCardSkeleton: Component<{ position: number }> = (props) => {
   return (
     <div class="w-68 overflow-clip rounded-md border pb-8">
       <div
-        class={`relative border-black border-b bg-gradient-to-br px-6 py-4 text-end font-semibold text-4xl text-white ${COLOUR_MAP[props.position]}`}
+        class={cn(
+          "relative border-black border-b bg-gradient-to-br px-6 py-4 text-end font-semibold text-4xl text-white",
+          RANK_BG_GRADIENTS[props.position],
+        )}
       >
-        {POSITION_MAP[props.position]}
+        {ordinalSuffix(props.position)}
         <div class="-translate-y-1/2 absolute top-full flex size-20 items-center justify-center rounded-full border border-black bg-white">
           <div class="size-10 rounded-full bg-gray-300" />
         </div>
