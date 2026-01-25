@@ -35,7 +35,7 @@ impl From<UserDb> for UserResponse {
 pub struct CreateUserReq {
     #[validate(email(message = "Email must be valid"))]
     pub email: String,
-    #[validate(length(min = 2, max = 50, message = "Name must be between 2 and 512 chars"))]
+    #[validate(length(min = 1, max = 512, message = "Name must be between 1 and 512 chars"))]
     pub name: String,
     #[validate(length(
         min = 8,

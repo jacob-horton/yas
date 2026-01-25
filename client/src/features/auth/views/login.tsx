@@ -6,7 +6,7 @@ import { useAuth } from "../context/auth-provider";
 
 export const Login: Component = () => {
   const [email, setEmail] = createSignal("jacob@email.com");
-  const [password, setPassword] = createSignal("password123");
+  const [password, setPassword] = createSignal("password");
 
   const navigate = useNavigate();
   const auth = useAuth();
