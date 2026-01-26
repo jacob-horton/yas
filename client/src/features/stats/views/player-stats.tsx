@@ -24,8 +24,9 @@ export const PlayerStats = () => {
       <div class="flex flex-col gap-8">
         <ChartComponent
           data={
-            stats()?.map((s) => ({ score: s.score, rank: s.rank_in_match })) ??
-            []
+            stats()
+              ?.map((s) => ({ score: s.score, rank: s.rank_in_match }))
+              .toReversed() ?? []
           }
         />
 
