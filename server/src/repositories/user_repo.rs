@@ -16,7 +16,7 @@ impl UserRepo {
             "INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING *",
         )
         .bind(name)
-        .bind(email)
+        .bind(email.to_lowercase())
         .bind(password_hash)
         .fetch_one(executor)
         .await
@@ -28,7 +28,7 @@ impl UserRepo {
         email: &str,
     ) -> Result<Option<UserDb>, sqlx::Error> {
         sqlx::query_as::<_, UserDb>("SELECT * FROM users WHERE email = $1")
-            .bind(email)
+            .bind(email.to_lowercase())
             .fetch_optional(executor)
             .await
     }
