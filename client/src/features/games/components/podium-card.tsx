@@ -1,7 +1,7 @@
 import type { Component } from "solid-js";
+import { cn } from "@/lib/classname";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_BG_GRADIENTS } from "@/lib/rank-colours";
-import { cn } from "@/lib/classname";
 
 export const PodiumCard: Component<{
   name: string;
@@ -28,12 +28,16 @@ export const PodiumCard: Component<{
 
         <div class="flex">
           <div class="w-full font-semibold">
-            <p class="text-lg">{(props.winRate * 100).toFixed(0)}%</p>
+            <p class="font-mono-nums text-lg">
+              {(props.winRate * 100).toFixed(0)}%
+            </p>
             <p class="font-normal text-gray-400 text-xs">WIN RATE</p>
           </div>
 
           <div class="w-full font-semibold">
-            <p class="text-lg">{props.pointsPerGame.toFixed(2)}</p>
+            <p class="font-mono-nums text-lg">
+              {props.pointsPerGame.toFixed(2)}
+            </p>
             <p class="font-normal text-gray-400 text-xs">POINTS/GAME</p>
           </div>
         </div>

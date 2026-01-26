@@ -1,10 +1,25 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100..900;1,100..900&display=swap");
+
+/* Inter, but only 0-9 and punctuation */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400..900&text=0123456789%24%25%2C%2E%2B%2D&display=swap");
+
 @import "tailwindcss";
 
 /* biome-ignore lint/suspicious/noUnknownAtRules: Supported by tailwind */
 @theme {
   --font-sans: "Poppins", sans-serif;
+  --font-mono-nums: "Inter", "Poppins", sans-serif; /* Monospaced numbers */
+
   --default-border-width: 1.5px;
+}
+
+/* Mono font for numbers in table */
+@layer base {
+  td,
+  th {
+    font-family: var(--font-mono-nums);
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 .aurora-gradient {
