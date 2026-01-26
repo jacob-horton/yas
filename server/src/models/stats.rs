@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use sqlx::types::Uuid;
+use sqlx::{prelude::FromRow, types::Uuid};
 
 use crate::models::game::{GameDb, GameResponse};
 
@@ -101,6 +101,81 @@ impl From<Scoreboard> for ScoreboardResponse {
         Self {
             entries: scoreboard.entries.into_iter().map(|s| s.into()).collect(),
             game: scoreboard.game.into(),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct PlayerStatsSummary {
+    pub period: StatsPeriod,
+    pub lifetime: StatsLifetime,
+}
+
+#[derive(Debug, FromRow)]
+pub struct StatsPeriod {
+    pub average_score: f64,
+    pub win_rate: f64,
+    pub best_score: i64,
+    pub rank: i64,
+}
+
+#[derive(Debug, FromRow)]
+pub struct StatsLifetime {
+    pub average_score: f64,
+    pub best_score: i64,
+    pub total_games: i64,
+    pub win_rate: f64,
+}
+
+#[derive(Serialize)]
+pub struct PlayerStatsSummaryResponse {
+    pub period: StatsPeriodResponse,
+    pub lifetime: StatsLifetimeResponse,
+}
+
+#[derive(Serialize)]
+pub struct StatsPeriodResponse {
+    pub average_score: f64,
+    pub win_rate: f64,
+    pub best_score: i64,
+    pub rank: i64,
+}
+
+#[derive(Serialize)]
+pub struct StatsLifetimeResponse {
+    pub average_score: f64,
+    pub best_score: i64,
+    pub total_games: i64,
+    pub win_rate: f64,
+}
+
+impl From<StatsLifetime> for StatsLifetimeResponse {
+    fn from(value: StatsLifetime) -> Self {
+        Self {
+            average_score: value.average_score,
+            best_score: value.best_score,
+            total_games: value.total_games,
+            win_rate: value.win_rate,
+        }
+    }
+}
+
+impl From<StatsPeriod> for StatsPeriodResponse {
+    fn from(value: StatsPeriod) -> Self {
+        Self {
+            average_score: value.average_score,
+            win_rate: value.win_rate,
+            best_score: value.best_score,
+            rank: value.rank,
+        }
+    }
+}
+
+impl From<PlayerStatsSummary> for PlayerStatsSummaryResponse {
+    fn from(value: PlayerStatsSummary) -> Self {
+        Self {
+            period: value.period.into(),
+            lifetime: value.lifetime.into(),
         }
     }
 }

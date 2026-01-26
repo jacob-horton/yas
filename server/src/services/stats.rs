@@ -3,7 +3,9 @@ use sqlx::types::Uuid;
 use crate::{
     AppState,
     errors::{AppError, GameError, GroupError},
-    models::stats::{OrderBy, PlayerMatchDb, RawMatchStats, Scoreboard, ScoreboardEntry},
+    models::stats::{
+        OrderBy, PlayerMatchDb, PlayerStatsSummary, RawMatchStats, Scoreboard, ScoreboardEntry,
+    },
 };
 use std::{cmp::Ordering, collections::HashMap};
 
@@ -94,7 +96,7 @@ pub async fn get_scoreboard(
     Ok(scoreboard)
 }
 
-pub async fn get_player_stats(
+pub async fn get_player_history(
     state: &AppState,
     user_id: Uuid,
     game_id: Uuid,
@@ -124,4 +126,45 @@ pub async fn get_player_stats(
         .await?;
 
     Ok(last_n_games)
+}
+
+pub async fn get_player_summary(
+    state: &AppState,
+    user_id: Uuid,
+    game_id: Uuid,
+    player_id: Uuid,
+    num_matches: i32,
+) -> Result<PlayerStatsSummary, AppError> {
+    let game = state
+        .game_repo
+        .get(&state.pool, game_id)
+        .await?
+        .ok_or(GameError::NotFound)?;
+
+    // Check user is in group
+    let is_member = state
+        .group_repo
+        .are_members(&state.pool, game.group_id, &[user_id])
+        .await?;
+
+    if !is_member {
+        return Err(GroupError::MemberNotFound.into());
+    }
+
+    let lifetime_stats = state
+        .stats_repo
+        .get_lifetime_stats(&state.pool, game_id, player_id)
+        .await?;
+
+    let period_stats = state
+        .stats_repo
+        .get_period_stats(&state.pool, game_id, player_id, num_matches)
+        .await?;
+
+    let stats = PlayerStatsSummary {
+        lifetime: lifetime_stats,
+        period: period_stats,
+    };
+
+    Ok(stats)
 }
