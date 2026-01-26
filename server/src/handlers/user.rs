@@ -1,6 +1,6 @@
 use axum::{
     Json, Router,
-    extract::State,
+    extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
     routing::{get, post},
@@ -14,7 +14,7 @@ use crate::{
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     models::{
         group::GroupResponse,
-        user::{CreateUserReq, UserResponse},
+        user::{CreateUserReq, PublicUserDetailsResponse, UserResponse},
     },
     services,
 };
@@ -58,6 +58,37 @@ async fn get_current_user(
     Ok((StatusCode::OK, Json(response)))
 }
 
+// Gets public info about a user
+async fn get_user(
+    State(state): State<AppState>,
+    AuthUser(logged_in_user): AuthUser,
+    Path((user_id,)): Path<(String,)>,
+) -> Result<impl IntoResponse, AppError> {
+    let user_id = user_id
+        .parse()
+        .map_err(|_| AppError::BadRequest("Invalid user id".to_string()))?;
+
+    // Check if logged in user shares a group with lookup user for privacy
+    let shares_group = state
+        .group_repo
+        .users_share_group(&state.pool, logged_in_user.id, user_id)
+        .await?;
+
+    if !shares_group {
+        return Err(UserError::NotPermittedToView.into());
+    }
+
+    let user = state
+        .user_repo
+        .find_by_id(&state.pool, user_id)
+        .await
+        .map_err(UserError::Database)?
+        .ok_or(UserError::NotFound)?;
+
+    let response: PublicUserDetailsResponse = user.into();
+    Ok((StatusCode::OK, Json(response)))
+}
+
 async fn get_current_user_groups(
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
@@ -77,4 +108,5 @@ pub fn router() -> Router<AppState> {
         .route("/users", post(create_user))
         .route("/users/me", get(get_current_user))
         .route("/users/me/groups", get(get_current_user_groups))
+        .route("/users/:id", get(get_user))
 }

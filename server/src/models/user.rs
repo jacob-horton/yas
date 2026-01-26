@@ -31,6 +31,21 @@ impl From<UserDb> for UserResponse {
     }
 }
 
+#[derive(Debug, Serialize)]
+pub struct PublicUserDetailsResponse {
+    pub id: String,
+    pub name: String,
+}
+
+impl From<UserDb> for PublicUserDetailsResponse {
+    fn from(user: UserDb) -> Self {
+        Self {
+            id: user.id.to_string(),
+            name: user.name,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Validate)]
 pub struct CreateUserReq {
     #[validate(email(message = "Email must be valid"))]

@@ -111,4 +111,28 @@ impl GroupRepo {
         .fetch_all(executor)
         .await
     }
+
+    pub async fn users_share_group<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        user_1_id: Uuid,
+        user_2_id: Uuid,
+    ) -> Result<bool, sqlx::Error> {
+        let exists: bool = sqlx::query_scalar(
+            r#"
+            SELECT EXISTS (
+                SELECT 1
+                FROM group_members gm1
+                JOIN group_members gm2 ON gm1.group_id = gm2.group_id
+                WHERE gm1.user_id = $1 AND gm2.user_id = $2
+            )
+            "#,
+        )
+        .bind(user_1_id)
+        .bind(user_2_id)
+        .fetch_one(executor)
+        .await?;
+
+        Ok(exists)
+    }
 }

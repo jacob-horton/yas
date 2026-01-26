@@ -22,6 +22,9 @@ pub enum UserError {
     #[error("User not found")]
     NotFound,
 
+    #[error("Not permitted to view user data")]
+    NotPermittedToView,
+
     #[error(transparent)]
     Database(#[from] sqlx::Error),
 }
@@ -129,6 +132,7 @@ impl IntoResponse for AppError {
             AppError::User(err) => match err {
                 UserError::UserAlreadyExists => (StatusCode::CONFLICT, err.to_string()),
                 UserError::NotFound => (StatusCode::NOT_FOUND, err.to_string()),
+                UserError::NotPermittedToView => (StatusCode::FORBIDDEN, err.to_string()),
                 UserError::Database(e) => {
                     eprintln!("User DB error: {:?}", e);
                     (

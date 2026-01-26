@@ -1,6 +1,7 @@
 import { useParams } from "@solidjs/router";
 import { Page } from "@/components/layout/page";
 import { Table } from "@/components/ui/table";
+import { useUser } from "@/features/users/hooks/use-user";
 import { cn } from "@/lib/classname";
 import { formatDate } from "@/lib/format-date";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
@@ -16,8 +17,10 @@ export const PlayerStats = () => {
     () => params.playerId,
   );
 
+  const player = useUser(() => params.playerId);
+
   return (
-    <Page title="Player Stats" showBack>
+    <Page title={`Stats for ${player()?.name ?? "Loading"}`} showBack>
       <div class="flex flex-col gap-8">
         <ChartComponent
           data={

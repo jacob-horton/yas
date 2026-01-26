@@ -8,7 +8,7 @@ export interface StatsApiContract {
 }
 
 export class StatsApi implements StatsApiContract {
-  public constructor(private gameId: string) {}
+  constructor(private gameId: string) {}
 
   public async getPlayerStats(playerId: string): Promise<MatchStats[]> {
     return api
