@@ -108,7 +108,7 @@ export const Dropdown: Component<{
         <Show when={isOpen()}>
           <div
             role="listbox"
-            class="absolute top-full left-0 z-10 mt-2 w-full overflow-y-auto rounded-md border border-black bg-white shadow-lg"
+            class="absolute top-full left-0 z-10 mt-2 w-full overflow-y-auto rounded-md border bg-white shadow-lg"
           >
             <For
               each={props.options}

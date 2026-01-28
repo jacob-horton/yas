@@ -89,7 +89,7 @@ export const Sidebar: Component = () => {
           <span class="flex items-center gap-3 px-2 text-gray-300 text-sm">
             <SlidersHorizontalIcon size={18} />
             <p class="font-semibold">MANAGE GROUP</p>
-            <div class="flex-grow border-t" />
+            <div class="flex-grow border-gray-200 border-t" />
           </span>
 
           <NavItem name="Details" href="" icon={NotebookTextIcon} end />
@@ -101,7 +101,7 @@ export const Sidebar: Component = () => {
           <span class="flex items-center gap-3 px-2 text-gray-300 text-sm">
             <GamePadIcon size={18} />
             <p class="font-semibold">GAMES</p>
-            <div class="flex-grow border-t" />
+            <div class="flex-grow border-gray-200 border-t" />
           </span>
 
           <For each={games()}>

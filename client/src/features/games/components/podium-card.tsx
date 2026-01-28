@@ -13,12 +13,12 @@ export const PodiumCard: Component<{
     <div class="w-68 overflow-clip rounded-md border pb-8">
       <div
         class={cn(
-          "relative border-black border-b bg-gradient-to-br px-6 py-4 text-end font-semibold text-4xl text-white",
+          "relative border-b bg-gradient-to-br px-6 py-4 text-end font-semibold text-4xl text-white",
           RANK_BG_GRADIENTS[props.position],
         )}
       >
         {ordinalSuffix(props.position)}
-        <div class="-translate-y-1/2 absolute top-full flex size-20 items-center justify-center rounded-full border border-black bg-white">
+        <div class="-translate-y-1/2 absolute top-full flex size-20 items-center justify-center rounded-full border bg-white">
           <div class="size-10 rounded-full bg-gray-300" />
         </div>
       </div>
@@ -52,12 +52,12 @@ export const PodiumCardSkeleton: Component<{ position: number }> = (props) => {
     <div class="w-68 overflow-clip rounded-md border pb-8">
       <div
         class={cn(
-          "relative border-black border-b bg-gradient-to-br px-6 py-4 text-end font-semibold text-4xl text-white",
+          "relative border-b bg-gradient-to-br px-6 py-4 text-end font-semibold text-4xl text-white",
           RANK_BG_GRADIENTS[props.position],
         )}
       >
         {ordinalSuffix(props.position)}
-        <div class="-translate-y-1/2 absolute top-full flex size-20 items-center justify-center rounded-full border border-black bg-white">
+        <div class="-translate-y-1/2 absolute top-full flex size-20 items-center justify-center rounded-full border bg-white">
           <div class="size-10 rounded-full bg-gray-300" />
         </div>
       </div>

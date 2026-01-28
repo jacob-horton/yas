@@ -20,6 +20,10 @@
     font-family: var(--font-mono-nums);
     font-variant-numeric: tabular-nums;
   }
+
+  * {
+    border-color: var(--color-gray-800);
+  }
 }
 
 .aurora-gradient {
