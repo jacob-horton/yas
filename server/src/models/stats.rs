@@ -116,7 +116,6 @@ pub struct StatsPeriod {
     pub average_score: f64,
     pub win_rate: f64,
     pub best_score: i64,
-    pub rank: i64,
 }
 
 #[derive(Debug, FromRow)]
@@ -138,7 +137,6 @@ pub struct StatsPeriodResponse {
     pub average_score: f64,
     pub win_rate: f64,
     pub best_score: i64,
-    pub rank: i64,
 }
 
 #[derive(Serialize)]
@@ -166,7 +164,6 @@ impl From<StatsPeriod> for StatsPeriodResponse {
             average_score: value.average_score,
             win_rate: value.win_rate,
             best_score: value.best_score,
-            rank: value.rank,
         }
     }
 }

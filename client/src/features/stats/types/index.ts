@@ -19,7 +19,6 @@ export type StatsPeriod = {
   average_score: number;
   win_rate: number;
   best_score: number;
-  rank: number;
 };
 
 export type StatsLifetime = {
