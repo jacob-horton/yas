@@ -18,6 +18,7 @@ import { RecordGame } from "@/features/matches/views/record-match";
 import { PlayerStats } from "@/features/stats/views/player-stats";
 import { UserSettings } from "@/features/users/views/settings";
 import { HomePage } from "@/pages/home-page";
+import { EditUser } from "@/features/users/views/edit-user";
 
 const WithSidebar: ParentComponent = (props) => {
   return (
@@ -56,6 +57,7 @@ export default function App() {
           <Route path="/" component={HomePage} />
           <Route path="/groups/create" component={CreateGroup} />
           <Route path="/settings" component={UserSettings} />
+          <Route path="/me/edit" component={EditUser} />
 
           <Route path="/invites/:inviteId/accept" component={AcceptInvite} />
         </Route>

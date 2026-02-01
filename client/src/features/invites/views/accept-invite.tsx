@@ -2,14 +2,14 @@ import { useNavigate, useParams } from "@solidjs/router";
 import { Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";
-import { useMe } from "@/features/users/hooks/use-me";
+import { useAuth } from "@/features/auth/context/auth-provider";
 import { invitesApi } from "../api";
 import { useInvite } from "../hooks/use-invite";
 
 export const AcceptInvite = () => {
   const params = useParams<{ inviteId: string }>();
   const invite = useInvite(() => params.inviteId);
-  const me = useMe();
+  const auth = useAuth();
 
   const navigate = useNavigate();
 
@@ -34,7 +34,7 @@ export const AcceptInvite = () => {
           <div>
             You are currently logged in as{" "}
             <strong>
-              {me()?.name} ({me()?.email})
+              {auth.user()?.name} ({auth.user()?.email})
             </strong>
           </div>
 

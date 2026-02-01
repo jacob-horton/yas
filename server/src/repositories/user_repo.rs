@@ -22,6 +22,23 @@ impl UserRepo {
         .await
     }
 
+    pub async fn update<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        id: Uuid,
+        name: &str,
+        email: &str,
+    ) -> Result<UserDb, sqlx::Error> {
+        sqlx::query_as::<_, UserDb>(
+            "UPDATE users SET name = $1, email = $2 WHERE id = $3 RETURNING *",
+        )
+        .bind(name)
+        .bind(email.to_lowercase())
+        .bind(id)
+        .fetch_one(executor)
+        .await
+    }
+
     pub async fn find_by_email<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,

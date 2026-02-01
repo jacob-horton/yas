@@ -3,7 +3,7 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::{get, post},
+    routing::{get, patch, post},
 };
 use tower_sessions::Session;
 
@@ -14,7 +14,7 @@ use crate::{
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     models::{
         group::GroupResponse,
-        user::{CreateUserReq, PublicUserDetailsResponse, UserResponse},
+        user::{CreateUserReq, PublicUserDetailsResponse, UpdateUserReq, UserResponse},
     },
     services,
 };
@@ -103,10 +103,26 @@ async fn get_current_user_groups(
     Ok((StatusCode::OK, Json(response)))
 }
 
+async fn update_current_user(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    ValidatedJson(payload): ValidatedJson<UpdateUserReq>,
+) -> Result<impl IntoResponse, AppError> {
+    let user = state
+        .user_repo
+        .update(&state.pool, user.id, &payload.name, &payload.email)
+        .await
+        .map_err(UserError::Database)?;
+
+    let response: UserResponse = user.into();
+    Ok((StatusCode::OK, Json(response)))
+}
+
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/users", post(create_user))
         .route("/users/me", get(get_current_user))
+        .route("/users/me", patch(update_current_user))
         .route("/users/me/groups", get(get_current_user_groups))
         .route("/users/:id", get(get_user))
 }

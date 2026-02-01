@@ -59,3 +59,11 @@ pub struct CreateUserReq {
     ))]
     pub password: String,
 }
+
+#[derive(Debug, Deserialize, Validate)]
+pub struct UpdateUserReq {
+    #[validate(email(message = "Email must be valid"))]
+    pub email: String,
+    #[validate(length(min = 1, max = 512, message = "Name must be between 1 and 512 chars"))]
+    pub name: String,
+}

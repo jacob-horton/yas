@@ -26,6 +26,7 @@ type ErrorDetail = {
 const AuthContext = createContext<{
   user: Accessor<User | null>;
   loading: Accessor<boolean>;
+  revalidate: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   register: (
@@ -50,6 +51,12 @@ export const AuthProvider: ParentComponent = (props) => {
     await authApi.logout();
     localStorage.removeItem(LS_LAST_GROUP_ID);
     setUser(null);
+  }
+
+  async function revalidate() {
+    // TODO: try/catch
+    const user = await usersApi.me();
+    setUser(user);
   }
 
   setupAxiosInterceptors(logout);
@@ -82,7 +89,9 @@ export const AuthProvider: ParentComponent = (props) => {
   });
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, register }}>
+    <AuthContext.Provider
+      value={{ user, loading, revalidate, login, logout, register }}
+    >
       {props.children}
     </AuthContext.Provider>
   );
