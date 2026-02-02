@@ -1,0 +1,23 @@
+meta {
+  name: Update Current User
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{base_url}}/api/users/me
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Updated Name",
+    "email": "updated@email.com"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

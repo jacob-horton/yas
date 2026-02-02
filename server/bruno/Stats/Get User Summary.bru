@@ -1,0 +1,21 @@
+meta {
+  name: Get User Summary
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/api/games/{{game_id}}/players/{{player_id}}/summary
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  game_id: cd49d33e-6f62-4e18-95de-2833ba6fad80
+  player_id: 0d09610a-dde1-47e0-a677-057d0b34ca49
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

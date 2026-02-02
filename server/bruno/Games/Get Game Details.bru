@@ -1,18 +1,13 @@
 meta {
-  name: Get Scoreboard
+  name: Get Game Details
   type: http
-  seq: 2
+  seq: 4
 }
 
 get {
-  url: {{base_url}}/api/games/{{game_id}}/scoreboard
+  url: {{base_url}}/api/games/{{game_id}}
   body: none
   auth: inherit
-}
-
-params:query {
-  order_by: average_score
-  num_matches: 1
 }
 
 vars:pre-request {

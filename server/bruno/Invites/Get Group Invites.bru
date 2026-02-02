@@ -1,0 +1,20 @@
+meta {
+  name: Get Group Invites
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/groups/{{group_id}}/invites
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  group_id: {{group_id}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

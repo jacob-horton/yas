@@ -1,0 +1,26 @@
+meta {
+  name: Create Invite
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/groups/{{group_id}}/invites
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "New Invite!",
+    "max_uses": 5
+  }
+}
+
+vars:pre-request {
+  group_id: 0d09610a-dde1-47e0-a677-057d0b34ca49
+}
+
+script:post-response {
+  bru.setEnvVar('invite_code', res.body.id);
+}

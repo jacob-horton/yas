@@ -5,16 +5,9 @@ meta {
 }
 
 delete {
-  url: http://localhost:8000/api/sessions
+  url: {{base_url}}/api/sessions
   body: none
   auth: inherit
-}
-
-body:json {
-  {
-    "username": "jacob",
-    "password": "password123"
-  }
 }
 
 settings {

@@ -1,0 +1,20 @@
+meta {
+  name: Get Group Members
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{base_url}}/api/groups/{{group_id}}/members
+  body: none
+  auth: inherit
+}
+
+vars:pre-request {
+  group_id: {{group_id}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

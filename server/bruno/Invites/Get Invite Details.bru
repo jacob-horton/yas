@@ -1,11 +1,11 @@
 meta {
-  name: Accept Invite
+  name: Get Invite Details
   type: http
-  seq: 2
+  seq: 3
 }
 
-post {
-  url: {{base_url}}/api/invites/{{invite_code}}/accept
+get {
+  url: {{base_url}}/api/invites/{{invite_code}}
   body: none
   auth: inherit
 }

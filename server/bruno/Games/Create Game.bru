@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: http://localhost:8000/api/groups/0d09610a-dde1-47e0-a677-057d0b34ca49/games
+  url: {{base_url}}/api/groups/{{group_id}}/games
   body: json
   auth: inherit
 }
@@ -15,6 +15,14 @@ body:json {
     "name": "Mario Kart",
     "players_per_match": 2
   }
+}
+
+vars:pre-request {
+  group_id: 0d09610a-dde1-47e0-a677-057d0b34ca49
+}
+
+script:post-response {
+  bru.setEnvVar('game_id', res.body.id);
 }
 
 settings {

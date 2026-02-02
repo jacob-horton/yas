@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: http://localhost:8000/api/users
+  url: {{base_url}}/api/users
   body: json
   auth: inherit
 }
@@ -13,9 +13,13 @@ post {
 body:json {
   {
     "name": "Jacob",
-    "email": "jacob@email.com",
+    "email": "jacob+test@email.com",
     "password": "password123"
   }
+}
+
+script:post-response {
+  bru.setEnvVar('user_id', res.body.id);
 }
 
 settings {

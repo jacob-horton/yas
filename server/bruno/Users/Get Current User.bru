@@ -1,11 +1,11 @@
 meta {
-  name: Get Session
+  name: Get Current User
   type: http
   seq: 2
 }
 
 get {
-  url: {{base_url}}/api/sessions
+  url: {{base_url}}/api/users/me
   body: none
   auth: inherit
 }
