@@ -172,7 +172,7 @@ impl IntoResponse for AppError {
             AppError::Game(err) => match err {
                 GameError::NotFound => (StatusCode::NOT_FOUND, err.to_string()),
                 GameError::Database(e) => {
-                    eprintln!("Invite DB error: {:?}", e);
+                    eprintln!("Game DB error: {:?}", e);
                     (
                         StatusCode::INTERNAL_SERVER_ERROR,
                         "Internal server error".to_string(),
@@ -186,7 +186,7 @@ impl IntoResponse for AppError {
                 MatchError::OneOrMorePlayersNotMember => (StatusCode::BAD_REQUEST, err.to_string()),
                 MatchError::DuplicatePlayer => (StatusCode::BAD_REQUEST, err.to_string()),
                 MatchError::Database(e) => {
-                    eprintln!("Invite DB error: {:?}", e);
+                    eprintln!("Match DB error: {:?}", e);
                     (
                         StatusCode::INTERNAL_SERVER_ERROR,
                         "Internal server error".to_string(),
