@@ -1,9 +1,20 @@
 import { For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
-import { Table } from "@/components/ui/table";
+import {
+  Table,
+  TableCell,
+  TableRow,
+  type Heading,
+} from "@/components/ui/table";
 import { formatDate } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
+
+const TABLE_HEADINGS = [
+  { label: "Name" },
+  { label: "Email" },
+  { label: "Created On" },
+] as const satisfies Heading<string>[];
 
 export const GroupMembers = () => {
   const group = useGroup();
@@ -11,18 +22,15 @@ export const GroupMembers = () => {
 
   return (
     <Page title="Group Members">
-      <Table
-        headings={["Name", "Email", "Created On"]}
-        caption="All members of this group"
-      >
+      <Table headings={TABLE_HEADINGS} caption="All members of this group">
         <Suspense>
           <For each={members()}>
             {(member) => (
-              <Table.Row>
-                <Table.Cell>{member.name}</Table.Cell>
-                <Table.Cell>{member.email}</Table.Cell>
-                <Table.Cell>{formatDate(member.created_at)}</Table.Cell>
-              </Table.Row>
+              <TableRow>
+                <TableCell>{member.name}</TableCell>
+                <TableCell>{member.email}</TableCell>
+                <TableCell>{formatDate(member.created_at)}</TableCell>
+              </TableRow>
             )}
           </For>
         </Suspense>

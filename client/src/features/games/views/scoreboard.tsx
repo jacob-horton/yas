@@ -1,12 +1,18 @@
 import { useNavigate, useParams } from "@solidjs/router";
 import type { Component } from "solid-js";
-import { For, Suspense } from "solid-js";
+import { createSignal, For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
-import { Table } from "@/components/ui/table";
+import {
+  type Heading,
+  type Sort,
+  Table,
+  TableCell,
+  TableRow,
+} from "@/components/ui/table";
 import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
-import type { GameRouteParams } from "../types/game";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
+import type { GameRouteParams } from "../types/game";
 
 const LoadingText = () => {
   return (
@@ -20,24 +26,44 @@ const LoadingRows: Component<{ numCols: number; numRows?: number }> = (
   return (
     <For each={Array(props.numRows ?? 5)}>
       {() => (
-        <Table.Row>
+        <TableRow>
           <For each={Array(props.numCols)}>
             {() => (
-              <Table.Cell>
+              <TableCell>
                 <LoadingText />
-              </Table.Cell>
+              </TableCell>
             )}
           </For>
-        </Table.Row>
+        </TableRow>
       )}
     </For>
   );
 };
 
+type SortProp = "name" | "win_rate" | "average_score";
+
+const DEFAULT_SORT: Sort<SortProp> = {
+  property: "win_rate",
+  direction: "descending",
+};
+
 export const Scoreboard = () => {
   const params = useParams<GameRouteParams>();
-  const scoreboardData = useScoreboardData(() => params.gameId);
+
+  const [sort, setSort] = createSignal<Sort<SortProp>>(DEFAULT_SORT);
+  const scoreboardData = useScoreboardData(() => params.gameId, sort);
   const navigate = useNavigate();
+
+  const tableHeadings = [
+    { label: "No." },
+    { label: "Name", sortProp: "name" },
+    { label: "Win Rate", sortProp: "win_rate", defaultDirection: "descending" },
+    {
+      label: "Points/Game",
+      sortProp: "average_score",
+      defaultDirection: "descending",
+    },
+  ] as const satisfies Heading<string>[];
 
   // TODO: proper loading for scoreboard name
   return (
@@ -73,27 +99,29 @@ export const Scoreboard = () => {
           </Suspense>
         </div>
         <Table
-          headings={["No.", "Name", "Win Rate", "Points/Game"]}
+          sortedBy={sort()}
+          onSort={setSort}
+          headings={tableHeadings}
           caption="Stats of all players playing this game"
         >
           <Suspense fallback={<LoadingRows numCols={4} />}>
             <For each={scoreboardData()?.entries}>
               {(score, index) => (
-                <Table.Row onClick={() => navigate(`player/${score.user_id}`)}>
-                  <Table.Cell>
+                <TableRow onClick={() => navigate(`player/${score.user_id}`)}>
+                  <TableCell>
                     <span class="text-gray-400">{index() + 1}</span>
-                  </Table.Cell>
-                  <Table.Cell>{score.user_name}</Table.Cell>
-                  <Table.Cell>
+                  </TableCell>
+                  <TableCell>{score.user_name}</TableCell>
+                  <TableCell>
                     <span class="flex w-48 min-w-16 items-center">
                       <ProgressBar percentage={score.win_rate * 100} />
                       <span class="w-18 min-w-10 text-right">
                         {(score.win_rate * 100).toFixed(0)}%
                       </span>
                     </span>
-                  </Table.Cell>
-                  <Table.Cell>{score.average_score.toFixed(2)}</Table.Cell>
-                </Table.Row>
+                  </TableCell>
+                  <TableCell>{score.average_score.toFixed(2)}</TableCell>
+                </TableRow>
               )}
             </For>
           </Suspense>

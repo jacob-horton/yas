@@ -12,7 +12,7 @@ use crate::{
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     models::{
         game::{CreateGameReq, GameResponse},
-        stats::{OrderBy, ScoreboardResponse, StatsParams},
+        stats::{OrderBy, OrderDir, ScoreboardResponse, StatsParams},
     },
     services,
 };
@@ -58,12 +58,22 @@ pub async fn get_scoreboard(
         .parse()
         .map_err(|_| AppError::BadRequest("Invalid game ID".to_string()))?;
 
+    let order_by = query.order_by.unwrap_or(OrderBy::WinRate);
+
+    let order_dir = query.order_dir.unwrap_or_else(|| match order_by {
+        // Names naturally sort A-Z
+        OrderBy::Name => OrderDir::Ascending,
+        // Numbers/Stats naturally sort High-to-Low
+        OrderBy::WinRate | OrderBy::AverageScore => OrderDir::Descending,
+    });
+
     let scoreboard = services::stats::get_scoreboard(
         &state,
         user.id,
         game_id,
         query.num_matches.unwrap_or(10),
-        query.order_by.unwrap_or(OrderBy::WinRate),
+        order_by,
+        order_dir,
     )
     .await?;
 

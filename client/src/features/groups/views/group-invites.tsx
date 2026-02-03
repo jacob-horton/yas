@@ -2,12 +2,17 @@ import { useNavigate } from "@solidjs/router";
 import { formatDistanceToNow } from "date-fns";
 import { type Component, For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
-import { Table } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableCell,
+  TableRow,
+  type Heading,
+} from "@/components/ui/table";
 import { cn } from "@/lib/classname";
 import { formatDate, formatDateTime } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupInvites } from "../hooks/use-group-invites";
-import { Button } from "@/components/ui/button";
 
 function isExpired(expiry: string) {
   const expiryDate = new Date(expiry);
@@ -44,6 +49,15 @@ function getInviteLink(id: string) {
   return `${site}/invites/${id}/accept`;
 }
 
+const TABLE_HEADINGS = [
+  { label: "Name" },
+  { label: "Created By" },
+  { label: "Uses" },
+  { label: "Created On" },
+  { label: "Expiry" },
+  { label: "" },
+] as const satisfies Heading<string>[];
+
 export const Invites = () => {
   const group = useGroup();
   const invites = useGroupInvites(group);
@@ -61,25 +75,22 @@ export const Invites = () => {
         },
       ]}
     >
-      <Table
-        headings={["Name", "Created By", "Uses", "Created On", "Expiry", ""]}
-        caption="All invites for this group"
-      >
+      <Table headings={TABLE_HEADINGS} caption="All invites for this group">
         <Suspense>
           <For each={invites()}>
             {(invite) => (
-              <Table.Row>
-                <Table.Cell>{invite.name}</Table.Cell>
-                <Table.Cell>{invite.created_by_name}</Table.Cell>
-                <Table.Cell>
+              <TableRow>
+                <TableCell>{invite.name}</TableCell>
+                <TableCell>{invite.created_by_name}</TableCell>
+                <TableCell>
                   {invite.uses}
                   {invite.max_uses && <>/{invite.max_uses}</>}
-                </Table.Cell>
-                <Table.Cell>{formatDate(invite.created_at)}</Table.Cell>
-                <Table.Cell>
+                </TableCell>
+                <TableCell>{formatDate(invite.created_at)}</TableCell>
+                <TableCell>
                   <ExpiryCell expiresAt={invite.expires_at} />
-                </Table.Cell>
-                <Table.Cell>
+                </TableCell>
+                <TableCell>
                   <Button
                     icon="copy"
                     variant="ghost"
@@ -87,8 +98,8 @@ export const Invites = () => {
                       navigator.clipboard.writeText(getInviteLink(invite.id))
                     }
                   />
-                </Table.Cell>
-              </Table.Row>
+                </TableCell>
+              </TableRow>
             )}
           </For>
         </Suspense>

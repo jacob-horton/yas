@@ -1,3 +1,4 @@
+import type { Sort } from "@/components/ui/table";
 import type { Scoreboard } from "@/features/games/types/scoreboard";
 import { api } from "@/lib/api";
 import type { MatchStats, PlayerStatsSummary } from "../types";
@@ -5,7 +6,7 @@ import type { MatchStats, PlayerStatsSummary } from "../types";
 export interface StatsApiContract {
   getPlayerHistory(playerId: string): Promise<MatchStats[]>;
   getPlayerSummary(playerId: string): Promise<PlayerStatsSummary>;
-  getScoreboard(): Promise<Scoreboard>;
+  getScoreboard<T extends string>(sort?: Sort<T>): Promise<Scoreboard>;
 }
 
 export class StatsApi implements StatsApiContract {
@@ -24,9 +25,19 @@ export class StatsApi implements StatsApiContract {
       .then((resp) => resp.data);
   }
 
-  public async getScoreboard(): Promise<Scoreboard> {
+  // public async getScoreboard(): Promise<Scoreboard> {
+  public async getScoreboard<T extends string>(
+    sort?: Sort<T>,
+  ): Promise<Scoreboard> {
+    let params = {};
+    if (sort) {
+      params = {
+        order_by: sort.property,
+        order_dir: sort.direction,
+      };
+    }
     return api
-      .get(`/games/${this.gameId}/scoreboard`)
+      .get(`/games/${this.gameId}/scoreboard`, { params })
       .then((resp) => resp.data);
   }
 }

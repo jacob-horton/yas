@@ -4,7 +4,8 @@ use crate::{
     AppState,
     errors::{AppError, GameError, GroupError},
     models::stats::{
-        OrderBy, PlayerMatchDb, PlayerStatsSummary, RawMatchStats, Scoreboard, ScoreboardEntry,
+        OrderBy, OrderDir, PlayerMatchDb, PlayerStatsSummary, RawMatchStats, Scoreboard,
+        ScoreboardEntry,
     },
 };
 use std::{cmp::Ordering, collections::HashMap};
@@ -15,6 +16,7 @@ pub async fn get_scoreboard(
     game_id: Uuid,
     num_matches: i32,
     order_by: OrderBy,
+    order_dir: OrderDir,
 ) -> Result<Scoreboard, AppError> {
     let game = state
         .game_repo
@@ -68,27 +70,31 @@ pub async fn get_scoreboard(
 
     // Sort
     entries.sort_by(|a, b| {
-        let key = |s: &ScoreboardEntry| match order_by {
-            OrderBy::WinRate => (s.win_rate, s.matches_played, s.average_score),
-            OrderBy::AverageScore => (s.average_score, s.matches_played, s.win_rate),
+        let cmp_f64 = |x: f64, y: f64| x.partial_cmp(&y).unwrap_or(Ordering::Equal);
+
+        let ordering = match order_by {
+            OrderBy::WinRate => cmp_f64(a.win_rate, b.win_rate)
+                .then_with(|| a.matches_played.cmp(&b.matches_played))
+                .then_with(|| cmp_f64(a.average_score, b.average_score))
+                .then_with(|| a.user_name.cmp(&b.user_name)),
+
+            OrderBy::AverageScore => cmp_f64(a.average_score, b.average_score)
+                .then_with(|| a.matches_played.cmp(&b.matches_played))
+                .then_with(|| cmp_f64(a.win_rate, b.win_rate))
+                .then_with(|| a.user_name.cmp(&b.user_name)),
+
+            OrderBy::Name => a
+                .user_name
+                .cmp(&b.user_name)
+                .then_with(|| cmp_f64(a.win_rate, b.win_rate))
+                .then_with(|| a.matches_played.cmp(&b.matches_played))
+                .then_with(|| cmp_f64(a.average_score, b.average_score)),
         };
 
-        let (b_primary, b_secondary, b_tertiary) = key(b);
-        let (a_primary, a_secondary, a_tertiary) = key(a);
-
-        b_primary
-            .partial_cmp(&a_primary)
-            .unwrap_or(Ordering::Equal)
-            .then_with(|| {
-                b_secondary
-                    .partial_cmp(&a_secondary)
-                    .unwrap_or(Ordering::Equal)
-            })
-            .then_with(|| {
-                b_tertiary
-                    .partial_cmp(&a_tertiary)
-                    .unwrap_or(Ordering::Equal)
-            })
+        match order_dir {
+            OrderDir::Ascending => ordering,
+            OrderDir::Descending => ordering.reverse(),
+        }
     });
 
     let scoreboard = Scoreboard { entries, game };

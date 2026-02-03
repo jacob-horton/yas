@@ -1,16 +1,27 @@
 import { useParams } from "@solidjs/router";
 import { Page } from "@/components/layout/page";
-import { Table } from "@/components/ui/table";
+import {
+  type Heading,
+  Table,
+  TableCell,
+  TableRow,
+} from "@/components/ui/table";
 import { useUser } from "@/features/users/hooks/use-user";
 import { cn } from "@/lib/classname";
 import { formatDate } from "@/lib/format-date";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_TEXT_COLOURS } from "@/lib/rank-colours";
 import { ChartComponent } from "../components/chart";
+import { StatCard } from "../components/stat-card";
 import { usePlayerHistory } from "../hooks/use-player-history";
 import { usePlayerSummary } from "../hooks/use-player-summary";
 import type { PlayerStatsRouteParams } from "../types";
-import { StatCard } from "../components/stat-card";
+
+const TABLE_HEADINGS = [
+  { label: "Date" },
+  { label: "Rank" },
+  { label: "Score" },
+] as const satisfies Heading<string>[];
 
 export const PlayerStats = () => {
   const params = useParams<PlayerStatsRouteParams>();
@@ -77,11 +88,11 @@ export const PlayerStats = () => {
           </div>
         </div>
 
-        <Table headings={["Date", "Rank", "Score"]} caption="Match history">
+        <Table headings={TABLE_HEADINGS} caption="Match history">
           {history()?.map((s) => (
-            <Table.Row>
-              <Table.Cell>{formatDate(s.played_at)}</Table.Cell>
-              <Table.Cell>
+            <TableRow>
+              <TableCell>{formatDate(s.played_at)}</TableCell>
+              <TableCell>
                 <span
                   class={cn(
                     { "font-bold": !!RANK_TEXT_COLOURS[s.rank_in_match] },
@@ -90,9 +101,9 @@ export const PlayerStats = () => {
                 >
                   {ordinalSuffix(s.rank_in_match)}
                 </span>
-              </Table.Cell>
-              <Table.Cell>{s.score}</Table.Cell>
-            </Table.Row>
+              </TableCell>
+              <TableCell>{s.score}</TableCell>
+            </TableRow>
           ))}
         </Table>
       </div>
