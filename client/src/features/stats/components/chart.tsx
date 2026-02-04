@@ -1,4 +1,3 @@
-import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import Chart, { type ScriptableContext } from "chart.js/auto";
 import {
   type Component,
@@ -7,6 +6,7 @@ import {
   onCleanup,
   onMount,
 } from "solid-js";
+import { ordinalSuffix } from "@/lib/ordinal-suffix";
 
 function calculateBackgroundGradient(context: ScriptableContext<"line">) {
   const chart = context.chart;
@@ -76,6 +76,23 @@ export const ChartComponent: Component<ChartProps> = (props) => {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animations: {
+          y: {
+            duration: 750,
+            easing: "easeOutQuart",
+            from: (ctx) => {
+              if (ctx.type === "data") {
+                if (ctx.chart.scales.y) {
+                  return ctx.chart.scales.y.getPixelForValue(0);
+                }
+                return ctx.chart.height;
+              }
+            },
+          },
+          x: {
+            duration: 0,
+          },
+        },
         interaction: {
           mode: "index",
           intersect: false,
