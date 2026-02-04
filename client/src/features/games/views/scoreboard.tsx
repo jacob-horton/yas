@@ -1,5 +1,4 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import type { Component } from "solid-js";
 import { createSignal, For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import {
@@ -9,38 +8,13 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table";
+import { LoadingRows } from "@/components/ui/table.skeleton";
+import { useAuth } from "@/features/auth/context/auth-provider";
+import { cn } from "@/lib/classname";
 import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams } from "../types/game";
-import { cn } from "@/lib/classname";
-import { useAuth } from "@/features/auth/context/auth-provider";
-
-const LoadingText = () => {
-  return (
-    <div class="inline-block h-[1em] w-full animate-pulse rounded-sm bg-gray-200" />
-  );
-};
-
-const LoadingRows: Component<{ numCols: number; numRows?: number }> = (
-  props,
-) => {
-  return (
-    <For each={Array(props.numRows ?? 5)}>
-      {() => (
-        <TableRow>
-          <For each={Array(props.numCols)}>
-            {() => (
-              <TableCell>
-                <LoadingText />
-              </TableCell>
-            )}
-          </For>
-        </TableRow>
-      )}
-    </For>
-  );
-};
 
 type SortProp = "name" | "win_rate" | "average_score";
 
