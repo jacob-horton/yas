@@ -35,6 +35,7 @@ export type TableProps<T extends string> = ParentProps<{
 
 export type TableRowProps = {
   onClick?: () => void;
+  class?: string;
 };
 
 const SORT_ICON_SIZE = 14;
@@ -126,9 +127,10 @@ export function Table<T extends string>(props: TableProps<T>) {
 export const TableRow: ParentComponent<TableRowProps> = (props) => {
   return (
     <tr
-      class={cn({
-        "cursor-pointer transition hover:bg-gray-50": props.onClick,
-      })}
+      class={cn(
+        { "cursor-pointer transition hover:bg-gray-50": props.onClick },
+        props.class,
+      )}
       onClick={props.onClick}
     >
       {props.children}

@@ -13,6 +13,8 @@ import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams } from "../types/game";
+import { cn } from "@/lib/classname";
+import { useAuth } from "@/features/auth/context/auth-provider";
 
 const LoadingText = () => {
   return (
@@ -49,6 +51,8 @@ const DEFAULT_SORT: Sort<SortProp> = {
 
 export const Scoreboard = () => {
   const params = useParams<GameRouteParams>();
+  const auth = useAuth();
+  const userIdStr = () => auth.user()?.id?.toString();
 
   const [sort, setSort] = createSignal<Sort<SortProp>>(DEFAULT_SORT);
   const scoreboardData = useScoreboardData(() => params.gameId, sort);
@@ -107,9 +111,22 @@ export const Scoreboard = () => {
           <Suspense fallback={<LoadingRows numCols={4} />}>
             <For each={scoreboardData.data?.entries}>
               {(score, index) => (
-                <TableRow onClick={() => navigate(`player/${score.user_id}`)}>
+                <TableRow
+                  onClick={() => navigate(`player/${score.user_id}`)}
+                  class={cn({
+                    "font-semibold": score.user_id === userIdStr(),
+                  })}
+                >
                   <TableCell>
-                    <span class="text-gray-400">{index() + 1}</span>
+                    <span
+                      class={cn(
+                        score.user_id === userIdStr()
+                          ? "font-bold text-gray-600"
+                          : "text-gray-400",
+                      )}
+                    >
+                      {index() + 1}
+                    </span>
                   </TableCell>
                   <TableCell>{score.user_name}</TableCell>
                   <TableCell>
