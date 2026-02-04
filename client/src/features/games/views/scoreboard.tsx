@@ -106,7 +106,7 @@ export const Scoreboard = () => {
                   <TableCell>
                     <span class="flex w-48 min-w-16 items-center">
                       <ProgressBar percentage={score.win_rate * 100} />
-                      <span class="w-18 min-w-10 text-right">
+                      <span class="w-20 min-w-10 text-right">
                         {(score.win_rate * 100).toFixed(0)}%
                       </span>
                     </span>

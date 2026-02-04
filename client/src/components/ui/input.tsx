@@ -14,20 +14,20 @@ export const Input: Component<{
   return (
     <div
       class={cn(
-        "flex flex-col gap-1 transition",
+        "flex h-16 flex-col gap-1 transition",
         { "text-red-500": !!props.error },
         props.class,
       )}
     >
       <div
         class={cn(
-          "group flex max-w-96 rounded-md border font-medium transition focus-within:border-violet-500",
+          "group flex h-full max-w-96 items-center rounded-md border font-medium transition focus-within:border-violet-500",
           { "bg-red-100 focus-within:border-red-500": !!props.error },
         )}
       >
         <div
           class={cn(
-            "w-2 rounded-l-sm bg-transparent transition group-focus-within:bg-violet-500",
+            "h-full w-2 rounded-l-sm bg-transparent transition group-focus-within:bg-violet-500",
             { "group-focus-within:bg-red-500": !!props.error },
           )}
         />

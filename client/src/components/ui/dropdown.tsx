@@ -50,15 +50,15 @@ export const Dropdown: Component<{
   return (
     <div
       class={cn(
-        "flex max-w-96 flex-col gap-1 transition",
+        "flex h-16 max-w-96 flex-col gap-1 transition",
         { "text-red-500": !!props.error },
         props.class,
       )}
     >
-      <div ref={dropdownWrapperRef} class="relative w-full">
+      <div ref={dropdownWrapperRef} class="relative h-full w-full">
         <div
           class={cn(
-            "group flex w-full rounded-md border font-medium transition",
+            "group flex h-full w-full items-center rounded-md border font-medium transition",
             {
               "border-violet-500": isOpen() && !props.error,
               "focus-within:border-violet-500": !props.error,
@@ -68,7 +68,7 @@ export const Dropdown: Component<{
           )}
         >
           <div
-            class={cn("w-2 rounded-l-sm bg-transparent transition", {
+            class={cn("h-full w-2 rounded-l-sm bg-transparent transition", {
               "bg-violet-500": isOpen() && !props.error,
               "group-focus-within:bg-violet-500": !props.error,
               "bg-red-500": isOpen() && !!props.error,
