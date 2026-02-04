@@ -46,10 +46,16 @@ export const RecordGame = () => {
 
   return (
     <FormPage title="Record Match" onSubmit={handleSubmit}>
-      <Suspense>
+      <Suspense
+        fallback={
+          <div class="inline-flex h-[1em] w-64 animate-pulse rounded-md bg-gray-200" />
+        }
+      >
         <p>
           Recording game for <b>{game.data?.name}</b>
         </p>
+      </Suspense>
+      <Suspense>
         <For each={Array.from(Array(game.data?.players_per_match).keys())}>
           {(i) => (
             <div class="flex gap-4">
@@ -87,8 +93,10 @@ export const RecordGame = () => {
             </div>
           )}
         </For>
-        <Button type="submit">Submit</Button>
       </Suspense>
+      <Button type="submit" disabled={game.isLoading}>
+        Submit
+      </Button>
     </FormPage>
   );
 };

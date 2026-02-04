@@ -31,9 +31,10 @@ export const Button: ParentComponent<{
   return (
     <button
       class={cn(
-        "flex w-fit items-center justify-center gap-2 whitespace-nowrap rounded-md p-10 py-1 font-medium hover:cursor-pointer",
+        "flex w-fit cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md p-10 py-1 font-medium",
         COLOUR_MAP[props.variant ?? "primary"],
         { "p-1.5": props.icon && !props.children },
+        { "cursor-not-allowed bg-gray-300": props.disabled },
         props.class,
       )}
       onClick={props.onClick}
