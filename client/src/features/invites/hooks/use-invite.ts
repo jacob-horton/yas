@@ -1,12 +1,12 @@
-import { createAsync, query } from "@solidjs/router";
+import { keepPreviousData, useQuery } from "@tanstack/solid-query";
 import type { Accessor } from "solid-js";
 import { invitesApi } from "../api";
 import { QK_INVITES } from "../constants";
 
-export const useInvite = (id: Accessor<string>) => {
-  const getInvite = query(async (id) => {
-    return invitesApi.invite(id).get();
-  }, QK_INVITES);
-
-  return createAsync(() => getInvite(id()));
+export const useInvite = (inviteId: Accessor<string>) => {
+  return useQuery(() => ({
+    queryKey: [QK_INVITES, inviteId()],
+    queryFn: () => invitesApi.invite(inviteId()).get(),
+    placeholderData: keepPreviousData,
+  }));
 };

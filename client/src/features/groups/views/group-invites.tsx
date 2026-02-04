@@ -77,7 +77,7 @@ export const Invites = () => {
     >
       <Table headings={TABLE_HEADINGS} caption="All invites for this group">
         <Suspense>
-          <For each={invites()}>
+          <For each={invites.data}>
             {(invite) => (
               <TableRow>
                 <TableCell>{invite.name}</TableCell>

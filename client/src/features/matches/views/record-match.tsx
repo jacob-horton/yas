@@ -7,15 +7,15 @@ import { Input } from "@/components/ui/input";
 import { gamesApi } from "@/features/games/api";
 import type { GameRouteParams } from "@/features/games/types/game";
 import { useGroup } from "@/features/groups/context/group-provider";
+import { useGroupMembers } from "@/features/groups/hooks/use-group-members";
 import { useGame } from "../hooks/use-game";
-import { useMembers } from "../hooks/use-members";
 
 export const RecordGame = () => {
   const params = useParams<GameRouteParams>();
   const game = useGame(() => params.gameId);
 
   const group = useGroup();
-  const members = useMembers(group);
+  const members = useGroupMembers(group);
 
   const navigate = useNavigate();
 
@@ -27,7 +27,7 @@ export const RecordGame = () => {
     e.preventDefault();
 
     // TODO: proper error
-    const g = game();
+    const g = game.data;
     if (!g) {
       return;
     }
@@ -48,9 +48,9 @@ export const RecordGame = () => {
     <FormPage title="Record Match" onSubmit={handleSubmit}>
       <Suspense>
         <p>
-          Recording game for <b>{game()?.name}</b>
+          Recording game for <b>{game.data?.name}</b>
         </p>
-        <For each={Array.from(Array(game()?.players_per_match).keys())}>
+        <For each={Array.from(Array(game.data?.players_per_match).keys())}>
           {(i) => (
             <div class="flex gap-4">
               <Dropdown
@@ -64,7 +64,7 @@ export const RecordGame = () => {
                   })
                 }
                 options={
-                  members()?.map((m) => ({
+                  members.data?.map((m) => ({
                     label: m.name,
                     value: m.id.toString(),
                   })) ?? []

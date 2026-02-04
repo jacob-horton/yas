@@ -24,7 +24,7 @@ export const GroupMembers = () => {
     <Page title="Group Members">
       <Table headings={TABLE_HEADINGS} caption="All members of this group">
         <Suspense>
-          <For each={members()}>
+          <For each={members.data}>
             {(member) => (
               <TableRow>
                 <TableCell>{member.name}</TableCell>

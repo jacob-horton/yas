@@ -14,7 +14,7 @@ export const AcceptInvite = () => {
   const navigate = useNavigate();
 
   const handleAccept = async () => {
-    const i = invite();
+    const i = invite.data;
     if (!i) {
       return;
     }
@@ -41,18 +41,20 @@ export const AcceptInvite = () => {
           <div>
             <h2>Invite Details</h2>
             <p>
-              Group: <strong>{invite()?.group_name}</strong>
+              Group: <strong>{invite.data?.group_name}</strong>
             </p>
             <p>
-              Invited by: <strong>{invite()?.created_by_name}</strong>
+              Invited by: <strong>{invite.data?.created_by_name}</strong>
             </p>
-            {invite()?.is_current_user_member && (
+            {invite.data?.is_current_user_member && (
               <p>You are already a member of this group!</p>
             )}
           </div>
 
           <Button onClick={handleAccept}>
-            {invite()?.is_current_user_member ? "Go to group" : "Accept invite"}
+            {invite.data?.is_current_user_member
+              ? "Go to group"
+              : "Accept invite"}
           </Button>
         </div>
       </Suspense>

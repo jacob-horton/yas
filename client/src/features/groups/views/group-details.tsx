@@ -11,9 +11,9 @@ export const GroupDetails = () => {
   return (
     <Page title="Group Details">
       <Suspense>
-        <p>{groupDetails()?.id}</p>
-        <p>{groupDetails()?.name}</p>
-        <p>{formatDate(groupDetails()?.created_at ?? "")}</p>
+        <p>{groupDetails.data?.id}</p>
+        <p>{groupDetails.data?.name}</p>
+        <p>{formatDate(groupDetails.data?.created_at ?? "")}</p>
       </Suspense>
     </Page>
   );

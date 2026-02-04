@@ -13,8 +13,8 @@ import { useAuth } from "@/features/auth/context/auth-provider";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { useGroupGames } from "@/features/groups/hooks/use-group-games";
 import { useMyGroups } from "@/features/users/hooks/use-my-groups";
-import { Dropdown } from "../ui/dropdown";
 import { Button } from "../ui/button";
+import { Dropdown } from "../ui/dropdown";
 
 type Route = {
   href: string;
@@ -104,7 +104,7 @@ export const Sidebar: Component = () => {
             <div class="flex-grow border-gray-200 border-t" />
           </span>
 
-          <For each={games()}>
+          <For each={games.data}>
             {(game) => <NavItem href={`games/${game.id}`} name={game.name} />}
           </For>
 

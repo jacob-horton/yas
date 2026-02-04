@@ -1,13 +1,12 @@
-import { createAsync, query } from "@solidjs/router";
+import { keepPreviousData, useQuery } from "@tanstack/solid-query";
 import type { Accessor } from "solid-js";
 import { gamesApi } from "@/features/games/api";
 import { QK_GAME } from "@/features/games/constants";
 
-export const useGame = (id: Accessor<string>) => {
-  const getGame = query(async (id) => {
-    // TODO: try/catch
-    return gamesApi.game(id).get();
-  }, QK_GAME);
-
-  return createAsync(() => getGame(id()));
+export const useGame = (gameId: Accessor<string>) => {
+  return useQuery(() => ({
+    queryKey: [QK_GAME, gameId()],
+    queryFn: () => gamesApi.game(gameId()).get(),
+    placeholderData: keepPreviousData,
+  }));
 };

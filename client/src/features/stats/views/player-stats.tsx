@@ -42,7 +42,7 @@ export const PlayerStats = () => {
       <div class="flex flex-col gap-8">
         <ChartComponent
           data={
-            history()
+            history.data
               ?.map((s) => ({ score: s.score, rank: s.rank_in_match }))
               .toReversed() ?? []
           }
@@ -52,44 +52,44 @@ export const PlayerStats = () => {
           <div class="grid w-fit grid-cols-2 gap-4">
             <StatCard
               label="WIN RATE"
-              stat={`${((summary()?.lifetime.win_rate ?? 0) * 100).toFixed(0)}%`}
+              stat={`${((summary.data?.lifetime.win_rate ?? 0) * 100).toFixed(0)}%`}
             />
             <StatCard
               label="BEST SCORE"
-              stat={(summary()?.lifetime.best_score ?? 0).toFixed(0)}
+              stat={(summary.data?.lifetime.best_score ?? 0).toFixed(0)}
             />
             <StatCard
               label="AVERAGE SCORE"
-              stat={(summary()?.lifetime.average_score ?? 0).toFixed(2)}
+              stat={(summary.data?.lifetime.average_score ?? 0).toFixed(2)}
             />
             <StatCard
               label="TOTAL GAMES"
-              stat={(summary()?.lifetime.total_games ?? 0).toFixed(0)}
+              stat={(summary.data?.lifetime.total_games ?? 0).toFixed(0)}
             />
           </div>
 
           <div class="grid w-fit grid-cols-2 gap-4">
             <StatCard
               label="WIN RATE"
-              stat={`${((summary()?.period.win_rate ?? 0) * 100).toFixed(0)}%`}
+              stat={`${((summary.data?.period.win_rate ?? 0) * 100).toFixed(0)}%`}
             />
             <StatCard
               label="BEST SCORE"
-              stat={(summary()?.period.best_score ?? 0).toFixed(0)}
+              stat={(summary.data?.period.best_score ?? 0).toFixed(0)}
             />
             <StatCard
               label="AVERAGE SCORE"
-              stat={(summary()?.period.average_score ?? 0).toFixed(2)}
+              stat={(summary.data?.period.average_score ?? 0).toFixed(2)}
             />
             <StatCard
               label="CURRENT RANK"
-              stat={ordinalSuffix(summary()?.period.rank ?? 0)}
+              stat={ordinalSuffix(summary.data?.period.rank ?? 0)}
             />
           </div>
         </div>
 
         <Table headings={TABLE_HEADINGS} caption="Match history">
-          {history()?.map((s) => (
+          {history.data?.map((s) => (
             <TableRow>
               <TableCell>{formatDate(s.played_at)}</TableCell>
               <TableCell>

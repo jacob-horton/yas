@@ -1,4 +1,4 @@
-import { createAsync, query } from "@solidjs/router";
+import { keepPreviousData, useQuery } from "@tanstack/solid-query";
 import type { Accessor } from "solid-js";
 import { gamesApi } from "@/features/games/api";
 import { QK_PLAYER_SUMMARY } from "../constants";
@@ -7,9 +7,9 @@ export const usePlayerSummary = (
   gameId: Accessor<string>,
   playerId: Accessor<string>,
 ) => {
-  const getPlayerSummary = query(async (gameId, playerId) => {
-    return gamesApi.game(gameId).stats().getPlayerSummary(playerId);
-  }, QK_PLAYER_SUMMARY);
-
-  return createAsync(() => getPlayerSummary(gameId(), playerId()));
+  return useQuery(() => ({
+    queryKey: [QK_PLAYER_SUMMARY, gameId(), playerId()],
+    queryFn: () => gamesApi.game(gameId()).stats().getPlayerSummary(playerId()),
+    placeholderData: keepPreviousData,
+  }));
 };

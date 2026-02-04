@@ -1,13 +1,12 @@
-import { createAsync, query } from "@solidjs/router";
+import { keepPreviousData, useQuery } from "@tanstack/solid-query";
 import type { Accessor } from "solid-js";
 import { groupsApi } from "../api";
 import { QK_GROUP_DETAILS } from "../constants";
 
-export const useGroupDetails = (id: Accessor<string>) => {
-  const getGroupDetails = query(
-    async (id) => groupsApi.group(id).get(),
-    QK_GROUP_DETAILS,
-  );
-
-  return createAsync(() => getGroupDetails(id()));
+export const useGroupDetails = (groupId: Accessor<string>) => {
+  return useQuery(() => ({
+    queryKey: [QK_GROUP_DETAILS, groupId()],
+    queryFn: () => groupsApi.group(groupId()).get(),
+    placeholderData: keepPreviousData,
+  }));
 };
