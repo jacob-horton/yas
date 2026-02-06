@@ -96,7 +96,7 @@ export const PlayerStats = () => {
 
   return (
     <Page title={`Stats for ${player()?.name ?? "Loading"}`} showBack>
-      <div class="flex flex-col gap-8">
+      <div class="flex flex-col gap-8 pb-42">
         <ChartComponent
           data={
             history.data

@@ -3,16 +3,17 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::{get, post},
+    routing::{delete, get, post},
 };
 
 use crate::{
     AppState,
-    errors::AppError,
+    errors::{AppError, GroupError},
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     models::invite::{
         CreateInviteReq, InviteBasicResponse, InviteDetailResponse, InviteSummaryResponse,
     },
+    policies::GroupAction,
     services,
 };
 
@@ -79,6 +80,33 @@ async fn get_invite(
     Ok((StatusCode::OK, Json(response)))
 }
 
+async fn delete_invite(
+    Path((code,)): Path<(String,)>,
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+) -> Result<impl IntoResponse, AppError> {
+    let code = code
+        .parse()
+        .map_err(|_| AppError::BadRequest("Invalid invite code".to_string()))?;
+
+    let invite = services::invite::get_invite(&state, code).await?;
+    let group = services::group::get_group_without_auth_check(&state, invite.group_id).await?;
+
+    let member = state
+        .group_repo
+        .get_member(&state.pool, group.id, user.id)
+        .await?
+        .ok_or(GroupError::MemberNotFound)?;
+
+    if !member.role.can_perform(GroupAction::DeleteInvite) {
+        return Err(GroupError::Forbidden.into());
+    }
+
+    services::invite::delete_invite(&state, code).await?;
+
+    Ok(StatusCode::NO_CONTENT)
+}
+
 async fn accept_invite(
     Path((code,)): Path<(String,)>,
     State(state): State<AppState>,
@@ -99,4 +127,5 @@ pub fn router() -> Router<AppState> {
         .route("/groups/:id/invites", get(get_group_invites))
         .route("/invites/:code/accept", post(accept_invite))
         .route("/invites/:code", get(get_invite))
+        .route("/invites/:code", delete(delete_invite))
 }

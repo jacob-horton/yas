@@ -1,4 +1,4 @@
-import { useNavigate } from "@solidjs/router";
+import { revalidate, useNavigate } from "@solidjs/router";
 import { formatDistanceToNow } from "date-fns";
 import { type Component, For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
@@ -14,6 +14,8 @@ import { cn } from "@/lib/classname";
 import { formatDate, formatDateTime } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupInvites } from "../hooks/use-group-invites";
+import { invitesApi } from "@/features/invites/api";
+import { QK_GROUP_INVITES } from "../constants";
 
 function isExpired(expiry: string) {
   const expiryDate = new Date(expiry);
@@ -93,13 +95,24 @@ export const Invites = () => {
                   <ExpiryCell expiresAt={invite.expires_at} />
                 </TableCell>
                 <TableCell>
-                  <Button
-                    icon="copy"
-                    variant="ghost"
-                    onClick={() =>
-                      navigator.clipboard.writeText(getInviteLink(invite.id))
-                    }
-                  />
+                  <div class="flex gap-1">
+                    <Button
+                      icon="copy"
+                      variant="ghost"
+                      onClick={() =>
+                        navigator.clipboard.writeText(getInviteLink(invite.id))
+                      }
+                    />
+                    <Button
+                      danger
+                      icon="delete"
+                      variant="ghost"
+                      onClick={async () => {
+                        await invitesApi.invite(invite.id).delete();
+                        invites.refetch();
+                      }}
+                    />
+                  </div>
                 </TableCell>
               </TableRow>
             )}

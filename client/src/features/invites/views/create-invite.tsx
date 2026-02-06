@@ -1,10 +1,9 @@
-import { revalidate, useNavigate } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import { createSignal } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { groupsApi } from "@/features/groups/api";
-import { QK_GROUP_INVITES } from "@/features/groups/constants";
 import { useGroup } from "@/features/groups/context/group-provider";
 
 export const CreateInvite = () => {
@@ -36,7 +35,6 @@ export const CreateInvite = () => {
       max_uses,
       expires_at,
     });
-    revalidate(QK_GROUP_INVITES);
     navigate("..");
   };
 

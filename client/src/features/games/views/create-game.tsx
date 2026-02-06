@@ -1,10 +1,9 @@
-import { revalidate, useNavigate } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import { createSignal } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { groupsApi } from "@/features/groups/api";
-import { QK_GROUP_GAMES } from "@/features/groups/constants";
 import { useGroup } from "@/features/groups/context/group-provider";
 import type { CreateGameRequest } from "../types/game";
 
@@ -24,8 +23,6 @@ export const CreateGame = () => {
     };
 
     const res = await groupsApi.group(group()).createGame(game);
-
-    revalidate(QK_GROUP_GAMES);
     navigate(`/groups/${group()}/games/${res.id}`);
   }
 

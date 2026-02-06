@@ -1,1 +1,1 @@
-export const QK_INVITES = "invites";
+export const QK_INVITE = "invite";

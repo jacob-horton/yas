@@ -108,6 +108,16 @@ pub async fn get_invite(
     Ok(invite)
 }
 
+pub async fn delete_invite(state: &AppState, invite_code: Uuid) -> Result<(), AppError> {
+    state
+        .invite_repo
+        .delete(&state.pool, invite_code)
+        .await
+        .map_err(InviteError::Database)?;
+
+    Ok(())
+}
+
 pub fn validate_invite(invite: &InviteWithCreatedByNameDb) -> Result<(), AppError> {
     // If there is a max number of uses, and they've been used up, invite is no longer valid
     if let Some(max_uses) = invite.max_uses {

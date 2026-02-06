@@ -39,6 +39,17 @@ impl InviteRepo {
             .await
     }
 
+    pub async fn delete<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        code: Uuid,
+    ) -> Result<Option<InviteWithCreatedByNameDb>, sqlx::Error> {
+        sqlx::query_as::<_, InviteWithCreatedByNameDb>("DELETE FROM invites WHERE invites.id = $1")
+            .bind(code)
+            .fetch_optional(executor)
+            .await
+    }
+
     pub async fn increment_uses<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,

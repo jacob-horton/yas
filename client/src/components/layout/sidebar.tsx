@@ -46,7 +46,7 @@ export const Sidebar: Component = () => {
         </A>
       </div>
 
-      <div class="flex gap-2">
+      <div class="flex items-center gap-2">
         <Dropdown
           label="Group"
           // TODO: default value
