@@ -10,10 +10,7 @@ use crate::{
     AppState,
     errors::AppError,
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
-    models::{
-        group::{CreateGroupReq, GroupResponse},
-        user::UserResponse,
-    },
+    models::group::{CreateGroupReq, GroupMemberResponse, GroupResponse},
     services,
 };
 
@@ -56,7 +53,7 @@ async fn get_group_members(
 
     let members = services::group::get_group_members(&state, user.id, group_id).await?;
 
-    let response: Vec<UserResponse> = members.into_iter().map(|m| m.into()).collect();
+    let response: Vec<GroupMemberResponse> = members.into_iter().map(|m| m.into()).collect();
     Ok((StatusCode::OK, Json(response)))
 }
 

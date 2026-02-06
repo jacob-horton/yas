@@ -1,20 +1,22 @@
 import { For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import {
+  type Heading,
   Table,
   TableCell,
   TableRow,
-  type Heading,
 } from "@/components/ui/table";
+import { TableRowSkeleton } from "@/components/ui/table.skeleton";
 import { formatDate } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
-import { TableRowSkeleton } from "@/components/ui/table.skeleton";
+import { Role } from "@/components/ui/role";
 
 const TABLE_HEADINGS = [
   { label: "Name" },
   { label: "Email" },
-  { label: "Created On" },
+  { label: "Role" },
+  { label: "Joined At" },
 ] as const satisfies Heading<string>[];
 
 export const GroupMembers = () => {
@@ -24,13 +26,16 @@ export const GroupMembers = () => {
   return (
     <Page title="Group Members">
       <Table headings={TABLE_HEADINGS} caption="All members of this group">
-        <Suspense fallback={<TableRowSkeleton numCols={3} />}>
+        <Suspense fallback={<TableRowSkeleton numCols={4} />}>
           <For each={members.data}>
             {(member) => (
               <TableRow>
                 <TableCell>{member.name}</TableCell>
                 <TableCell>{member.email}</TableCell>
-                <TableCell>{formatDate(member.created_at)}</TableCell>
+                <TableCell>
+                  <Role role={member.role} />
+                </TableCell>
+                <TableCell>{formatDate(member.joined_at)}</TableCell>
               </TableRow>
             )}
           </For>

@@ -4,12 +4,15 @@ export type Group = {
   created_at: string;
 };
 
-// TODO: make into created_at and user props
+export type MemberRole = "member" | "admin" | "owner";
+
 export type GroupMember = {
   id: string;
   name: string;
   email: string;
   created_at: string;
+  joined_at: string;
+  role: MemberRole;
 };
 
 export type CreateGroupRequest = {

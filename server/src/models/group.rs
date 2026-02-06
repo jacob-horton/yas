@@ -19,8 +19,19 @@ pub struct GroupMemberDb {
     pub role: GroupMemberRole,
 }
 
+#[derive(Debug, FromRow)]
+pub struct GroupMemberDetailsDb {
+    pub id: Uuid,
+    pub role: GroupMemberRole,
+    pub email: String,
+    pub name: String,
+    pub joined_at: DateTime<Utc>,
+    pub created_at: DateTime<Utc>,
+}
+
 #[derive(Debug, Serialize, Deserialize, Type, PartialEq, Eq)]
 #[sqlx(type_name = "user_role", rename_all = "lowercase")]
+#[serde(rename_all = "lowercase")]
 pub enum GroupMemberRole {
     Member,
     Admin,
@@ -56,6 +67,29 @@ impl From<GroupDb> for GroupResponse {
             id: group.id.to_string(),
             name: group.name,
             created_at: group.created_at.to_rfc3339(),
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct GroupMemberResponse {
+    pub id: String,
+    pub email: String,
+    pub name: String,
+    pub created_at: String,
+    pub joined_at: String,
+    pub role: GroupMemberRole,
+}
+
+impl From<GroupMemberDetailsDb> for GroupMemberResponse {
+    fn from(group_member: GroupMemberDetailsDb) -> Self {
+        Self {
+            id: group_member.id.to_string(),
+            email: group_member.email,
+            name: group_member.name,
+            created_at: group_member.created_at.to_rfc3339(),
+            joined_at: group_member.joined_at.to_rfc3339(),
+            role: group_member.role,
         }
     }
 }
