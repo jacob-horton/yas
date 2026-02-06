@@ -25,7 +25,7 @@ impl StatsRepo {
                 JOIN matches m ON m.id = lb.match_id
                 WHERE m.game_id = $1
             )
-            SELECT u.name, rs.user_id, rs.match_id, rs.score, rs.played_at, rs.rank_in_match
+            SELECT u.name, u.avatar, u.avatar_colour, rs.user_id, rs.match_id, rs.score, rs.played_at, rs.rank_in_match
             FROM ranked_scores as rs
             JOIN users u ON u.id = rs.user_id
             WHERE history_index <= $2

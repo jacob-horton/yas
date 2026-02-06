@@ -19,6 +19,7 @@ export type Heading<T extends string> = {
   label: JSX.Element;
   sortProp?: T;
   defaultDirection?: SortDirection;
+  class?: string;
 };
 
 export type Sort<T extends string> = {
@@ -35,6 +36,10 @@ export type TableProps<T extends string> = ParentProps<{
 
 export type TableRowProps = {
   onClick?: () => void;
+  class?: string;
+};
+
+export type TableCellProps = {
   class?: string;
 };
 
@@ -73,10 +78,14 @@ export function Table<T extends string>(props: TableProps<T>) {
             {(heading, i) => (
               <th
                 scope="col"
-                class={cn("bg-gray-100 px-5 py-3 text-start font-semibold", {
-                  "rounded-s-md": i() === 0,
-                  "rounded-e-md": i() === props.headings.length - 1,
-                })}
+                class={cn(
+                  "whitespace-nowrap bg-gray-100 px-5 py-3 text-start font-semibold",
+                  {
+                    "rounded-s-md": i() === 0,
+                    "rounded-e-md": i() === props.headings.length - 1,
+                  },
+                  heading.class,
+                )}
               >
                 <div class="flex items-center gap-2">
                   {heading.label}
@@ -138,6 +147,10 @@ export const TableRow: ParentComponent<TableRowProps> = (props) => {
   );
 };
 
-export const TableCell: ParentComponent = (props) => {
-  return <td class="whitespace-nowrap px-5 py-3">{props.children}</td>;
+export const TableCell: ParentComponent<TableCellProps> = (props) => {
+  return (
+    <td class={cn("whitespace-nowrap px-5 py-3", props.class)}>
+      {props.children}
+    </td>
+  );
 };

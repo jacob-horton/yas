@@ -7,7 +7,12 @@ export interface UsersApiContract {
   create(payload: CreateUserRequest): Promise<User>;
   me(): Promise<User>;
   myGroups(): Promise<Group[]>;
-  updateMe(name: string, email: string): Promise<User>;
+  updateMe(
+    name: string,
+    email: string,
+    avatar: string,
+    avatarColour: string,
+  ): Promise<User>;
 
   user(id: string): UserApiContract;
 }
@@ -22,8 +27,15 @@ class UsersApi implements UsersApiContract {
     return api.get("/users/me").then((resp) => resp.data);
   }
 
-  public async updateMe(name: string, email: string): Promise<User> {
-    return api.patch("/users/me", { name, email }).then((resp) => resp.data);
+  public async updateMe(
+    name: string,
+    email: string,
+    avatar: string,
+    avatar_colour: string,
+  ): Promise<User> {
+    return api
+      .patch("/users/me", { name, email, avatar, avatar_colour })
+      .then((resp) => resp.data);
   }
 
   public async myGroups(): Promise<Group[]> {

@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { Index, Suspense } from "solid-js";
+import { Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth/context/auth-provider";

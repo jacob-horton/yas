@@ -54,14 +54,18 @@ pub async fn get_scoreboard(
         let avg_score = matches.iter().map(|m| m.score).sum::<i32>() as f64 / matches_played as f64;
 
         let user_name = matches[0].name.clone();
+        let user_avatar = matches[0].avatar.clone();
+        let user_avatar_colour = matches[0].avatar_colour.clone();
 
         let total_wins = matches.iter().filter(|m| m.rank_in_match == 1).count();
         let win_rate = total_wins as f64 / matches_played as f64;
 
         entries.push(ScoreboardEntry {
             user_id,
-            matches_played,
             user_name,
+            user_avatar,
+            user_avatar_colour,
+            matches_played,
             average_score: avg_score,
             wins: total_wins as i64,
             win_rate,

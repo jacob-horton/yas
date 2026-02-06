@@ -1,5 +1,4 @@
 import { A, useNavigate } from "@solidjs/router";
-import ArrowLeftIcon from "lucide-solid/icons/arrow-left";
 import { type Component, createEffect } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Button } from "@/components/ui/button";

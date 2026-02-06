@@ -1,6 +1,6 @@
 use sqlx::{PgExecutor, Postgres, types::Uuid};
 
-use crate::models::user::UserDb;
+use crate::models::user::{Avatar, AvatarColour, UserDb};
 
 pub struct UserRepo {}
 
@@ -28,12 +28,16 @@ impl UserRepo {
         id: Uuid,
         name: &str,
         email: &str,
+        avatar: Avatar,
+        avatar_colour: AvatarColour,
     ) -> Result<UserDb, sqlx::Error> {
         sqlx::query_as::<_, UserDb>(
-            "UPDATE users SET name = $1, email = $2 WHERE id = $3 RETURNING *",
+            "UPDATE users SET name = $1, email = $2, avatar = $3, avatar_colour = $4 WHERE id = $5 RETURNING *",
         )
         .bind(name)
         .bind(email.to_lowercase())
+        .bind(avatar)
+        .bind(avatar_colour)
         .bind(id)
         .fetch_one(executor)
         .await

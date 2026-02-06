@@ -3,7 +3,10 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, prelude::Type, types::Uuid};
 use validator::Validate;
 
-use crate::policies::GroupAction;
+use crate::{
+    models::user::{Avatar, AvatarColour},
+    policies::GroupAction,
+};
 
 #[derive(Debug, FromRow)]
 pub struct GroupDb {
@@ -27,6 +30,8 @@ pub struct GroupMemberDetailsDb {
     pub name: String,
     pub joined_at: DateTime<Utc>,
     pub created_at: DateTime<Utc>,
+    pub avatar: Avatar,
+    pub avatar_colour: AvatarColour,
 }
 
 #[derive(Debug, Serialize, Deserialize, Type, PartialEq, Eq)]
@@ -81,6 +86,8 @@ pub struct GroupMemberResponse {
     pub created_at: String,
     pub joined_at: String,
     pub role: GroupMemberRole,
+    pub avatar: Avatar,
+    pub avatar_colour: AvatarColour,
 }
 
 impl From<GroupMemberDetailsDb> for GroupMemberResponse {
@@ -92,6 +99,8 @@ impl From<GroupMemberDetailsDb> for GroupMemberResponse {
             created_at: group_member.created_at.to_rfc3339(),
             joined_at: group_member.joined_at.to_rfc3339(),
             role: group_member.role,
+            avatar: group_member.avatar,
+            avatar_colour: group_member.avatar_colour,
         }
     }
 }

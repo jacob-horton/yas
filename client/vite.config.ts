@@ -1,11 +1,12 @@
+import path from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import devtools from "solid-devtools/vite";
 import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
-import path from "node:path";
+import svg from "vite-plugin-solid-svg";
 
 export default defineConfig({
-  plugins: [devtools(), solidPlugin(), tailwindcss()],
+  plugins: [devtools(), solidPlugin(), tailwindcss(), svg()],
   server: {
     port: 3000,
   },

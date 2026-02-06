@@ -1,7 +1,41 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, types::Uuid};
+use sqlx::{FromRow, prelude::Type, types::Uuid};
 use validator::Validate;
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]
+#[sqlx(type_name = "TEXT", rename_all = "lowercase")]
+#[serde(rename_all = "lowercase")]
+pub enum Avatar {
+    Basketball,
+    Crab,
+    Helmet,
+    Headphones,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]
+#[sqlx(type_name = "TEXT", rename_all = "lowercase")]
+#[serde(rename_all = "lowercase")]
+pub enum AvatarColour {
+    Red,
+    Orange,
+    Amber,
+    Yellow,
+    Lime,
+    Green,
+    Emerald,
+    Teal,
+    Cyan,
+    Sky,
+    Blue,
+    Indigo,
+    Violet,
+    Purple,
+    Fuchsia,
+    Pink,
+    Rose,
+    Slate,
+}
 
 #[derive(Debug, FromRow)]
 pub struct UserDb {
@@ -10,6 +44,8 @@ pub struct UserDb {
     pub email: String,
     pub password_hash: String,
     pub created_at: DateTime<Utc>,
+    pub avatar: Avatar,
+    pub avatar_colour: AvatarColour,
 }
 
 #[derive(Debug, Serialize)]
@@ -18,6 +54,8 @@ pub struct UserResponse {
     pub email: String,
     pub name: String,
     pub created_at: String,
+    pub avatar: Avatar,
+    pub avatar_colour: AvatarColour,
 }
 
 impl From<UserDb> for UserResponse {
@@ -27,6 +65,8 @@ impl From<UserDb> for UserResponse {
             name: user.name,
             email: user.email,
             created_at: user.created_at.to_rfc3339(),
+            avatar: user.avatar,
+            avatar_colour: user.avatar_colour,
         }
     }
 }
@@ -66,4 +106,6 @@ pub struct UpdateUserReq {
     pub email: String,
     #[validate(length(min = 1, max = 512, message = "Name must be between 1 and 512 chars"))]
     pub name: String,
+    pub avatar: Avatar,
+    pub avatar_colour: AvatarColour,
 }

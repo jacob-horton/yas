@@ -1,3 +1,4 @@
+import type { AvatarColour, AvatarIcon } from "@/components/ui/avatar";
 import type { Game } from "./game";
 
 export type Scoreboard = {
@@ -8,6 +9,8 @@ export type Scoreboard = {
 export type ScoreboardEntry = {
   user_id: string;
   user_name: string;
+  user_avatar: AvatarIcon;
+  user_avatar_colour: AvatarColour;
   win_rate: number;
   average_score: number;
   matches_played: number;

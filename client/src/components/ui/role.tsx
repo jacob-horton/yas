@@ -1,6 +1,6 @@
+import type { Component } from "solid-js";
 import type { MemberRole } from "@/features/groups/types";
 import { cn } from "@/lib/classname";
-import type { Component, ParentComponent } from "solid-js";
 
 type Props = {
   role: MemberRole;

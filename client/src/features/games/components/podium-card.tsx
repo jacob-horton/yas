@@ -1,9 +1,17 @@
-import type { Component } from "solid-js";
+import { Suspense, type Component } from "solid-js";
+import {
+  Avatar,
+  type AvatarColour,
+  type AvatarIcon,
+} from "@/components/ui/avatar";
 import { cn } from "@/lib/classname";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_BG_GRADIENTS } from "@/lib/rank-colours";
+import { AvatarSkeleton } from "@/components/ui/avatar.skeleton";
 
 export const PodiumCard: Component<{
+  avatar: AvatarIcon;
+  avatarColour: AvatarColour;
   name: string;
   position: number;
   winRate: number;
@@ -18,8 +26,10 @@ export const PodiumCard: Component<{
         )}
       >
         {ordinalSuffix(props.position)}
-        <div class="-translate-y-1/2 absolute top-full flex size-20 items-center justify-center rounded-full border bg-white">
-          <div class="size-10 rounded-full bg-gray-300" />
+        <div class="-translate-y-1/2 absolute top-full flex size-20 items-center justify-center rounded-full border bg-white p-2">
+          <Suspense fallback={<AvatarSkeleton />}>
+            <Avatar colour={props.avatarColour} avatar={props.avatar} />
+          </Suspense>
         </div>
       </div>
 

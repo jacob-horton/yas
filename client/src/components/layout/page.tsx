@@ -1,5 +1,4 @@
 import { useNavigate } from "@solidjs/router";
-import ChevronLeftIcon from "lucide-solid/icons/chevron-left";
 import { For, type ParentComponent, Show } from "solid-js";
 import { cn } from "@/lib/classname";
 import { Button, type Variant } from "../ui/button";

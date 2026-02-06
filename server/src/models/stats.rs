@@ -1,12 +1,17 @@
 use serde::{Deserialize, Serialize};
 use sqlx::{prelude::FromRow, types::Uuid};
 
-use crate::models::game::{GameDb, GameResponse};
+use crate::models::{
+    game::{GameDb, GameResponse},
+    user::{Avatar, AvatarColour},
+};
 
 #[derive(sqlx::FromRow, Debug)]
 pub struct RawMatchStats {
     pub user_id: Uuid,
     pub name: String,
+    pub avatar: Avatar,
+    pub avatar_colour: AvatarColour,
     pub match_id: Uuid,
     pub score: i32,
     pub played_at: chrono::DateTime<chrono::Utc>,
@@ -43,6 +48,8 @@ impl From<PlayerMatchDb> for PlayerMatchResponse {
 pub struct ScoreboardEntry {
     pub user_id: Uuid,
     pub user_name: String,
+    pub user_avatar: Avatar,
+    pub user_avatar_colour: AvatarColour,
     pub matches_played: i64,
     pub average_score: f64,
     pub wins: i64,
@@ -86,6 +93,8 @@ pub struct ScoreboardResponse {
 pub struct ScoreboardEntryResponse {
     pub user_id: String,
     pub user_name: String,
+    pub user_avatar: Avatar,
+    pub user_avatar_colour: AvatarColour,
     pub matches_played: i64,
     pub average_score: f64,
     pub wins: i64,
@@ -97,6 +106,8 @@ impl From<ScoreboardEntry> for ScoreboardEntryResponse {
         Self {
             user_id: entry.user_id.to_string(),
             user_name: entry.user_name,
+            user_avatar: entry.user_avatar,
+            user_avatar_colour: entry.user_avatar_colour,
             matches_played: entry.matches_played,
             average_score: entry.average_score,
             wins: entry.wins,

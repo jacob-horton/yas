@@ -1,3 +1,5 @@
+import type { AvatarColour, AvatarIcon } from "@/components/ui/avatar";
+
 export type Group = {
   id: string;
   name: string;
@@ -13,6 +15,8 @@ export type GroupMember = {
   created_at: string;
   joined_at: string;
   role: MemberRole;
+  avatar: AvatarIcon;
+  avatar_colour: AvatarColour;
 };
 
 export type CreateGroupRequest = {

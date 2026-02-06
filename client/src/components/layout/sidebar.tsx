@@ -6,7 +6,7 @@ import PlusIcon from "lucide-solid/icons/plus";
 import SettingsIcon from "lucide-solid/icons/settings";
 import SlidersHorizontalIcon from "lucide-solid/icons/sliders-horizontal";
 import UsersIcon from "lucide-solid/icons/users";
-import { type Component, For, Index, Suspense } from "solid-js";
+import { type Component, For, Index, Suspense, Show } from "solid-js";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { useGroupGames } from "@/features/groups/hooks/use-group-games";
@@ -15,6 +15,8 @@ import { Button } from "../ui/button";
 import { Dropdown } from "../ui/dropdown";
 import { NavItem } from "../ui/nav-item";
 import { NavItemSkeleton } from "../ui/nav-item.skeleton";
+import { Avatar } from "../ui/avatar";
+import { AvatarSkeleton } from "../ui/avatar.skeleton";
 
 export const Sidebar: Component = () => {
   // TODO: what if no group - types say it's always defined
@@ -29,8 +31,17 @@ export const Sidebar: Component = () => {
   return (
     <nav class="flex h-full w-80 min-w-80 flex-col gap-4 border-gray-200 border-r p-4 text-gray-800">
       <div class="flex items-center gap-3 px-2 py-4">
-        <div class="flex size-10 min-h-10 min-w-10 items-center justify-center rounded-full border">
-          <div class="size-5 rounded-full bg-gray-300" />
+        <div class="flex size-10 min-h-10 min-w-10 items-center justify-center rounded-full border p-1">
+          <Suspense fallback={<AvatarSkeleton />}>
+            <Show when={user()}>
+              {(user) => (
+                <Avatar
+                  avatar={user()?.avatar}
+                  colour={user()?.avatar_colour}
+                />
+              )}
+            </Show>
+          </Suspense>
         </div>
         <div class="flex flex-col">
           <p class="font-semibold text-xl leading-tight">{user()?.name}</p>

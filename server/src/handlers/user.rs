@@ -110,7 +110,14 @@ async fn update_current_user(
 ) -> Result<impl IntoResponse, AppError> {
     let user = state
         .user_repo
-        .update(&state.pool, user.id, &payload.name, &payload.email)
+        .update(
+            &state.pool,
+            user.id,
+            &payload.name,
+            &payload.email,
+            payload.avatar,
+            payload.avatar_colour,
+        )
         .await
         .map_err(UserError::Database)?;
 

@@ -15,6 +15,7 @@ import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams } from "../types/game";
+import { Avatar } from "@/components/ui/avatar";
 
 type SortProp = "name" | "win_rate" | "average_score";
 
@@ -35,7 +36,7 @@ export const Scoreboard = () => {
   const navigate = useNavigate();
 
   const tableHeadings = [
-    { label: "No." },
+    { label: "No.", class: "w-12" },
     { label: "Name", sortProp: "name" },
     { label: "Win Rate", sortProp: "win_rate", defaultDirection: "descending" },
     {
@@ -69,6 +70,8 @@ export const Scoreboard = () => {
             <For each={scoreboardData.data?.entries?.slice(0, 3)}>
               {(score, index) => (
                 <PodiumCard
+                  avatar={score.user_avatar}
+                  avatarColour={score.user_avatar_colour}
                   name={score.user_name}
                   winRate={score.win_rate}
                   pointsPerGame={score.average_score}
@@ -104,9 +107,16 @@ export const Scoreboard = () => {
                       {index() + 1}
                     </span>
                   </TableCell>
-                  <TableCell>{score.user_name}</TableCell>
+                  <TableCell class="flex items-center gap-3">
+                    <Avatar
+                      class="size-7"
+                      avatar={score.user_avatar}
+                      colour={score.user_avatar_colour}
+                    />
+                    {score.user_name}
+                  </TableCell>
                   <TableCell>
-                    <span class="flex w-48 min-w-16 items-center">
+                    <span class="flex w-64 min-w-16 items-center">
                       <ProgressBar percentage={score.win_rate * 100} />
                       <span class="w-20 min-w-10 text-right">
                         {(score.win_rate * 100).toFixed(0)}%

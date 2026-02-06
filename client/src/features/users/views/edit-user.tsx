@@ -1,22 +1,38 @@
 import { useNavigate } from "@solidjs/router";
-import { createSignal } from "solid-js";
+import { createSignal, For } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { usersApi } from "../api";
+import {
+  Avatar,
+  AVATAR_SVGS,
+  COLOUR_MAP,
+  type AvatarColour,
+  type AvatarIcon,
+} from "@/components/ui/avatar";
+import { Dropdown } from "@/components/ui/dropdown";
+import { cn } from "@/lib/classname";
+
+const COLOURS = Object.keys(COLOUR_MAP) as AvatarColour[];
+const AVATARS = Object.keys(AVATAR_SVGS) as AvatarIcon[];
 
 export const EditUser = () => {
   const auth = useAuth();
   const navigate = useNavigate();
 
+  const [colour, setColour] = createSignal(
+    auth.user()?.avatar_colour ?? COLOURS[0],
+  );
+  const [avatar, setAvatar] = createSignal(auth.user()?.avatar ?? AVATARS[0]);
   const [name, setName] = createSignal(auth.user()?.name ?? "");
   const [email, setEmail] = createSignal(auth.user()?.email ?? "");
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
 
-    await usersApi.updateMe(name(), email());
+    await usersApi.updateMe(name(), email(), avatar(), colour());
     await auth.revalidate();
     navigate("/");
   };
@@ -35,6 +51,33 @@ export const EditUser = () => {
         onChange={setEmail}
         placeholder="user@email.com"
       />
+
+      <Dropdown
+        label="Colour"
+        value={colour()}
+        onChange={setColour}
+        options={COLOURS.map((col) => ({
+          label: col,
+          value: col,
+        }))}
+      />
+
+      <div class="flex flex-wrap gap-2">
+        <For each={AVATARS}>
+          {(a) => (
+            <button
+              type="button"
+              onClick={() => setAvatar(a)}
+              class={cn(
+                "cursor-pointer rounded-md border bg-gray-100 p-4 hover:bg-gray-200",
+                { "border-transparent": a !== avatar() },
+              )}
+            >
+              <Avatar avatar={a} colour={colour()} class="size-20" />
+            </button>
+          )}
+        </For>
+      </div>
 
       <div class="flex gap-4">
         <Button type="submit">Save</Button>

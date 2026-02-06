@@ -1,5 +1,7 @@
 import { For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
+import { Avatar } from "@/components/ui/avatar";
+import { Role } from "@/components/ui/role";
 import {
   type Heading,
   Table,
@@ -10,7 +12,6 @@ import { TableRowSkeleton } from "@/components/ui/table.skeleton";
 import { formatDate } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
-import { Role } from "@/components/ui/role";
 
 const TABLE_HEADINGS = [
   { label: "Name" },
@@ -30,7 +31,14 @@ export const GroupMembers = () => {
           <For each={members.data}>
             {(member) => (
               <TableRow>
-                <TableCell>{member.name}</TableCell>
+                <TableCell class="flex items-center gap-3">
+                  <Avatar
+                    class="size-7"
+                    avatar={member.avatar}
+                    colour={member.avatar_colour}
+                  />
+                  {member.name}
+                </TableCell>
                 <TableCell>{member.email}</TableCell>
                 <TableCell>
                   <Role role={member.role} />

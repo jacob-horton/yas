@@ -1,4 +1,4 @@
-import { revalidate, useNavigate } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import { formatDistanceToNow } from "date-fns";
 import { type Component, For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
@@ -15,7 +15,6 @@ import { formatDate, formatDateTime } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupInvites } from "../hooks/use-group-invites";
 import { invitesApi } from "@/features/invites/api";
-import { QK_GROUP_INVITES } from "../constants";
 
 function isExpired(expiry: string) {
   const expiryDate = new Date(expiry);
