@@ -1,9 +1,10 @@
 import { type Component, For } from "solid-js";
 import { TableCell, TableRow } from "./table";
 
-export const LoadingRows: Component<{ numCols: number; numRows?: number }> = (
-  props,
-) => {
+export const TableRowSkeleton: Component<{
+  numCols: number;
+  numRows?: number;
+}> = (props) => {
   return (
     <For each={Array(props.numRows ?? 5)}>
       {() => (

@@ -8,7 +8,7 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table";
-import { LoadingRows } from "@/components/ui/table.skeleton";
+import { TableRowSkeleton } from "@/components/ui/table.skeleton";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { cn } from "@/lib/classname";
 import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
@@ -17,6 +17,8 @@ import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams } from "../types/game";
 
 type SortProp = "name" | "win_rate" | "average_score";
+
+const TABLE_CAPTION = "Stats of all players playing this game";
 
 const DEFAULT_SORT: Sort<SortProp> = {
   property: "win_rate",
@@ -80,9 +82,9 @@ export const Scoreboard = () => {
           sortedBy={sort()}
           onSort={setSort}
           headings={tableHeadings}
-          caption="Stats of all players playing this game"
+          caption={TABLE_CAPTION}
         >
-          <Suspense fallback={<LoadingRows numCols={4} />}>
+          <Suspense fallback={<TableRowSkeleton numCols={4} />}>
             <For each={scoreboardData.data?.entries}>
               {(score, index) => (
                 <TableRow

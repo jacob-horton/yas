@@ -1,5 +1,4 @@
 import { A, useNavigate } from "@solidjs/router";
-import type { LucideProps } from "lucide-solid";
 import GamePadIcon from "lucide-solid/icons/gamepad-2";
 import MailPlusIcon from "lucide-solid/icons/mail-plus";
 import NotebookTextIcon from "lucide-solid/icons/notebook-text";
@@ -7,35 +6,15 @@ import PlusIcon from "lucide-solid/icons/plus";
 import SettingsIcon from "lucide-solid/icons/settings";
 import SlidersHorizontalIcon from "lucide-solid/icons/sliders-horizontal";
 import UsersIcon from "lucide-solid/icons/users";
-import { type Component, For, Show } from "solid-js";
-import type { JSX } from "solid-js/jsx-runtime";
+import { type Component, For, Index, Suspense } from "solid-js";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { useGroupGames } from "@/features/groups/hooks/use-group-games";
 import { useMyGroups } from "@/features/users/hooks/use-my-groups";
 import { Button } from "../ui/button";
 import { Dropdown } from "../ui/dropdown";
-
-type Route = {
-  href: string;
-  name: string;
-  icon?: (props: LucideProps) => JSX.Element;
-  end?: boolean; // Whether path has to be exact
-};
-
-const NavItem: Component<Route> = (props) => {
-  return (
-    <A
-      href={props.href}
-      end={props.end}
-      class="flex items-center gap-2 rounded-md px-2 py-1 transition hover:bg-gray-50"
-      activeClass="bg-violet-50 text-violet-800 hover:bg-violet-100"
-    >
-      <Show when={props.icon}>{props.icon?.({ size: 18 })}</Show>
-      {props.name}
-    </A>
-  );
-};
+import { NavItem } from "../ui/nav-item";
+import { NavItemSkeleton } from "../ui/nav-item.skeleton";
 
 export const Sidebar: Component = () => {
   // TODO: what if no group - types say it's always defined
@@ -104,9 +83,17 @@ export const Sidebar: Component = () => {
             <div class="flex-grow border-gray-200 border-t" />
           </span>
 
-          <For each={games.data}>
-            {(game) => <NavItem href={`games/${game.id}`} name={game.name} />}
-          </For>
+          <Suspense
+            fallback={
+              <Index each={Array.from({ length: 3 })}>
+                {() => <NavItemSkeleton />}
+              </Index>
+            }
+          >
+            <For each={games.data}>
+              {(game) => <NavItem href={`games/${game.id}`} name={game.name} />}
+            </For>
+          </Suspense>
 
           <NavItem href="games/create" icon={PlusIcon} name="Create game" />
         </div>

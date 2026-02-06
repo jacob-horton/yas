@@ -139,5 +139,5 @@ export const TableRow: ParentComponent<TableRowProps> = (props) => {
 };
 
 export const TableCell: ParentComponent = (props) => {
-  return <td class="px-5 py-3">{props.children}</td>;
+  return <td class="whitespace-nowrap px-5 py-3">{props.children}</td>;
 };

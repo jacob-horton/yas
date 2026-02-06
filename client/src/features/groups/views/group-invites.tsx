@@ -4,11 +4,12 @@ import { type Component, For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";
 import {
+  type Heading,
   Table,
   TableCell,
   TableRow,
-  type Heading,
 } from "@/components/ui/table";
+import { TableRowSkeleton } from "@/components/ui/table.skeleton";
 import { cn } from "@/lib/classname";
 import { formatDate, formatDateTime } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
@@ -26,6 +27,7 @@ type ExpiryCellProps = { expiresAt: string };
 const ExpiryCell: Component<ExpiryCellProps> = (props) => {
   const expired = isExpired(props.expiresAt);
 
+  // TODO: show "in 10 days", tooltip for exact time
   return (
     <div class="flex flex-col">
       <span class={cn({ "text-red-500": expired })}>
@@ -76,7 +78,7 @@ export const Invites = () => {
       ]}
     >
       <Table headings={TABLE_HEADINGS} caption="All invites for this group">
-        <Suspense>
+        <Suspense fallback={<TableRowSkeleton numCols={5} />}>
           <For each={invites.data}>
             {(invite) => (
               <TableRow>

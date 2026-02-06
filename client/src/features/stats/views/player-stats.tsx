@@ -1,6 +1,6 @@
 import { useParams } from "@solidjs/router";
 import type { ParentComponent } from "solid-js";
-import { For, Index, Show, Suspense } from "solid-js";
+import { For, Show, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import {
   type Heading,
@@ -8,7 +8,7 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table";
-import { LoadingRows } from "@/components/ui/table.skeleton";
+import { TableRowSkeleton } from "@/components/ui/table.skeleton";
 import { useUser } from "@/features/users/hooks/use-user";
 import { cn } from "@/lib/classname";
 import { formatDate } from "@/lib/format-date";
@@ -152,7 +152,7 @@ export const PlayerStats = () => {
         </Suspense>
 
         <Table headings={TABLE_HEADINGS} caption="Match history">
-          <Suspense fallback={<LoadingRows numCols={3} />}>
+          <Suspense fallback={<TableRowSkeleton numCols={3} />}>
             <Show when={history.data}>
               {(data) =>
                 data().map((s) => (

@@ -14,7 +14,7 @@ const COLOUR_MAP: Record<Variant, string> = {
   ghost: "hover:bg-gray-100 transition",
 } as const;
 
-const ICON_MAP: Record<Icon, Component> = {
+export const ICON_MAP: Record<Icon, Component> = {
   copy: ClipboardIcon,
   chevronLeft: ChevronLeftIcon,
   plus: PlusIcon,

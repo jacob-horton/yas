@@ -9,6 +9,7 @@ import {
 import { formatDate } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
+import { TableRowSkeleton } from "@/components/ui/table.skeleton";
 
 const TABLE_HEADINGS = [
   { label: "Name" },
@@ -23,7 +24,7 @@ export const GroupMembers = () => {
   return (
     <Page title="Group Members">
       <Table headings={TABLE_HEADINGS} caption="All members of this group">
-        <Suspense>
+        <Suspense fallback={<TableRowSkeleton numCols={3} />}>
           <For each={members.data}>
             {(member) => (
               <TableRow>
