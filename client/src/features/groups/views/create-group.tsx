@@ -1,12 +1,15 @@
 import { useNavigate } from "@solidjs/router";
+import { useQueryClient } from "@tanstack/solid-query";
 import { createSignal } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { QK_MY_GROUPS } from "@/features/users/constants";
 import { groupsApi } from "../api";
 
 export const CreateGroup = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [name, setName] = createSignal("");
 
@@ -15,6 +18,8 @@ export const CreateGroup = () => {
 
     // TODO: handle errors
     const res = await groupsApi.create({ name: name() });
+    await queryClient.invalidateQueries({ queryKey: [QK_MY_GROUPS] });
+
     navigate(`/groups/${res.id}`);
   }
 

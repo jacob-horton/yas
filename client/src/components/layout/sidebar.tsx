@@ -19,7 +19,6 @@ import { NavItem } from "../ui/nav-item";
 import { NavItemSkeleton } from "../ui/nav-item.skeleton";
 
 export const Sidebar: Component = () => {
-  // TODO: what if no group - types say it's always defined
   const { user } = useAuth();
   const groups = useMyGroups();
 
@@ -63,7 +62,9 @@ export const Sidebar: Component = () => {
           // TODO: default value
           value={group() ?? ""}
           onChange={(group) => navigate(`/groups/${group}`)}
-          options={groups()?.map((g) => ({ label: g.name, value: g.id })) ?? []}
+          options={
+            groups.data?.map((g) => ({ label: g.name, value: g.id })) ?? []
+          }
           class="w-full"
         />
 

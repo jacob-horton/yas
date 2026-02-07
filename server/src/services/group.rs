@@ -71,6 +71,18 @@ pub async fn get_group(
     get_group_without_auth_check(state, group_id).await
 }
 
+pub async fn delete_group(state: &AppState, user_id: Uuid, group_id: Uuid) -> Result<(), AppError> {
+    // Check user is a member
+    state
+        .group_repo
+        .get_member(&state.pool, group_id, user_id)
+        .await?
+        .ok_or(GroupError::MemberNotFound)?;
+
+    state.group_repo.delete(&state.pool, group_id).await?;
+    Ok(())
+}
+
 pub async fn get_group_without_auth_check(
     state: &AppState,
     group_id: Uuid,

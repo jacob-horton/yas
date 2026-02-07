@@ -11,6 +11,7 @@ export interface GroupApiContract {
   members(): Promise<GroupMember[]>;
   games(): Promise<Game[]>;
   invites(): Promise<InviteSummary[]>;
+  delete(): Promise<void>;
 
   createGame(payload: CreateGameRequest): Promise<Game>;
   createInvite(payload: CreateInviteRequest): Promise<InviteSummary>;
@@ -33,6 +34,10 @@ export class GroupApi implements GroupApiContract {
 
   public async invites(): Promise<InviteSummary[]> {
     return api.get(`/groups/${this.groupId}/invites`).then((resp) => resp.data);
+  }
+
+  public async delete(): Promise<void> {
+    return api.delete(`/groups/${this.groupId}`);
   }
 
   public async createGame(payload: CreateGameRequest): Promise<Game> {

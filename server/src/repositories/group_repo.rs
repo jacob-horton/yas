@@ -23,6 +23,19 @@ impl GroupRepo {
         .await
     }
 
+    pub async fn delete<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        id: Uuid,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query("DELETE FROM groups WHERE id = $1")
+            .bind(id)
+            .execute(executor)
+            .await?;
+
+        Ok(())
+    }
+
     pub async fn find_by_id<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,

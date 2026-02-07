@@ -3,7 +3,7 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::{get, post},
+    routing::{delete, get, post},
 };
 
 use crate::{
@@ -42,6 +42,20 @@ async fn get_group_details(
     Ok((StatusCode::OK, Json(response)))
 }
 
+async fn delete_group(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    Path(group_id): Path<String>,
+) -> Result<impl IntoResponse, AppError> {
+    let group_id = group_id
+        .parse()
+        .map_err(|_| AppError::BadRequest("Invalid group ID".to_string()))?;
+
+    services::group::delete_group(&state, user.id, group_id).await?;
+
+    Ok(StatusCode::NO_CONTENT)
+}
+
 async fn get_group_members(
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
@@ -61,5 +75,6 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .route("/groups", post(create_group))
         .route("/groups/:id", get(get_group_details))
+        .route("/groups/:id", delete(delete_group))
         .route("/groups/:id/members", get(get_group_members))
 }
