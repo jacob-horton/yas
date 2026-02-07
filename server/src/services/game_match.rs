@@ -1,10 +1,9 @@
-use sqlx::types::Uuid;
-
 use crate::AppState;
-
 use crate::errors::{AppError, GameError, GroupError, MatchError};
 use crate::models::game_match::{CreateMatchReq, MatchDb, MatchScoreDb};
 use crate::policies::GroupAction;
+
+use uuid::Uuid;
 
 pub async fn create_match(
     state: &AppState,

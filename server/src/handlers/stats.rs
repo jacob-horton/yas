@@ -5,6 +5,7 @@ use axum::{
     response::IntoResponse,
     routing::get,
 };
+use uuid::Uuid;
 
 use crate::{
     AppState,
@@ -16,19 +17,11 @@ use crate::{
 
 pub async fn get_user_history(
     State(state): State<AppState>,
-    Path((game_id, player_id)): Path<(String, String)>,
+    Path((game_id, player_id)): Path<(Uuid, Uuid)>,
     // TODO: don't allow order by
     Query(query): Query<StatsParams>,
     AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let game_id = game_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid game ID".to_string()))?;
-
-    let player_id = player_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid player ID".to_string()))?;
-
     let stats = services::stats::get_player_history(
         &state,
         user.id,
@@ -45,19 +38,11 @@ pub async fn get_user_history(
 
 pub async fn get_user_summary(
     State(state): State<AppState>,
-    Path((game_id, player_id)): Path<(String, String)>,
+    Path((game_id, player_id)): Path<(Uuid, Uuid)>,
     // TODO: don't allow order by
     Query(query): Query<StatsParams>,
     AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let game_id = game_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid game ID".to_string()))?;
-
-    let player_id = player_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid player ID".to_string()))?;
-
     let stats = services::stats::get_player_summary(
         &state,
         user.id,

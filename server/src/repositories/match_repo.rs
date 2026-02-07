@@ -1,4 +1,5 @@
-use sqlx::{PgConnection, Postgres, QueryBuilder, types::Uuid};
+use sqlx::{PgConnection, Postgres, QueryBuilder};
+use uuid::Uuid;
 
 use crate::models::game_match::{MatchDb, MatchDetailsDb, MatchScoreDb};
 

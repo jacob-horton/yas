@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, types::Uuid};
+use sqlx::FromRow;
+use uuid::Uuid;
 use validator::Validate;
 
 #[derive(Debug, FromRow)]

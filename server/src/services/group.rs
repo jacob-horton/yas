@@ -1,14 +1,10 @@
-use sqlx::types::Uuid;
-
 use crate::AppState;
-
 use crate::errors::{AppError, GroupError};
 use crate::models::game::GameDb;
-use crate::models::group::{
-    CreateGroupReq, GroupDb, GroupMemberDb, GroupMemberDetailsDb, GroupMemberRole,
-};
-use crate::models::user::UserDb;
+use crate::models::group::{CreateGroupReq, GroupDb, GroupMemberDetailsDb, GroupMemberRole};
 use crate::policies::GroupAction;
+
+use uuid::Uuid;
 
 pub async fn create_group(
     state: &AppState,

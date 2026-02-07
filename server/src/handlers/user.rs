@@ -6,6 +6,7 @@ use axum::{
     routing::{get, patch, post},
 };
 use tower_sessions::Session;
+use uuid::Uuid;
 
 use crate::{
     AppState,
@@ -62,12 +63,8 @@ async fn get_current_user(
 async fn get_user(
     State(state): State<AppState>,
     AuthUser(logged_in_user): AuthUser,
-    Path((user_id,)): Path<(String,)>,
+    Path(user_id): Path<Uuid>,
 ) -> Result<impl IntoResponse, AppError> {
-    let user_id = user_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid user id".to_string()))?;
-
     // Check if logged in user shares a group with lookup user for privacy
     let shares_group = state
         .group_repo

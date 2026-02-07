@@ -5,6 +5,7 @@ use axum::{
     response::IntoResponse,
     routing::{get, post},
 };
+use uuid::Uuid;
 
 use crate::{
     AppState,
@@ -19,14 +20,10 @@ use crate::{
 
 pub async fn create_game(
     State(state): State<AppState>,
-    Path((group_id,)): Path<(String,)>,
+    Path(group_id): Path<Uuid>,
     AuthUser(user): AuthUser,
     ValidatedJson(payload): ValidatedJson<CreateGameReq>,
 ) -> Result<impl IntoResponse, AppError> {
-    let group_id = group_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid group ID".to_string()))?;
-
     let game = services::game::create_game(&state, user.id, group_id, payload).await?;
 
     let response: GameResponse = game.into();
@@ -35,13 +32,9 @@ pub async fn create_game(
 
 pub async fn get_games_in_group(
     State(state): State<AppState>,
-    Path((group_id,)): Path<(String,)>,
+    Path(group_id): Path<Uuid>,
     AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let group_id = group_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid group ID".to_string()))?;
-
     let games = services::group::get_games_in_group(&state, user.id, group_id).await?;
 
     let response: Vec<GameResponse> = games.into_iter().map(|g| g.into()).collect();
@@ -50,17 +43,13 @@ pub async fn get_games_in_group(
 
 pub async fn get_scoreboard(
     State(state): State<AppState>,
-    Path((game_id,)): Path<(String,)>,
+    Path(game_id): Path<Uuid>,
     Query(query): Query<StatsParams>,
     AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let game_id = game_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid game ID".to_string()))?;
-
     let order_by = query.order_by.unwrap_or(OrderBy::WinRate);
 
-    let order_dir = query.order_dir.unwrap_or_else(|| match order_by {
+    let order_dir = query.order_dir.unwrap_or(match order_by {
         // Names naturally sort A-Z
         OrderBy::Name => OrderDir::Ascending,
         // Numbers/Stats naturally sort High-to-Low
@@ -84,13 +73,9 @@ pub async fn get_scoreboard(
 
 pub async fn get_game_details(
     State(state): State<AppState>,
-    Path((game_id,)): Path<(String,)>,
+    Path(game_id): Path<Uuid>,
     AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let game_id = game_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid game ID".to_string()))?;
-
     let game = services::game::get(&state, user.id, game_id).await?;
     let response: GameResponse = game.into();
 

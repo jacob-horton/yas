@@ -5,6 +5,7 @@ use axum::{
     response::IntoResponse,
     routing::{delete, get, post},
 };
+use uuid::Uuid;
 
 use crate::{
     AppState,
@@ -18,15 +19,11 @@ use crate::{
 };
 
 pub async fn create_invite(
-    Path((group_id,)): Path<(String,)>,
+    Path(group_id): Path<Uuid>,
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
     ValidatedJson(payload): ValidatedJson<CreateInviteReq>,
 ) -> Result<impl IntoResponse, AppError> {
-    let group_id = group_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid group ID".to_string()))?;
-
     let invite = services::invite::create_link(&state, group_id, user.id, payload).await?;
 
     let response: InviteBasicResponse = invite.into();
@@ -34,14 +31,10 @@ pub async fn create_invite(
 }
 
 pub async fn get_group_invites(
-    Path((group_id,)): Path<(String,)>,
+    Path(group_id): Path<Uuid>,
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let group_id = group_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid group ID".to_string()))?;
-
     let invites = services::invite::get_group_invites(&state, user.id, group_id).await?;
 
     let response: Vec<InviteSummaryResponse> =
@@ -50,14 +43,10 @@ pub async fn get_group_invites(
 }
 
 async fn get_invite(
-    Path((code,)): Path<(String,)>,
+    Path(code): Path<Uuid>,
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let code = code
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid invite code".to_string()))?;
-
     let invite = services::invite::get_invite(&state, code).await?;
     let group = services::group::get_group_without_auth_check(&state, invite.group_id).await?;
 
@@ -81,14 +70,10 @@ async fn get_invite(
 }
 
 async fn delete_invite(
-    Path((code,)): Path<(String,)>,
+    Path(code): Path<Uuid>,
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let code = code
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid invite code".to_string()))?;
-
     let invite = services::invite::get_invite(&state, code).await?;
     let group = services::group::get_group_without_auth_check(&state, invite.group_id).await?;
 
@@ -108,14 +93,10 @@ async fn delete_invite(
 }
 
 async fn accept_invite(
-    Path((code,)): Path<(String,)>,
+    Path(code): Path<Uuid>,
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let code = code
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid invite code".to_string()))?;
-
     services::invite::accept_invite(&state, user.id, code).await?;
 
     Ok(StatusCode::NO_CONTENT)

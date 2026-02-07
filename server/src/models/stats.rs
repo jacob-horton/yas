@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
-use sqlx::{prelude::FromRow, types::Uuid};
+use sqlx::prelude::FromRow;
+use uuid::Uuid;
 
 use crate::models::{
     game::{GameDb, GameResponse},

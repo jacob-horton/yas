@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
-use sqlx::{PgExecutor, Postgres, types::Uuid};
+use sqlx::{PgExecutor, Postgres};
+use uuid::Uuid;
 
 use crate::models::invite::{InviteDb, InviteWithCreatedByNameDb};
 

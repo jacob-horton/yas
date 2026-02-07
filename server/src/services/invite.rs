@@ -1,5 +1,5 @@
 use chrono::{DateTime, Months, Utc};
-use sqlx::types::Uuid;
+use uuid::Uuid;
 
 use crate::{
     AppState,

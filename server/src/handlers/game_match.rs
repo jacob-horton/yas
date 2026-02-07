@@ -5,6 +5,7 @@ use axum::{
     response::IntoResponse,
     routing::post,
 };
+use uuid::Uuid;
 
 use crate::{
     AppState,
@@ -16,14 +17,10 @@ use crate::{
 
 pub async fn create_match(
     State(state): State<AppState>,
-    Path((game_id,)): Path<(String,)>,
+    Path(game_id): Path<Uuid>,
     AuthUser(user): AuthUser,
     ValidatedJson(payload): ValidatedJson<CreateMatchReq>,
 ) -> Result<impl IntoResponse, AppError> {
-    let game_id = game_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid game ID".to_string()))?;
-
     let game_match = services::game_match::create_match(&state, game_id, user.id, payload).await?;
 
     let response: MatchResponse = game_match.into();

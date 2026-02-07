@@ -5,8 +5,8 @@ use crate::{
     models::user::UserDb,
 };
 use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
-use sqlx::types::Uuid;
 use tower_sessions::Session;
+use uuid::Uuid;
 
 pub struct AuthUser(pub UserDb);
 

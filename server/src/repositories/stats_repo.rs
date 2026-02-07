@@ -1,4 +1,4 @@
-use sqlx::types::Uuid;
+use uuid::Uuid;
 
 use crate::models::stats::{PlayerMatchDb, RawMatchStats, StatsLifetime, StatsPeriod};
 

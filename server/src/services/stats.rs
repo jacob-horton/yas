@@ -1,5 +1,3 @@
-use sqlx::types::Uuid;
-
 use crate::{
     AppState,
     errors::{AppError, GameError, GroupError},
@@ -9,6 +7,7 @@ use crate::{
     },
 };
 use std::{cmp::Ordering, collections::HashMap};
+use uuid::Uuid;
 
 pub async fn get_scoreboard(
     state: &AppState,

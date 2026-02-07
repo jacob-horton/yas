@@ -1,4 +1,5 @@
-use sqlx::{PgExecutor, Postgres, types::Uuid};
+use sqlx::{PgExecutor, Postgres};
+use uuid::Uuid;
 
 use crate::models::game::GameDb;
 

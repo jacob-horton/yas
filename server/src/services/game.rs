@@ -1,10 +1,9 @@
-use sqlx::types::Uuid;
-
 use crate::AppState;
-
 use crate::errors::{AppError, GameError, GroupError};
 use crate::models::game::{CreateGameReq, GameDb};
 use crate::policies::GroupAction;
+
+use uuid::Uuid;
 
 pub async fn create_game(
     state: &AppState,

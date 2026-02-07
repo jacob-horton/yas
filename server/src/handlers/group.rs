@@ -5,6 +5,7 @@ use axum::{
     response::IntoResponse,
     routing::{delete, get, post},
 };
+use uuid::Uuid;
 
 use crate::{
     AppState,
@@ -30,12 +31,8 @@ async fn create_group(
 async fn get_group_details(
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
-    Path(group_id): Path<String>,
+    Path(group_id): Path<Uuid>,
 ) -> Result<impl IntoResponse, AppError> {
-    let group_id = group_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid group ID".to_string()))?;
-
     let group = services::group::get_group(&state, user.id, group_id).await?;
 
     let response: GroupResponse = group.into();
@@ -45,12 +42,8 @@ async fn get_group_details(
 async fn delete_group(
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
-    Path(group_id): Path<String>,
+    Path(group_id): Path<Uuid>,
 ) -> Result<impl IntoResponse, AppError> {
-    let group_id = group_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid group ID".to_string()))?;
-
     services::group::delete_group(&state, user.id, group_id).await?;
 
     Ok(StatusCode::NO_CONTENT)
@@ -59,12 +52,8 @@ async fn delete_group(
 async fn get_group_members(
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
-    Path(group_id): Path<String>,
+    Path(group_id): Path<Uuid>,
 ) -> Result<impl IntoResponse, AppError> {
-    let group_id = group_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid group ID".to_string()))?;
-
     let members = services::group::get_group_members(&state, user.id, group_id).await?;
 
     let response: Vec<GroupMemberResponse> = members.into_iter().map(|m| m.into()).collect();
@@ -74,16 +63,8 @@ async fn get_group_members(
 async fn remove_group_member(
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
-    Path((group_id, member_id)): Path<(String, String)>,
+    Path((group_id, member_id)): Path<(Uuid, Uuid)>,
 ) -> Result<impl IntoResponse, AppError> {
-    let group_id = group_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid group ID".to_string()))?;
-
-    let member_id = member_id
-        .parse()
-        .map_err(|_| AppError::BadRequest("Invalid member ID".to_string()))?;
-
     services::group::remove_group_member(&state, user.id, group_id, member_id).await?;
 
     Ok(StatusCode::NO_CONTENT)
