@@ -58,7 +58,7 @@ const TABLE_HEADINGS = [
   { label: "Uses" },
   { label: "Created On" },
   { label: "Expiry" },
-  { label: "" },
+  { label: "", class: "w-28" },
 ] as const satisfies Heading<string>[];
 
 export const Invites = () => {
@@ -98,6 +98,7 @@ export const Invites = () => {
                     <Button
                       icon="copy"
                       variant="ghost"
+                      class="text-gray-400"
                       onClick={() =>
                         navigator.clipboard.writeText(getInviteLink(invite.id))
                       }
@@ -106,6 +107,7 @@ export const Invites = () => {
                       danger
                       icon="delete"
                       variant="ghost"
+                      class="text-gray-400"
                       onClick={async () => {
                         await invitesApi.invite(invite.id).delete();
                         invites.refetch();

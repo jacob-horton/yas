@@ -5,6 +5,10 @@ import type {
 } from "@/features/invites/types/invite";
 import { api } from "@/lib/api";
 import type { Group, GroupMember } from "../types";
+import {
+  GroupMemberApi,
+  type GroupMemberApiContract,
+} from "./group-member-api";
 
 export interface GroupApiContract {
   get(): Promise<Group>;
@@ -15,6 +19,8 @@ export interface GroupApiContract {
 
   createGame(payload: CreateGameRequest): Promise<Game>;
   createInvite(payload: CreateInviteRequest): Promise<InviteSummary>;
+
+  member(userId: string): GroupMemberApiContract;
 }
 
 export class GroupApi implements GroupApiContract {
@@ -52,5 +58,9 @@ export class GroupApi implements GroupApiContract {
     return api
       .post(`/groups/${this.groupId}/invites`, payload)
       .then((resp) => resp.data);
+  }
+
+  public member(userId: string) {
+    return new GroupMemberApi(this.groupId, userId);
   }
 }

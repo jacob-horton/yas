@@ -29,7 +29,7 @@ const DEFAULT_SORT: Sort<SortProp> = {
 export const Scoreboard = () => {
   const params = useParams<GameRouteParams>();
   const auth = useAuth();
-  const userIdStr = () => auth.user()?.id?.toString();
+  const userId = () => auth.user()?.id;
 
   const [sort, setSort] = createSignal<Sort<SortProp>>(DEFAULT_SORT);
   const scoreboardData = useScoreboardData(() => params.gameId, sort);
@@ -93,13 +93,13 @@ export const Scoreboard = () => {
                 <TableRow
                   onClick={() => navigate(`player/${score.user_id}`)}
                   class={cn({
-                    "font-semibold": score.user_id === userIdStr(),
+                    "font-semibold": score.user_id === userId(),
                   })}
                 >
                   <TableCell>
                     <span
                       class={cn(
-                        score.user_id === userIdStr()
+                        score.user_id === userId()
                           ? "font-bold text-gray-600"
                           : "text-gray-400",
                       )}

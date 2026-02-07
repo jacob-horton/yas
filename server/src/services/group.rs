@@ -8,6 +8,7 @@ use crate::models::group::{
     CreateGroupReq, GroupDb, GroupMemberDb, GroupMemberDetailsDb, GroupMemberRole,
 };
 use crate::models::user::UserDb;
+use crate::policies::GroupAction;
 
 pub async fn create_group(
     state: &AppState,
@@ -116,4 +117,40 @@ pub async fn get_group_members(
         .map_err(GroupError::Database)?;
 
     Ok(group_member)
+}
+
+pub async fn remove_group_member(
+    state: &AppState,
+    user_id: Uuid,
+    group_id: Uuid,
+    member_id: Uuid,
+) -> Result<(), AppError> {
+    // Check user is a member
+    let user_member = state
+        .group_repo
+        .get_member(&state.pool, group_id, user_id)
+        .await?
+        .ok_or(GroupError::MemberNotFound)?;
+
+    // Find member that's being removed
+    let member_to_be_deleted = state
+        .group_repo
+        .get_member(&state.pool, group_id, user_id)
+        .await?
+        .ok_or(GroupError::MemberNotFound)?;
+
+    if !user_member
+        .role
+        .can_perform(GroupAction::RemoveMember(member_to_be_deleted.role))
+    {
+        return Err(GroupError::Forbidden.into());
+    }
+
+    state
+        .group_repo
+        .remove_member(&state.pool, group_id, member_id)
+        .await
+        .map_err(GroupError::Database)?;
+
+    Ok(())
 }

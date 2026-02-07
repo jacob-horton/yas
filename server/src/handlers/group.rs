@@ -71,10 +71,32 @@ async fn get_group_members(
     Ok((StatusCode::OK, Json(response)))
 }
 
+async fn remove_group_member(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    Path((group_id, member_id)): Path<(String, String)>,
+) -> Result<impl IntoResponse, AppError> {
+    let group_id = group_id
+        .parse()
+        .map_err(|_| AppError::BadRequest("Invalid group ID".to_string()))?;
+
+    let member_id = member_id
+        .parse()
+        .map_err(|_| AppError::BadRequest("Invalid member ID".to_string()))?;
+
+    services::group::remove_group_member(&state, user.id, group_id, member_id).await?;
+
+    Ok(StatusCode::NO_CONTENT)
+}
+
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/groups", post(create_group))
         .route("/groups/:id", get(get_group_details))
         .route("/groups/:id", delete(delete_group))
         .route("/groups/:id/members", get(get_group_members))
+        .route(
+            "/groups/:groupId/member/:memberId",
+            delete(remove_group_member),
+        )
 }

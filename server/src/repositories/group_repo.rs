@@ -1,9 +1,6 @@
 use sqlx::{PgExecutor, Postgres, types::Uuid};
 
-use crate::models::{
-    group::{GroupDb, GroupMemberDb, GroupMemberDetailsDb, GroupMemberRole},
-    user::UserDb,
-};
+use crate::models::group::{GroupDb, GroupMemberDb, GroupMemberDetailsDb, GroupMemberRole};
 
 pub struct GroupRepo {}
 
@@ -30,6 +27,21 @@ impl GroupRepo {
     ) -> Result<(), sqlx::Error> {
         sqlx::query("DELETE FROM groups WHERE id = $1")
             .bind(id)
+            .execute(executor)
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn remove_member<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        group_id: Uuid,
+        member_id: Uuid,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query("DELETE FROM group_members WHERE group_id = $1 AND user_id = $2")
+            .bind(group_id)
+            .bind(member_id)
             .execute(executor)
             .await?;
 
