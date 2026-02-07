@@ -34,7 +34,7 @@ export const Button: ParentComponent<{
   return (
     <button
       class={cn(
-        "flex h-8 w-fit cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md p-10 py-1 font-medium",
+        "flex h-8 w-fit cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md p-10 py-1 font-semibold",
         COLOUR_MAP[props.variant ?? "primary"],
         {
           "p-1.5": props.icon && !props.children,

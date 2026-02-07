@@ -14,7 +14,7 @@ export const ButtonSkeleton: ParentComponent<{
     <button
       type="button"
       class={cn(
-        "flex h-8 w-fit animate-pulse cursor-not-allowed items-center justify-center gap-2 whitespace-nowrap rounded-md bg-gray-300 p-10 py-1 font-medium",
+        "flex h-8 w-fit animate-pulse cursor-not-allowed items-center justify-center gap-2 whitespace-nowrap rounded-md bg-gray-300 p-10 py-1 font-semibold",
         props.class,
       )}
       disabled

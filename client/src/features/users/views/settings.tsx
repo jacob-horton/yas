@@ -11,7 +11,7 @@ export const UserSettings = () => {
       <div class="flex flex-col gap-4">
         <A
           href="/me/edit"
-          class="h-8 w-fit rounded-md bg-violet-500 px-6 py-1 font-medium text-white"
+          class="h-8 w-fit rounded-md bg-violet-500 px-6 py-1 font-semibold text-white"
         >
           Edit Details
         </A>

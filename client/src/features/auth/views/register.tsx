@@ -115,7 +115,7 @@ export const Register: Component = () => {
             <span class="text-gray-500">Already have an account? </span>
             <A
               href="/login"
-              class="font-medium text-violet-600 hover:underline"
+              class="font-semibold text-violet-600 hover:underline"
             >
               Log in
             </A>

@@ -49,7 +49,7 @@ export const Login: Component = () => {
             <span class="text-gray-500">Don't have an account? </span>
             <A
               href="/register"
-              class="font-medium text-violet-600 hover:underline"
+              class="font-semibold text-violet-600 hover:underline"
             >
               Sign up
             </A>

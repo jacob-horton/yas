@@ -58,7 +58,7 @@ export const Dropdown: Component<{
       <div ref={dropdownWrapperRef} class="relative h-full w-full">
         <div
           class={cn(
-            "group flex h-full w-full items-center rounded-md border font-medium transition",
+            "group flex h-full w-full items-center rounded-md border font-semibold transition",
             {
               "border-violet-500": isOpen() && !props.error,
               "focus-within:border-violet-500": !props.error,

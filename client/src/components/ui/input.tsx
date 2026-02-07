@@ -21,7 +21,7 @@ export const Input: Component<{
     >
       <div
         class={cn(
-          "group flex h-full max-w-96 items-center rounded-md border font-medium transition focus-within:border-violet-500",
+          "group flex h-full max-w-96 items-center rounded-md border font-semibold transition focus-within:border-violet-500",
           { "bg-red-100 focus-within:border-red-500": !!props.error },
         )}
       >
