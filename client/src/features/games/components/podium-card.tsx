@@ -1,13 +1,13 @@
-import { Suspense, type Component } from "solid-js";
+import { type Component, Suspense } from "solid-js";
 import {
   Avatar,
   type AvatarColour,
   type AvatarIcon,
 } from "@/components/ui/avatar";
+import { AvatarSkeleton } from "@/components/ui/avatar.skeleton";
 import { cn } from "@/lib/classname";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_BG_GRADIENTS } from "@/lib/rank-colours";
-import { AvatarSkeleton } from "@/components/ui/avatar.skeleton";
 
 export const PodiumCard: Component<{
   avatar: AvatarIcon;

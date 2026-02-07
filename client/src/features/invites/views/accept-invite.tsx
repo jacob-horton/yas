@@ -2,11 +2,11 @@ import { useNavigate, useParams } from "@solidjs/router";
 import { Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";
+import { ButtonSkeleton } from "@/components/ui/button.skeleton";
+import { TextSkeleton } from "@/components/ui/text.skeleton";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { invitesApi } from "../api";
 import { useInvite } from "../hooks/use-invite";
-import { ButtonSkeleton } from "@/components/ui/button.skeleton";
-import { TextSkeleton } from "@/components/ui/text.skeleton";
 
 export const AcceptInvite = () => {
   const params = useParams<{ inviteId: string }>();

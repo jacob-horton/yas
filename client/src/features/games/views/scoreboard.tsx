@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "@solidjs/router";
 import { createSignal, For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
+import { Avatar } from "@/components/ui/avatar";
 import {
   type Heading,
   type Sort,
@@ -15,7 +16,6 @@ import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams } from "../types/game";
-import { Avatar } from "@/components/ui/avatar";
 
 type SortProp = "name" | "win_rate" | "average_score";
 

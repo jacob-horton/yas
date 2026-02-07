@@ -6,8 +6,8 @@ import {
   type ParentComponent,
   useContext,
 } from "solid-js";
-import type { GroupRouteParams } from "../types/params";
 import { LS_LAST_GROUP_ID } from "@/pages/home-page";
+import type { GroupRouteParams } from "../types/params";
 
 const GroupContext = createContext<Accessor<string>>();
 

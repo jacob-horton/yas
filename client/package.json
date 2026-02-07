@@ -9,7 +9,7 @@
     "build": "vite build",
     "serve": "vite preview",
     "lint": "biome lint",
-    "lint:fix": "biome lint --write --unsafe",
+    "lint:fix": "biome check --write --unsafe",
     "format": "biome format --write",
     "type-check": "tsc --noEmit"
   },

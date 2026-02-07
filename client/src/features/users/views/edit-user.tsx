@@ -1,19 +1,19 @@
 import { useNavigate } from "@solidjs/router";
 import { createSignal, For } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useAuth } from "@/features/auth/context/auth-provider";
-import { usersApi } from "../api";
 import {
-  Avatar,
   AVATAR_SVGS,
-  COLOUR_MAP,
+  Avatar,
   type AvatarColour,
   type AvatarIcon,
+  COLOUR_MAP,
 } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/features/auth/context/auth-provider";
 import { cn } from "@/lib/classname";
+import { usersApi } from "../api";
 
 const COLOURS = Object.keys(COLOUR_MAP) as AvatarColour[];
 const AVATARS = Object.keys(AVATAR_SVGS) as AvatarIcon[];

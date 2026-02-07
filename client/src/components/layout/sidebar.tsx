@@ -6,17 +6,17 @@ import PlusIcon from "lucide-solid/icons/plus";
 import SettingsIcon from "lucide-solid/icons/settings";
 import SlidersHorizontalIcon from "lucide-solid/icons/sliders-horizontal";
 import UsersIcon from "lucide-solid/icons/users";
-import { type Component, For, Index, Suspense, Show } from "solid-js";
+import { type Component, For, Index, Show, Suspense } from "solid-js";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { useGroupGames } from "@/features/groups/hooks/use-group-games";
 import { useMyGroups } from "@/features/users/hooks/use-my-groups";
+import { Avatar } from "../ui/avatar";
+import { AvatarSkeleton } from "../ui/avatar.skeleton";
 import { Button } from "../ui/button";
 import { Dropdown } from "../ui/dropdown";
 import { NavItem } from "../ui/nav-item";
 import { NavItemSkeleton } from "../ui/nav-item.skeleton";
-import { Avatar } from "../ui/avatar";
-import { AvatarSkeleton } from "../ui/avatar.skeleton";
 
 export const Sidebar: Component = () => {
   // TODO: what if no group - types say it's always defined
