@@ -17,10 +17,9 @@ import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams } from "../types/game";
 
-type SortProp = "name" | "win_rate" | "average_score";
-
 const TABLE_CAPTION = "Stats of all players playing this game";
 
+type SortProp = "name" | "win_rate" | "average_score";
 const DEFAULT_SORT: Sort<SortProp> = {
   property: "win_rate",
   direction: "descending",

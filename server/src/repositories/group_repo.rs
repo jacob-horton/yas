@@ -1,7 +1,10 @@
 use sqlx::{PgExecutor, Postgres};
 use uuid::Uuid;
 
-use crate::models::group::{GroupDb, GroupMemberDb, GroupMemberDetailsDb, GroupMemberRole};
+use crate::models::{
+    group::{GroupDb, GroupMemberDb, GroupMemberDetailsDb, GroupMemberRole, OrderBy},
+    stats::OrderDir,
+};
 
 pub struct GroupRepo {}
 
@@ -129,13 +132,36 @@ impl GroupRepo {
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,
         group_id: Uuid,
+        order_by: OrderBy,
+        order_dir: OrderDir,
     ) -> Result<Vec<GroupMemberDetailsDb>, sqlx::Error> {
-        sqlx::query_as::<_, GroupMemberDetailsDb>(
-            "SELECT users.*, group_members.joined_at, group_members.role FROM group_members JOIN users ON users.id = group_members.user_id WHERE group_members.group_id = $1 ORDER BY name",
-        )
-        .bind(group_id)
-        .fetch_all(executor)
-        .await
+        let sort_column = match order_by {
+            OrderBy::JoinedAt => "group_members.joined_at",
+            OrderBy::Role => "group_members.role",
+            OrderBy::Name => "users.name",
+            OrderBy::Email => "users.email",
+        };
+
+        // Reverse if role (in db: member = 1, admin = 2, owner = 3)
+        let order_dir = if order_by == OrderBy::Role {
+            order_dir.reverse()
+        } else {
+            order_dir
+        };
+
+        let direction = match order_dir {
+            OrderDir::Ascending => "ASC",
+            OrderDir::Descending => "DESC",
+        };
+
+        let sql = format!(
+            "SELECT users.*, group_members.joined_at, group_members.role FROM group_members JOIN users ON users.id = group_members.user_id WHERE group_members.group_id = $1 ORDER BY {sort_column} {direction}, users.name ASC, group_members.joined_at ASC",
+        );
+
+        sqlx::query_as::<_, GroupMemberDetailsDb>(&sql)
+            .bind(group_id)
+            .fetch_all(executor)
+            .await
     }
 
     pub async fn users_share_group<'e>(

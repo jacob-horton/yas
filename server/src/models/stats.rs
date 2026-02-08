@@ -72,11 +72,20 @@ pub enum OrderBy {
     AverageScore,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum OrderDir {
     Ascending,
     Descending,
+}
+
+impl OrderDir {
+    pub fn reverse(&self) -> Self {
+        match self {
+            Self::Ascending => Self::Descending,
+            Self::Descending => Self::Ascending,
+        }
+    }
 }
 
 pub struct Scoreboard {

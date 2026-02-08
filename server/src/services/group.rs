@@ -1,7 +1,10 @@
 use crate::AppState;
 use crate::errors::{AppError, GroupError};
 use crate::models::game::GameDb;
-use crate::models::group::{CreateGroupReq, GroupDb, GroupMemberDetailsDb, GroupMemberRole};
+use crate::models::group::{
+    CreateGroupReq, GroupDb, GroupMemberDetailsDb, GroupMemberRole, OrderBy,
+};
+use crate::models::stats::OrderDir;
 use crate::policies::GroupAction;
 
 use uuid::Uuid;
@@ -98,6 +101,8 @@ pub async fn get_group_members(
     state: &AppState,
     user_id: Uuid,
     group_id: Uuid,
+    order_by: OrderBy,
+    order_dir: OrderDir,
 ) -> Result<Vec<GroupMemberDetailsDb>, AppError> {
     // Check user is a member
     state
@@ -108,7 +113,7 @@ pub async fn get_group_members(
 
     let group_member = state
         .group_repo
-        .get_members(&state.pool, group_id)
+        .get_members(&state.pool, group_id, order_by, order_dir)
         .await
         .map_err(GroupError::Database)?;
 

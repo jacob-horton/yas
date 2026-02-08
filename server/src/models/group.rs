@@ -5,7 +5,10 @@ use uuid::Uuid;
 use validator::Validate;
 
 use crate::{
-    models::user::{Avatar, AvatarColour},
+    models::{
+        stats::OrderDir,
+        user::{Avatar, AvatarColour},
+    },
     policies::GroupAction,
 };
 
@@ -111,4 +114,19 @@ impl From<GroupMemberDetailsDb> for GroupMemberResponse {
 pub struct CreateGroupReq {
     #[validate(length(min = 3, max = 50, message = "Name must be between 3 and 50 chars"))]
     pub name: String,
+}
+
+#[derive(Deserialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum OrderBy {
+    Name,
+    Email,
+    Role,
+    JoinedAt,
+}
+
+#[derive(Deserialize)]
+pub struct GroupMembersParams {
+    pub order_by: Option<OrderBy>,
+    pub order_dir: Option<OrderDir>,
 }

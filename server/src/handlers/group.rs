@@ -1,6 +1,6 @@
 use axum::{
     Json, Router,
-    extract::{Path, State},
+    extract::{Path, Query, State},
     http::StatusCode,
     response::IntoResponse,
     routing::{delete, get, post},
@@ -11,7 +11,10 @@ use crate::{
     AppState,
     errors::AppError,
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
-    models::group::{CreateGroupReq, GroupMemberResponse, GroupResponse},
+    models::{
+        group::{CreateGroupReq, GroupMemberResponse, GroupMembersParams, GroupResponse, OrderBy},
+        stats::OrderDir,
+    },
     services,
 };
 
@@ -51,10 +54,18 @@ async fn delete_group(
 
 async fn get_group_members(
     State(state): State<AppState>,
+    Query(query): Query<GroupMembersParams>,
     AuthUser(user): AuthUser,
     Path(group_id): Path<Uuid>,
 ) -> Result<impl IntoResponse, AppError> {
-    let members = services::group::get_group_members(&state, user.id, group_id).await?;
+    let order_by = query.order_by.unwrap_or(OrderBy::Name);
+    let order_dir = query.order_dir.unwrap_or(match order_by {
+        OrderBy::Name | OrderBy::Email | OrderBy::JoinedAt => OrderDir::Ascending,
+        OrderBy::Role => OrderDir::Descending,
+    });
+
+    let members =
+        services::group::get_group_members(&state, user.id, group_id, order_by, order_dir).await?;
 
     let response: Vec<GroupMemberResponse> = members.into_iter().map(|m| m.into()).collect();
     Ok((StatusCode::OK, Json(response)))

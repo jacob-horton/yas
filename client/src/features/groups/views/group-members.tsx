@@ -1,38 +1,52 @@
-import { For, Suspense } from "solid-js";
+import { createSignal, For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Role } from "@/components/ui/role";
 import {
   type Heading,
+  type Sort,
   Table,
   TableCell,
   TableRow,
 } from "@/components/ui/table";
 import { TableRowSkeleton } from "@/components/ui/table.skeleton";
+import { useAuth } from "@/features/auth/context/auth-provider";
+import { cn } from "@/lib/classname";
 import { formatDate } from "@/lib/format-date";
+import { groupsApi } from "../api";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
-import { groupsApi } from "../api";
-import { cn } from "@/lib/classname";
-import { useAuth } from "@/features/auth/context/auth-provider";
+
+type SortProp = "name" | "email" | "role" | "joined_at";
+const DEFAULT_SORT: Sort<SortProp> = {
+  property: "name",
+  direction: "ascending",
+};
 
 const TABLE_HEADINGS = [
-  { label: "Name" },
-  { label: "Email" },
-  { label: "Role" },
-  { label: "Joined On" },
+  { label: "Name", sortProp: "name" },
+  { label: "Email", sortProp: "email" },
+  { label: "Role", sortProp: "role", defaultDirection: "descending" },
+  { label: "Joined On", sortProp: "joined_at" },
   { label: "", class: "w-18" },
-] as const satisfies Heading<string>[];
+] as const satisfies Heading<SortProp>[];
 
 export const GroupMembers = () => {
   const auth = useAuth();
   const group = useGroup();
-  const members = useGroupMembers(group);
+
+  const [sort, setSort] = createSignal<Sort<SortProp>>(DEFAULT_SORT);
+  const members = useGroupMembers(group, sort);
 
   return (
     <Page title="Group Members">
-      <Table headings={TABLE_HEADINGS} caption="All members of this group">
+      <Table
+        headings={TABLE_HEADINGS}
+        caption="All members of this group"
+        sortedBy={sort()}
+        onSort={setSort}
+      >
         <Suspense fallback={<TableRowSkeleton numCols={5} />}>
           <For each={members.data}>
             {(member) => (

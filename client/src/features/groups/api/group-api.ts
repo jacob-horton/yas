@@ -1,3 +1,4 @@
+import type { Sort } from "@/components/ui/table";
 import type { CreateGameRequest, Game } from "@/features/games/types/game";
 import type {
   CreateInviteRequest,
@@ -12,7 +13,7 @@ import {
 
 export interface GroupApiContract {
   get(): Promise<Group>;
-  members(): Promise<GroupMember[]>;
+  members<T extends string>(sort?: Sort<T>): Promise<GroupMember[]>;
   games(): Promise<Game[]>;
   invites(): Promise<InviteSummary[]>;
   delete(): Promise<void>;
@@ -30,8 +31,20 @@ export class GroupApi implements GroupApiContract {
     return api.get(`/groups/${this.groupId}`).then((resp) => resp.data);
   }
 
-  public async members(): Promise<GroupMember[]> {
-    return api.get(`/groups/${this.groupId}/members`).then((resp) => resp.data);
+  public async members<T extends string>(
+    sort?: Sort<T>,
+  ): Promise<GroupMember[]> {
+    let params = {};
+    if (sort) {
+      params = {
+        order_by: sort.property,
+        order_dir: sort.direction,
+      };
+    }
+
+    return api
+      .get(`/groups/${this.groupId}/members`, { params })
+      .then((resp) => resp.data);
   }
 
   public async games(): Promise<Game[]> {
