@@ -1,6 +1,8 @@
 use uuid::Uuid;
 
-use crate::models::stats::{PlayerMatchDb, RawMatchStats, StatsLifetime, StatsPeriod};
+use crate::models::stats::{
+    PlayerMatchDb, RawHighlight, RawMatchStats, StatsLifetime, StatsPeriod,
+};
 
 pub struct StatsRepo {}
 
@@ -140,5 +142,98 @@ impl StatsRepo {
         .bind(n)
         .fetch_one(pool)
         .await
+    }
+
+    pub async fn get_highlights(
+        &self,
+        pool: &sqlx::PgPool,
+        game_id: Uuid,
+    ) -> Result<Vec<RawHighlight>, sqlx::Error> {
+        let rows = sqlx::query_as::<_, RawHighlight>(
+            r#"
+            WITH
+            scores AS (
+                SELECT ms.user_id, ms.score
+                FROM match_scores ms
+                JOIN matches m ON ms.match_id = m.id
+                WHERE m.game_id = $1
+            ),
+            ranks AS (
+                SELECT lb.user_id, lb.rank
+                FROM match_leaderboards lb
+                JOIN matches m ON lb.match_id = m.id
+                WHERE m.game_id = $1
+            ),
+
+            -- Highest win rate
+            stat_win_rate AS (
+                SELECT
+                    user_id,
+                    (COUNT(*) FILTER (WHERE rank = 1))::FLOAT8 / COUNT(*)::FLOAT8 as val,
+                    'highest_win_rate' as stat_type
+                FROM ranks
+                GROUP BY user_id
+                ORDER BY val DESC 
+                LIMIT 1
+            ),
+
+            -- Highest average score
+            stat_avg_score AS (
+                SELECT
+                    user_id,
+                    AVG(score)::FLOAT8 as val,
+                    'highest_average_score' as stat_type
+                FROM scores
+                GROUP BY user_id
+                ORDER BY val DESC
+                LIMIT 1
+            ),
+
+            -- Highest single score
+            stat_high_score AS (
+                SELECT
+                    user_id,
+                    score::FLOAT8 as val,
+                    'highest_single_score' as stat_type
+                FROM scores
+                ORDER BY val DESC
+                LIMIT 1
+            ),
+
+            -- Most games played
+            stat_most_games AS (
+                SELECT
+                    user_id,
+                    COUNT(*)::FLOAT8 as val,
+                    'most_games_played' as stat_type
+                FROM scores
+                GROUP BY user_id
+                ORDER BY val DESC
+                LIMIT 1
+            ),
+
+            -- Combine them all
+            all_stats AS (
+                SELECT * FROM stat_win_rate
+                UNION ALL SELECT * FROM stat_avg_score
+                UNION ALL SELECT * FROM stat_high_score
+                UNION ALL SELECT * FROM stat_most_games
+            )
+
+            -- Join with users to get names
+            SELECT
+                s.user_id,
+                u.name as user_name,
+                s.val as value,
+                s.stat_type
+            FROM all_stats s
+            JOIN users u ON u.id = s.user_id
+            "#,
+        )
+        .bind(game_id)
+        .fetch_all(pool)
+        .await?;
+
+        Ok(rows)
     }
 }

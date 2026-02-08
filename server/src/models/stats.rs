@@ -92,6 +92,7 @@ impl OrderDir {
 pub struct Scoreboard {
     pub entries: Vec<ScoreboardEntry>,
     pub podium: Vec<ScoreboardEntry>,
+    pub highlights: HighlightsResponse,
     pub game: GameDb,
 }
 
@@ -99,6 +100,7 @@ pub struct Scoreboard {
 pub struct ScoreboardResponse {
     pub entries: Vec<ScoreboardEntryResponse>,
     pub podium: Vec<ScoreboardEntryResponse>,
+    pub highlights: HighlightsResponse,
     pub game: GameResponse,
 }
 
@@ -134,6 +136,7 @@ impl From<Scoreboard> for ScoreboardResponse {
         Self {
             entries: scoreboard.entries.into_iter().map(|s| s.into()).collect(),
             podium: scoreboard.podium.into_iter().map(|s| s.into()).collect(),
+            highlights: scoreboard.highlights,
             game: scoreboard.game.into(),
         }
     }
@@ -208,5 +211,85 @@ impl From<PlayerStatsSummary> for PlayerStatsSummaryResponse {
             period: value.period.into(),
             lifetime: value.lifetime.into(),
         }
+    }
+}
+
+#[derive(sqlx::FromRow)]
+pub struct RawHighlight {
+    pub user_id: Uuid,
+    pub user_name: String,
+    pub value: f64,
+    pub stat_type: String,
+}
+
+#[derive(Serialize, Clone, Debug)]
+pub struct HighlightDetail<T> {
+    pub user_id: Uuid,
+    pub user_name: String,
+    pub value: T,
+}
+
+// Just used when generating from array or raw highlights
+impl<T: Default> Default for HighlightDetail<T> {
+    fn default() -> Self {
+        Self {
+            user_id: Uuid::nil(),
+            user_name: String::new(),
+            value: T::default(),
+        }
+    }
+}
+
+#[derive(Serialize, Clone, Debug, Default)]
+#[serde(rename_all = "snake_case")]
+pub struct HighlightsResponse {
+    pub highest_win_rate: HighlightDetail<f64>,
+    pub highest_average_score: HighlightDetail<f64>,
+    pub highest_single_score: HighlightDetail<i32>,
+    pub most_games_played: HighlightDetail<u32>,
+    // TODO: longest win streak
+    // TODO: most consistent
+}
+
+impl From<Vec<RawHighlight>> for HighlightsResponse {
+    fn from(rows: Vec<RawHighlight>) -> Self {
+        // Start with all zeros/defaults
+        let mut response = Self::default();
+
+        for row in rows {
+            match row.stat_type.as_str() {
+                "highest_win_rate" => {
+                    response.highest_win_rate = HighlightDetail {
+                        user_id: row.user_id,
+                        user_name: row.user_name,
+                        value: row.value,
+                    };
+                }
+                "highest_average_score" => {
+                    response.highest_average_score = HighlightDetail {
+                        user_id: row.user_id,
+                        user_name: row.user_name,
+                        value: row.value,
+                    };
+                }
+                "highest_single_score" => {
+                    response.highest_single_score = HighlightDetail {
+                        user_id: row.user_id,
+                        user_name: row.user_name,
+                        value: row.value as i32,
+                    };
+                }
+                "most_games_played" => {
+                    response.most_games_played = HighlightDetail {
+                        user_id: row.user_id,
+                        user_name: row.user_name,
+                        value: row.value as u32,
+                    };
+                }
+                _ => panic!("Unknown stat type {}", row.stat_type),
+            }
+        }
+
+        response
     }
 }

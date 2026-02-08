@@ -2,8 +2,8 @@ use crate::{
     AppState,
     errors::{AppError, GameError, GroupError},
     models::stats::{
-        OrderBy, OrderDir, PlayerMatchDb, PlayerStatsSummary, RawMatchStats, Scoreboard,
-        ScoreboardEntry,
+        HighlightsResponse, OrderBy, OrderDir, PlayerMatchDb, PlayerStatsSummary, RawMatchStats,
+        Scoreboard, ScoreboardEntry,
     },
 };
 use std::{cmp::Ordering, collections::HashMap};
@@ -97,9 +97,16 @@ pub async fn get_scoreboard(
         entries.reverse();
     }
 
+    let highlights: HighlightsResponse = state
+        .stats_repo
+        .get_highlights(&state.pool, game_id)
+        .await?
+        .into();
+
     let scoreboard = Scoreboard {
         entries,
-        podium: podium,
+        podium,
+        highlights,
         game,
     };
 

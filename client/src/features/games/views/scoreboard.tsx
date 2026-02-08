@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { createMemo, createSignal, For, Suspense } from "solid-js";
+import { createSignal, For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
 import {
@@ -12,6 +12,8 @@ import {
 import { TableRowSkeleton } from "@/components/ui/table.skeleton";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { cn } from "@/lib/classname";
+import { HighlightStatCard } from "../components/highlight-stat-card";
+import { HighlightStatCardSkeleton } from "../components/highlight-stat-card.skeleton";
 import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
@@ -57,8 +59,8 @@ export const Scoreboard = () => {
         },
       ]}
     >
-      <div class="flex flex-col gap-6">
-        <div class="flex gap-6">
+      <div class="flex flex-col items-stretch gap-6 overflow-x-auto">
+        <div class="flex gap-6 self-center overflow-x-auto">
           <Suspense
             fallback={
               <For each={Array(3)}>
@@ -80,54 +82,116 @@ export const Scoreboard = () => {
             </For>
           </Suspense>
         </div>
-        <Table
-          sortedBy={sort()}
-          onSort={setSort}
-          headings={tableHeadings}
-          caption={TABLE_CAPTION}
-        >
-          <Suspense fallback={<TableRowSkeleton numCols={4} />}>
-            <For each={scoreboardData.data?.entries}>
-              {(score, index) => (
-                <TableRow
-                  onClick={() => navigate(`player/${score.user_id}`)}
-                  class={cn({
-                    "font-semibold": score.user_id === userId(),
-                  })}
-                >
-                  <TableCell>
-                    <span
-                      class={cn(
-                        score.user_id === userId()
-                          ? "font-bold text-gray-600"
-                          : "text-gray-400",
-                      )}
-                    >
-                      {index() + 1}
-                    </span>
-                  </TableCell>
-                  <TableCell class="flex items-center gap-3">
-                    <Avatar
-                      class="size-7"
-                      avatar={score.user_avatar}
-                      colour={score.user_avatar_colour}
-                    />
-                    {score.user_name}
-                  </TableCell>
-                  <TableCell>
-                    <span class="flex w-64 min-w-16 items-center">
-                      <ProgressBar percentage={score.win_rate * 100} />
-                      <span class="w-20 min-w-10 text-right">
-                        {(score.win_rate * 100).toFixed(0)}%
-                      </span>
-                    </span>
-                  </TableCell>
-                  <TableCell>{score.average_score.toFixed(2)}</TableCell>
-                </TableRow>
-              )}
-            </For>
+
+        <div class="flex flex-wrap gap-4">
+          <Suspense
+            fallback={
+              <For each={Array(4)}>{() => <HighlightStatCardSkeleton />}</For>
+            }
+          >
+            <HighlightStatCard
+              label="Grandmaster"
+              subtext="Highest win rate"
+              value={`${((scoreboardData.data?.highlights.highest_win_rate.value ?? 0) * 100).toFixed(0)}%`}
+              userName={
+                scoreboardData.data?.highlights.highest_win_rate.user_name ?? ""
+              }
+            />
+
+            <HighlightStatCard
+              label="Point Farmer"
+              subtext="Highest average score"
+              value={
+                scoreboardData.data?.highlights.highest_average_score.value.toFixed(
+                  2,
+                ) ?? "0"
+              }
+              userName={
+                scoreboardData.data?.highlights.highest_average_score
+                  .user_name ?? ""
+              }
+            />
+
+            <HighlightStatCard
+              label="Peak Performer"
+              subtext="Highest single score"
+              value={
+                scoreboardData.data?.highlights.highest_single_score.value.toFixed(
+                  0,
+                ) ?? "0"
+              }
+              userName={
+                scoreboardData.data?.highlights.highest_single_score
+                  .user_name ?? ""
+              }
+            />
+
+            <HighlightStatCard
+              label="Addict"
+              subtext="Most games played"
+              value={
+                scoreboardData.data?.highlights.most_games_played.value.toFixed(
+                  0,
+                ) ?? "0"
+              }
+              userName={
+                scoreboardData.data?.highlights.most_games_played.user_name ??
+                ""
+              }
+            />
           </Suspense>
-        </Table>
+        </div>
+
+        <div class="max-h-[550px] overflow-y-auto">
+          <Table
+            sortedBy={sort()}
+            onSort={setSort}
+            headings={tableHeadings}
+            caption={TABLE_CAPTION}
+          >
+            <Suspense fallback={<TableRowSkeleton numCols={4} />}>
+              <For each={scoreboardData.data?.entries}>
+                {(score, index) => (
+                  <TableRow
+                    onClick={() => navigate(`player/${score.user_id}`)}
+                    class={cn({
+                      "font-semibold": score.user_id === userId(),
+                    })}
+                  >
+                    <TableCell>
+                      <span
+                        class={cn(
+                          score.user_id === userId()
+                            ? "font-bold text-gray-600"
+                            : "text-gray-400",
+                        )}
+                      >
+                        {index() + 1}
+                      </span>
+                    </TableCell>
+                    <TableCell class="flex items-center gap-3">
+                      <Avatar
+                        class="size-7"
+                        avatar={score.user_avatar}
+                        colour={score.user_avatar_colour}
+                      />
+                      {score.user_name}
+                    </TableCell>
+                    <TableCell>
+                      <span class="flex w-64 min-w-16 items-center">
+                        <ProgressBar percentage={score.win_rate * 100} />
+                        <span class="w-20 min-w-10 text-right">
+                          {(score.win_rate * 100).toFixed(0)}%
+                        </span>
+                      </span>
+                    </TableCell>
+                    <TableCell>{score.average_score.toFixed(2)}</TableCell>
+                  </TableRow>
+                )}
+              </For>
+            </Suspense>
+          </Table>
+        </div>
       </div>
     </Page>
   );

@@ -72,7 +72,7 @@ export function Table<T extends string>(props: TableProps<T>) {
       <caption id={captionId} class="sr-only">
         {props.caption}
       </caption>
-      <thead>
+      <thead class="sticky top-0 z-10">
         <tr>
           <For each={props.headings}>
             {(heading, i) => (
