@@ -72,7 +72,9 @@ export const RecordGame = () => {
                 options={
                   members.data?.map((m) => ({
                     label: m.name,
-                    value: m.id.toString(),
+                    value: m.id,
+                    disabled:
+                      selected().includes(m.id) && m.id !== selected()[i],
                   })) ?? []
                 }
                 label={`Player ${i + 1}`}

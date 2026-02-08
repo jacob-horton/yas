@@ -53,15 +53,21 @@ export const EditUser = () => {
         placeholder="user@email.com"
       />
 
-      <Dropdown
-        label="Colour"
-        value={colour()}
-        onChange={setColour}
-        options={COLOURS.map((col) => ({
-          label: capitaliseFirstLetter(col),
-          value: col,
-        }))}
-      />
+      <div class="flex flex-wrap gap-2">
+        <For each={COLOURS}>
+          {(col) => (
+            <button
+              type="button"
+              onClick={() => setColour(col)}
+              class={cn(
+                "size-12 cursor-pointer rounded-md border hover:border-black/15",
+                { "border-transparent": col !== colour() },
+                COLOUR_MAP[col].bg,
+              )}
+            />
+          )}
+        </For>
+      </div>
 
       <div class="flex flex-wrap gap-2">
         <For each={AVATARS}>
