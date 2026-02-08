@@ -71,11 +71,11 @@ pub async fn get_scoreboard(
         });
     }
 
-    // Sort
-    entries.sort_by(|a, b| {
+    // Sort callback - ascending based on sort_by
+    let compare_stats = |a: &ScoreboardEntry, b: &ScoreboardEntry| {
         let cmp_f64 = |x: f64, y: f64| x.partial_cmp(&y).unwrap_or(Ordering::Equal);
 
-        let ordering = match order_by {
+        match order_by {
             OrderBy::WinRate => cmp_f64(a.win_rate, b.win_rate)
                 .then_with(|| a.matches_played.cmp(&b.matches_played))
                 .then_with(|| cmp_f64(a.average_score, b.average_score))
@@ -85,22 +85,23 @@ pub async fn get_scoreboard(
                 .then_with(|| a.matches_played.cmp(&b.matches_played))
                 .then_with(|| cmp_f64(a.win_rate, b.win_rate))
                 .then_with(|| a.user_name.cmp(&b.user_name)),
-
-            OrderBy::Name => a
-                .user_name
-                .cmp(&b.user_name)
-                .then_with(|| cmp_f64(a.win_rate, b.win_rate))
-                .then_with(|| a.matches_played.cmp(&b.matches_played))
-                .then_with(|| cmp_f64(a.average_score, b.average_score)),
-        };
-
-        match order_dir {
-            OrderDir::Ascending => ordering,
-            OrderDir::Descending => ordering.reverse(),
         }
-    });
+        .reverse()
+    };
 
-    let scoreboard = Scoreboard { entries, game };
+    entries.sort_by(compare_stats);
+    let podium: Vec<ScoreboardEntry> = entries.iter().take(3).cloned().collect();
+
+    // Flip if they want score ascending
+    if order_dir == OrderDir::Ascending {
+        entries.reverse();
+    }
+
+    let scoreboard = Scoreboard {
+        entries,
+        podium: podium,
+        game,
+    };
 
     Ok(scoreboard)
 }

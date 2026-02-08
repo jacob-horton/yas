@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { createSignal, For, Suspense } from "solid-js";
+import { createMemo, createSignal, For, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
 import {
@@ -19,7 +19,7 @@ import type { GameRouteParams } from "../types/game";
 
 const TABLE_CAPTION = "Stats of all players playing this game";
 
-type SortProp = "name" | "win_rate" | "average_score";
+type SortProp = "win_rate" | "average_score";
 const DEFAULT_SORT: Sort<SortProp> = {
   property: "win_rate",
   direction: "descending",
@@ -36,7 +36,7 @@ export const Scoreboard = () => {
 
   const tableHeadings = [
     { label: "No.", class: "w-12" },
-    { label: "Name", sortProp: "name" },
+    { label: "Name" },
     { label: "Win Rate", sortProp: "win_rate", defaultDirection: "descending" },
     {
       label: "Points/Game",
@@ -66,7 +66,7 @@ export const Scoreboard = () => {
               </For>
             }
           >
-            <For each={scoreboardData.data?.entries?.slice(0, 3)}>
+            <For each={scoreboardData.data?.podium}>
               {(score, index) => (
                 <PodiumCard
                   avatar={score.user_avatar}

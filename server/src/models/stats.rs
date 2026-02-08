@@ -46,6 +46,7 @@ impl From<PlayerMatchDb> for PlayerMatchResponse {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct ScoreboardEntry {
     pub user_id: Uuid,
     pub user_name: String,
@@ -67,7 +68,6 @@ pub struct StatsParams {
 #[derive(Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum OrderBy {
-    Name,
     WinRate,
     AverageScore,
 }
@@ -88,14 +88,17 @@ impl OrderDir {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct Scoreboard {
     pub entries: Vec<ScoreboardEntry>,
+    pub podium: Vec<ScoreboardEntry>,
     pub game: GameDb,
 }
 
 #[derive(Serialize)]
 pub struct ScoreboardResponse {
     pub entries: Vec<ScoreboardEntryResponse>,
+    pub podium: Vec<ScoreboardEntryResponse>,
     pub game: GameResponse,
 }
 
@@ -130,6 +133,7 @@ impl From<Scoreboard> for ScoreboardResponse {
     fn from(scoreboard: Scoreboard) -> Self {
         Self {
             entries: scoreboard.entries.into_iter().map(|s| s.into()).collect(),
+            podium: scoreboard.podium.into_iter().map(|s| s.into()).collect(),
             game: scoreboard.game.into(),
         }
     }

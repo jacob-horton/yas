@@ -3,6 +3,7 @@ import type { Game } from "./game";
 
 export type Scoreboard = {
   entries: ScoreboardEntry[];
+  podium: ScoreboardEntry[];
   game: Game;
 };
 

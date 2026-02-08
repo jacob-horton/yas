@@ -4,7 +4,7 @@ use sqlx::FromRow;
 use uuid::Uuid;
 use validator::Validate;
 
-#[derive(Debug, FromRow)]
+#[derive(Debug, Clone, FromRow)]
 pub struct GameDb {
     pub id: Uuid,
     pub group_id: Uuid,

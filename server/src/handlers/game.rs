@@ -48,13 +48,7 @@ pub async fn get_scoreboard(
     AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
     let order_by = query.order_by.unwrap_or(OrderBy::WinRate);
-
-    let order_dir = query.order_dir.unwrap_or(match order_by {
-        // Names naturally sort A-Z
-        OrderBy::Name => OrderDir::Ascending,
-        // Numbers/Stats naturally sort High-to-Low
-        OrderBy::WinRate | OrderBy::AverageScore => OrderDir::Descending,
-    });
+    let order_dir = query.order_dir.unwrap_or(OrderDir::Descending);
 
     let scoreboard = services::stats::get_scoreboard(
         &state,
