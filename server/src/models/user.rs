@@ -10,6 +10,7 @@ use validator::Validate;
 pub enum Avatar {
     Basketball,
     Crab,
+    Frog,
     Helmet,
     Headphones,
 }
