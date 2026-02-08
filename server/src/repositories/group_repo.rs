@@ -128,6 +128,27 @@ impl GroupRepo {
         .await
     }
 
+    pub async fn get_last_players<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        game_id: Uuid,
+    ) -> Result<Vec<Uuid>, sqlx::Error> {
+        sqlx::query_scalar::<_, Uuid>(
+            r#"SELECT user_id
+            FROM match_scores
+            WHERE match_id = (
+                SELECT id
+                FROM matches
+                WHERE game_id = $1
+                ORDER BY played_at DESC
+                LIMIT 1
+            );"#,
+        )
+        .bind(game_id)
+        .fetch_all(executor)
+        .await
+    }
+
     pub async fn get_members<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,

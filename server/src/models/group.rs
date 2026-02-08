@@ -68,7 +68,7 @@ impl GroupMemberRole {
 
 #[derive(Debug, Serialize)]
 pub struct GroupResponse {
-    pub id: String,
+    pub id: Uuid,
     pub name: String,
     pub created_at: String,
 }
@@ -76,7 +76,7 @@ pub struct GroupResponse {
 impl From<GroupDb> for GroupResponse {
     fn from(group: GroupDb) -> Self {
         Self {
-            id: group.id.to_string(),
+            id: group.id,
             name: group.name,
             created_at: group.created_at.to_rfc3339(),
         }
@@ -85,7 +85,7 @@ impl From<GroupDb> for GroupResponse {
 
 #[derive(Debug, Serialize)]
 pub struct GroupMemberResponse {
-    pub id: String,
+    pub id: Uuid,
     pub email: String,
     pub name: String,
     pub created_at: String,
@@ -98,7 +98,7 @@ pub struct GroupMemberResponse {
 impl From<GroupMemberDetailsDb> for GroupMemberResponse {
     fn from(group_member: GroupMemberDetailsDb) -> Self {
         Self {
-            id: group_member.id.to_string(),
+            id: group_member.id,
             email: group_member.email,
             name: group_member.name,
             created_at: group_member.created_at.to_rfc3339(),

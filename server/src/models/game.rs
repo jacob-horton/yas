@@ -15,9 +15,9 @@ pub struct GameDb {
 
 #[derive(Debug, Serialize)]
 pub struct GameResponse {
-    pub id: String,
+    pub id: Uuid,
     pub name: String,
-    pub group_id: String,
+    pub group_id: Uuid,
     pub created_at: String,
     pub players_per_match: i32,
 }
@@ -25,8 +25,8 @@ pub struct GameResponse {
 impl From<GameDb> for GameResponse {
     fn from(game: GameDb) -> Self {
         Self {
-            id: game.id.to_string(),
-            group_id: game.group_id.to_string(),
+            id: game.id,
+            group_id: game.group_id,
             name: game.name,
             created_at: game.created_at.to_rfc3339(),
             players_per_match: game.players_per_match,

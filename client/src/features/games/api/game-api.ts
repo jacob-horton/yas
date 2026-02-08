@@ -6,6 +6,7 @@ import type { Game } from "../types/game";
 export interface GameApiContract {
   get(): Promise<Game>;
   createMatch(match: CreateMatchRequest): Promise<Match>;
+  lastPlayers(): Promise<string[]>;
 
   stats(): StatsApiContract;
 }
@@ -20,6 +21,12 @@ export class GameApi implements GameApiContract {
   public async createMatch(match: CreateMatchRequest): Promise<Match> {
     return api
       .post(`/games/${this.gameId}/matches`, match)
+      .then((resp) => resp.data);
+  }
+
+  public async lastPlayers(): Promise<string[]> {
+    return api
+      .get(`/games/${this.gameId}/last-players`)
       .then((resp) => resp.data);
   }
 

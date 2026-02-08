@@ -38,17 +38,15 @@ pub async fn create_match(
     let mut player_ids = Vec::with_capacity(payload.scores.len());
 
     for s in payload.scores {
-        let user_id: Uuid = s.user_id.parse().map_err(|_| MatchError::InvalidUserID)?;
-
         // Prevent duplicate scoring for the same user in one match
-        if player_ids.contains(&user_id) {
+        if player_ids.contains(&s.user_id) {
             return Err(MatchError::DuplicatePlayer.into());
         }
 
-        player_ids.push(user_id);
+        player_ids.push(s.user_id);
 
         scores.push(MatchScoreDb {
-            user_id,
+            user_id: s.user_id,
             score: s.score,
         })
     }

@@ -53,7 +53,7 @@ pub struct UserDb {
 
 #[derive(Debug, Serialize)]
 pub struct UserResponse {
-    pub id: String,
+    pub id: Uuid,
     pub email: String,
     pub name: String,
     pub created_at: String,
@@ -64,7 +64,7 @@ pub struct UserResponse {
 impl From<UserDb> for UserResponse {
     fn from(user: UserDb) -> Self {
         Self {
-            id: user.id.to_string(),
+            id: user.id,
             name: user.name,
             email: user.email,
             created_at: user.created_at.to_rfc3339(),
@@ -76,14 +76,14 @@ impl From<UserDb> for UserResponse {
 
 #[derive(Debug, Serialize)]
 pub struct PublicUserDetailsResponse {
-    pub id: String,
+    pub id: Uuid,
     pub name: String,
 }
 
 impl From<UserDb> for PublicUserDetailsResponse {
     fn from(user: UserDb) -> Self {
         Self {
-            id: user.id.to_string(),
+            id: user.id,
             name: user.name,
         }
     }

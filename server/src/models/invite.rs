@@ -37,7 +37,7 @@ pub struct InviteWithCreatedByNameDb {
 
 #[derive(Debug, Serialize)]
 pub struct InviteSummaryResponse {
-    pub id: String,
+    pub id: Uuid,
     pub created_by_name: String,
     pub name: String,
 
@@ -51,7 +51,7 @@ pub struct InviteSummaryResponse {
 impl From<InviteWithCreatedByNameDb> for InviteSummaryResponse {
     fn from(invite: InviteWithCreatedByNameDb) -> Self {
         Self {
-            id: invite.id.to_string(),
+            id: invite.id,
             created_by_name: invite.created_by_name,
             name: invite.name,
 
@@ -66,7 +66,7 @@ impl From<InviteWithCreatedByNameDb> for InviteSummaryResponse {
 
 #[derive(Debug, Serialize)]
 pub struct InviteBasicResponse {
-    pub id: String,
+    pub id: Uuid,
     pub created_by: String,
     pub name: String,
 
@@ -80,7 +80,7 @@ pub struct InviteBasicResponse {
 impl From<InviteDb> for InviteBasicResponse {
     fn from(invite: InviteDb) -> Self {
         Self {
-            id: invite.id.to_string(),
+            id: invite.id,
             created_by: invite.created_by.to_string(),
             name: invite.name,
 
@@ -95,11 +95,11 @@ impl From<InviteDb> for InviteBasicResponse {
 
 #[derive(Debug, Serialize)]
 pub struct InviteDetailResponse {
-    pub id: String,
+    pub id: Uuid,
     pub created_by_name: String,
     pub expires_at: DateTime<Utc>,
 
-    pub group_id: String,
+    pub group_id: Uuid,
     pub group_name: String,
 
     pub is_current_user_member: bool,

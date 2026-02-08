@@ -73,9 +73,6 @@ pub enum GameError {
 
 #[derive(Debug, Error)]
 pub enum MatchError {
-    #[error("Invalid user ID for score")]
-    InvalidUserID,
-
     #[error(
         "Number of scores provided does not match the number of players per match for this game"
     )]
@@ -181,7 +178,6 @@ impl IntoResponse for AppError {
             },
 
             AppError::Match(err) => match err {
-                MatchError::InvalidUserID => (StatusCode::BAD_REQUEST, err.to_string()),
                 MatchError::IncorrectNumberOfScores => (StatusCode::BAD_REQUEST, err.to_string()),
                 MatchError::OneOrMorePlayersNotMember => (StatusCode::BAD_REQUEST, err.to_string()),
                 MatchError::DuplicatePlayer => (StatusCode::BAD_REQUEST, err.to_string()),

@@ -56,11 +56,11 @@ async fn get_invite(
         .await?;
 
     let response = InviteDetailResponse {
-        id: invite.id.to_string(),
+        id: invite.id,
         created_by_name: invite.created_by_name,
         expires_at: invite.expires_at,
 
-        group_id: group.id.to_string(),
+        group_id: group.id,
         group_name: group.name,
 
         is_current_user_member: in_group,

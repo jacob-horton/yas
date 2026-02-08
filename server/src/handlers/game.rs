@@ -76,10 +76,21 @@ pub async fn get_game_details(
     Ok((StatusCode::OK, Json(response)))
 }
 
+pub async fn get_last_players(
+    State(state): State<AppState>,
+    Path(game_id): Path<Uuid>,
+    AuthUser(user): AuthUser,
+) -> Result<impl IntoResponse, AppError> {
+    let players = services::game::get_last_players(&state, user.id, game_id).await?;
+
+    Ok((StatusCode::OK, Json(players)))
+}
+
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/groups/:id/games", post(create_game))
         .route("/groups/:id/games", get(get_games_in_group))
-        .route("/games/:id/scoreboard", get(get_scoreboard))
         .route("/games/:id", get(get_game_details))
+        .route("/games/:id/scoreboard", get(get_scoreboard))
+        .route("/games/:id/last-players", get(get_last_players))
 }

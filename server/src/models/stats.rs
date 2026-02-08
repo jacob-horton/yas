@@ -29,7 +29,7 @@ pub struct PlayerMatchDb {
 
 #[derive(Debug, Serialize)]
 pub struct PlayerMatchResponse {
-    pub match_id: String,
+    pub match_id: Uuid,
     pub score: i32,
     pub played_at: String,
     pub rank_in_match: i64,
@@ -38,7 +38,7 @@ pub struct PlayerMatchResponse {
 impl From<PlayerMatchDb> for PlayerMatchResponse {
     fn from(stats: PlayerMatchDb) -> Self {
         Self {
-            match_id: stats.match_id.to_string(),
+            match_id: stats.match_id,
             score: stats.score,
             played_at: stats.played_at.to_rfc3339(),
             rank_in_match: stats.rank_in_match,
@@ -104,7 +104,7 @@ pub struct ScoreboardResponse {
 
 #[derive(Serialize)]
 pub struct ScoreboardEntryResponse {
-    pub user_id: String,
+    pub user_id: Uuid,
     pub user_name: String,
     pub user_avatar: Avatar,
     pub user_avatar_colour: AvatarColour,
@@ -117,7 +117,7 @@ pub struct ScoreboardEntryResponse {
 impl From<ScoreboardEntry> for ScoreboardEntryResponse {
     fn from(entry: ScoreboardEntry) -> Self {
         Self {
-            user_id: entry.user_id.to_string(),
+            user_id: entry.user_id,
             user_name: entry.user_name,
             user_avatar: entry.user_avatar,
             user_avatar_colour: entry.user_avatar_colour,

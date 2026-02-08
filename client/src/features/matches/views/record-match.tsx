@@ -1,10 +1,11 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { createSignal, For, Suspense } from "solid-js";
+import { createEffect, createSignal, For, Suspense } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
 import { gamesApi } from "@/features/games/api";
+import { useLastPlayers } from "@/features/games/hooks/use-last-players";
 import type { GameRouteParams } from "@/features/games/types/game";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { useGroupMembers } from "@/features/groups/hooks/use-group-members";
@@ -19,9 +20,29 @@ export const RecordGame = () => {
 
   const navigate = useNavigate();
 
-  // TODO: defaults
   const [selected, setSelected] = createSignal<(string | undefined)[]>([]);
   const [points, setPoints] = createSignal<(string | undefined)[]>([]);
+
+  // Set selected players based on last game
+  const lastPlayers = useLastPlayers(() => params.gameId);
+  createEffect(() => {
+    const g = game.data;
+    const m = members.data;
+    const history = lastPlayers.data;
+
+    if (!g || !m || lastPlayers.isLoading || !history) return;
+    if (selected()[0] !== undefined) return;
+
+    const size = g.players_per_match;
+    if (history.length > 0) {
+      setSelected(history);
+      setPoints(new Array(size).fill(0));
+    } else {
+      const defaults = m.slice(0, size).map((member) => member.id);
+      setSelected(defaults);
+      setPoints(new Array(size).fill(0));
+    }
+  });
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
