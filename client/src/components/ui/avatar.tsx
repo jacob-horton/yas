@@ -4,6 +4,7 @@ import CrabSvg from "@/assets/avatars/crab.svg";
 import FrogSvg from "@/assets/avatars/frog.svg";
 import HeadphonesSvg from "@/assets/avatars/headphones.svg";
 import HelmetSvg from "@/assets/avatars/helmet.svg";
+import RocketSvg from "@/assets/avatars/rocket.svg";
 import { cn } from "@/lib/classname";
 
 export const COLOUR_MAP = {
@@ -33,6 +34,7 @@ export const AVATAR_SVGS = {
   frog: FrogSvg,
   helmet: HelmetSvg,
   headphones: HeadphonesSvg,
+  rocket: RocketSvg,
 } as const;
 
 export type AvatarColour = keyof typeof COLOUR_MAP;

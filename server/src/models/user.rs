@@ -13,6 +13,7 @@ pub enum Avatar {
     Frog,
     Helmet,
     Headphones,
+    Rocket,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]
