@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { cn } from "@/lib/classname";
 import { usersApi } from "../api";
+import { capitaliseFirstLetter } from "@/lib/capitalise";
 
 const COLOURS = Object.keys(COLOUR_MAP) as AvatarColour[];
 const AVATARS = Object.keys(AVATAR_SVGS) as AvatarIcon[];
@@ -57,7 +58,7 @@ export const EditUser = () => {
         value={colour()}
         onChange={setColour}
         options={COLOURS.map((col) => ({
-          label: col,
+          label: capitaliseFirstLetter(col),
           value: col,
         }))}
       />
