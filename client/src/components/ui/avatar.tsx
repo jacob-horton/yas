@@ -1,6 +1,7 @@
 import type { Component } from "solid-js";
 import BasketballSvg from "@/assets/avatars/basketball.svg";
 import CrabSvg from "@/assets/avatars/crab.svg";
+import FrogSvg from "@/assets/avatars/frog.svg";
 import HeadphonesSvg from "@/assets/avatars/headphones.svg";
 import HelmetSvg from "@/assets/avatars/helmet.svg";
 import { cn } from "@/lib/classname";
@@ -29,6 +30,7 @@ export const COLOUR_MAP = {
 export const AVATAR_SVGS = {
   crab: CrabSvg,
   basketball: BasketballSvg,
+  frog: FrogSvg,
   helmet: HelmetSvg,
   headphones: HeadphonesSvg,
 } as const;
