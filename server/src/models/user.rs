@@ -9,11 +9,22 @@ use validator::Validate;
 #[serde(rename_all = "lowercase")]
 pub enum Avatar {
     Basketball,
+    Bear,
+    Bomb,
+    Controller,
     Crab,
     Frog,
-    Helmet,
+    Ghost,
     Headphones,
+    Helmet,
+    Lightbulb,
+    Octopus,
+    Penguin,
+    Pizza,
+    Planet,
+    Robot,
     Rocket,
+    Wizard,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]

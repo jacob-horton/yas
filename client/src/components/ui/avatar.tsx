@@ -1,10 +1,22 @@
 import type { Component } from "solid-js";
 import BasketballSvg from "@/assets/avatars/basketball.svg";
+import BearSvg from "@/assets/avatars/bear.svg";
+import BombSvg from "@/assets/avatars/bomb.svg";
+import CatSvg from "@/assets/avatars/cat.svg";
+import ControllerSvg from "@/assets/avatars/controller.svg";
 import CrabSvg from "@/assets/avatars/crab.svg";
 import FrogSvg from "@/assets/avatars/frog.svg";
+import GhostSvg from "@/assets/avatars/ghost.svg";
 import HeadphonesSvg from "@/assets/avatars/headphones.svg";
 import HelmetSvg from "@/assets/avatars/helmet.svg";
+import LightbulbSvg from "@/assets/avatars/lightbulb.svg";
+import OctopusSvg from "@/assets/avatars/octopus.svg";
+import PenguinSvg from "@/assets/avatars/penguin.svg";
+import PizzaSvg from "@/assets/avatars/pizza.svg";
+import PlanetSvg from "@/assets/avatars/planet.svg";
+import RobotSvg from "@/assets/avatars/robot.svg";
 import RocketSvg from "@/assets/avatars/rocket.svg";
+import WizardSvg from "@/assets/avatars/wizard.svg";
 import { cn } from "@/lib/classname";
 
 export const COLOUR_MAP = {
@@ -29,12 +41,24 @@ export const COLOUR_MAP = {
 };
 
 export const AVATAR_SVGS = {
-  crab: CrabSvg,
   basketball: BasketballSvg,
+  bear: BearSvg,
+  bomb: BombSvg,
+  controller: ControllerSvg,
+  cat: CatSvg,
+  crab: CrabSvg,
   frog: FrogSvg,
-  helmet: HelmetSvg,
+  ghost: GhostSvg,
   headphones: HeadphonesSvg,
+  helmet: HelmetSvg,
+  lightbulb: LightbulbSvg,
+  octopus: OctopusSvg,
+  penguin: PenguinSvg,
+  pizza: PizzaSvg,
+  planet: PlanetSvg,
+  robot: RobotSvg,
   rocket: RocketSvg,
+  wizard: WizardSvg,
 } as const;
 
 export type AvatarColour = keyof typeof COLOUR_MAP;

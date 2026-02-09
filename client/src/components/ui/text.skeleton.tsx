@@ -6,7 +6,7 @@ export const TextSkeleton: Component<{ class?: string; lines?: number }> = (
 ) => {
   const lines = props.lines ?? 1;
   return (
-    <div class="flex flex-col gap-2.5 w-full">
+    <div class="flex w-full flex-col gap-2.5">
       <Index each={Array.from({ length: lines })}>
         {(_, i) => (
           <div
