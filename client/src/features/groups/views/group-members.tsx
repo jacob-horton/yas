@@ -17,6 +17,8 @@ import { formatDate } from "@/lib/format-date";
 import { groupsApi } from "../api";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
+import { useConfirmation } from "@/context/confirmation-context";
+import type { GroupMember } from "../types";
 
 type SortProp = "name" | "email" | "role" | "joined_at";
 const DEFAULT_SORT: Sort<SortProp> = {
@@ -38,6 +40,26 @@ export const GroupMembers = () => {
 
   const [sort, setSort] = createSignal<Sort<SortProp>>(DEFAULT_SORT);
   const members = useGroupMembers(group, sort);
+
+  const { showConfirm } = useConfirmation();
+  const handleRemove = async (member: GroupMember) => {
+    const isConfirmed = await showConfirm({
+      title: "Remove User From Group",
+      description: (
+        <p>
+          Are you sure you would like to remove <strong>{member.name}</strong>{" "}
+          from this group? This cannot be undone.
+        </p>
+      ),
+      confirmText: "Delete",
+      danger: true,
+    });
+
+    if (isConfirmed) {
+      await groupsApi.group(group()).member(member.id).delete();
+      members.refetch();
+    }
+  };
 
   return (
     <Page title="Group Members">
@@ -74,10 +96,7 @@ export const GroupMembers = () => {
                     variant="ghost"
                     icon="delete"
                     danger
-                    onClick={async () => {
-                      await groupsApi.group(group()).member(member.id).delete();
-                      members.refetch();
-                    }}
+                    onClick={() => handleRemove(member)}
                   />
                 </TableCell>
               </TableRow>

@@ -10,11 +10,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TableRowSkeleton } from "@/components/ui/table.skeleton";
+import { useConfirmation } from "@/context/confirmation-context";
 import { invitesApi } from "@/features/invites/api";
 import { cn } from "@/lib/classname";
 import { formatDate, formatDateTime } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupInvites } from "../hooks/use-group-invites";
+import type { InviteSummary } from "@/features/invites/types/invite";
 
 function isExpired(expiry: string) {
   const expiryDate = new Date(expiry);
@@ -67,6 +69,26 @@ export const Invites = () => {
 
   const navigate = useNavigate();
 
+  const { showConfirm } = useConfirmation();
+  const handleDelete = async (invite: InviteSummary) => {
+    const isConfirmed = await showConfirm({
+      title: `Delete Invite`,
+      description: (
+        <p>
+          Are you sure you would like to delete <strong>{invite.name}</strong>?
+          This cannot be undone.
+        </p>
+      ),
+      confirmText: "Delete",
+      danger: true,
+    });
+
+    if (isConfirmed) {
+      await invitesApi.invite(invite.id).delete();
+      invites.refetch();
+    }
+  };
+
   return (
     <Page
       title="Invites"
@@ -108,10 +130,7 @@ export const Invites = () => {
                       icon="delete"
                       variant="ghost"
                       class="text-gray-400"
-                      onClick={async () => {
-                        await invitesApi.invite(invite.id).delete();
-                        invites.refetch();
-                      }}
+                      onClick={() => handleDelete(invite)}
                     />
                   </div>
                 </TableCell>

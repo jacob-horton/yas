@@ -10,8 +10,8 @@ export type Variant = "primary" | "secondary" | "ghost";
 export type Icon = "copy" | "chevronLeft" | "plus" | "delete";
 
 const COLOUR_MAP: Record<Variant, string> = {
-  primary: "bg-violet-500 text-white",
-  secondary: "bg-white border",
+  primary: "bg-violet-500 text-white hover:bg-violet-600 transition",
+  secondary: "bg-white border hover:bg-gray-100 transition",
   ghost: "hover:bg-gray-100 transition",
 } as const;
 
@@ -39,7 +39,10 @@ export const Button: ParentComponent<{
         {
           "p-1.5": props.icon && !props.children,
           "cursor-not-allowed bg-gray-300": props.disabled,
-          "hover:bg-red-50 hover:text-red-600": props.danger,
+          "hover:bg-red-50 hover:text-red-600":
+            props.danger && props.variant === "ghost",
+          "border-red-700 text-red-700 hover:bg-red-100":
+            props.danger && props.variant === "secondary",
         },
         props.class,
       )}

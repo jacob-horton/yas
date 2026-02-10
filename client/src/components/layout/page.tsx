@@ -9,6 +9,7 @@ type Props = {
     variant: Variant;
     text: string;
     onAction: () => void;
+    danger?: boolean;
   }[];
   narrow?: boolean;
   showBack?: boolean;
@@ -39,7 +40,11 @@ export const Page: ParentComponent<Props> = (props) => {
         </h1>
         <For each={props.actions ?? []}>
           {(action) => (
-            <Button onClick={action.onAction} variant={action.variant}>
+            <Button
+              onClick={action.onAction}
+              variant={action.variant}
+              danger={action.danger}
+            >
               {action.text}
             </Button>
           )}

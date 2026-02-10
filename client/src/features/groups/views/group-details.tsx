@@ -25,6 +25,7 @@ export const GroupDetails = () => {
             queryClient.invalidateQueries({ queryKey: [QK_MY_GROUPS] });
           },
           variant: "secondary",
+          danger: true,
         },
       ]}
     >
