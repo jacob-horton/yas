@@ -28,6 +28,7 @@ pub async fn create_game(
             group_id,
             &payload.name,
             payload.players_per_match,
+            payload.metric,
         )
         .await
         .map_err(GameError::Database)?;

@@ -17,24 +17,36 @@ import { HighlightStatCardSkeleton } from "../components/highlight-stat-card.ske
 import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
-import type { GameRouteParams } from "../types/game";
+import type { GameRouteParams, ScoringMetric } from "../types/game";
 
 const TABLE_CAPTION = "Stats of all players playing this game";
 
-type SortProp = "win_rate" | "average_score";
-const DEFAULT_SORT: Sort<SortProp> = {
-  property: "win_rate",
-  direction: "descending",
-};
-
 export const Scoreboard = () => {
   const params = useParams<GameRouteParams>();
+  const navigate = useNavigate();
   const auth = useAuth();
+
   const userId = () => auth.user()?.id;
 
-  const [sort, setSort] = createSignal<Sort<SortProp>>(DEFAULT_SORT);
+  const [sort, setSort] = createSignal<Sort<ScoringMetric> | undefined>(
+    undefined,
+  );
+
   const scoreboardData = useScoreboardData(() => params.gameId, sort);
-  const navigate = useNavigate();
+
+  // User/front-end sort, fall back to default sort metric
+  const effectiveSort = () => {
+    const userSort = sort();
+    if (userSort) return userSort;
+
+    const metric = scoreboardData.data?.game.metric;
+    if (!metric) return undefined;
+
+    return {
+      property: metric,
+      direction: "descending",
+    } satisfies Sort<ScoringMetric>;
+  };
 
   const tableHeadings = [
     { label: "No.", class: "w-12" },
@@ -144,7 +156,7 @@ export const Scoreboard = () => {
 
         <div class="max-h-[550px] overflow-y-auto">
           <Table
-            sortedBy={sort()}
+            sortedBy={effectiveSort()}
             onSort={setSort}
             headings={tableHeadings}
             caption={TABLE_CAPTION}

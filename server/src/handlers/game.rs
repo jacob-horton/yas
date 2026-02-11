@@ -13,7 +13,7 @@ use crate::{
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     models::{
         game::{CreateGameReq, GameResponse},
-        stats::{OrderBy, OrderDir, ScoreboardResponse, StatsParams},
+        stats::{ScoreboardResponse, StatsParams},
     },
     services,
 };
@@ -47,16 +47,13 @@ pub async fn get_scoreboard(
     Query(query): Query<StatsParams>,
     AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let order_by = query.order_by.unwrap_or(OrderBy::WinRate);
-    let order_dir = query.order_dir.unwrap_or(OrderDir::Descending);
-
     let scoreboard = services::stats::get_scoreboard(
         &state,
         user.id,
         game_id,
         query.num_matches.unwrap_or(10),
-        order_by,
-        order_dir,
+        query.order_by,
+        query.order_dir,
     )
     .await?;
 

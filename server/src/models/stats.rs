@@ -3,7 +3,7 @@ use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
 use crate::models::{
-    game::{GameDb, GameResponse},
+    game::{GameDb, GameResponse, ScoringMetric},
     user::{Avatar, AvatarColour},
 };
 
@@ -60,16 +60,9 @@ pub struct ScoreboardEntry {
 
 #[derive(Deserialize)]
 pub struct StatsParams {
-    pub order_by: Option<OrderBy>,
+    pub order_by: Option<ScoringMetric>,
     pub order_dir: Option<OrderDir>,
     pub num_matches: Option<i32>,
-}
-
-#[derive(Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum OrderBy {
-    WinRate,
-    AverageScore,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]

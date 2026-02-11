@@ -1,9 +1,12 @@
 use crate::{
     AppState,
     errors::{AppError, GameError, GroupError},
-    models::stats::{
-        HighlightsResponse, OrderBy, OrderDir, PlayerMatchDb, PlayerStatsSummary, RawMatchStats,
-        Scoreboard, ScoreboardEntry,
+    models::{
+        game::ScoringMetric,
+        stats::{
+            HighlightsResponse, OrderDir, PlayerMatchDb, PlayerStatsSummary, RawMatchStats,
+            Scoreboard, ScoreboardEntry,
+        },
     },
 };
 use std::{cmp::Ordering, collections::HashMap};
@@ -14,8 +17,8 @@ pub async fn get_scoreboard(
     user_id: Uuid,
     game_id: Uuid,
     num_matches: i32,
-    order_by: OrderBy,
-    order_dir: OrderDir,
+    order_by: Option<ScoringMetric>,
+    order_dir: Option<OrderDir>,
 ) -> Result<Scoreboard, AppError> {
     let game = state
         .game_repo
@@ -71,17 +74,19 @@ pub async fn get_scoreboard(
         });
     }
 
+    let order_by = order_by.unwrap_or(game.metric.clone());
+
     // Sort callback - ascending based on sort_by
     let compare_stats = |a: &ScoreboardEntry, b: &ScoreboardEntry| {
         let cmp_f64 = |x: f64, y: f64| x.partial_cmp(&y).unwrap_or(Ordering::Equal);
 
         match order_by {
-            OrderBy::WinRate => cmp_f64(a.win_rate, b.win_rate)
+            ScoringMetric::WinRate => cmp_f64(a.win_rate, b.win_rate)
                 .then_with(|| a.matches_played.cmp(&b.matches_played))
                 .then_with(|| cmp_f64(a.average_score, b.average_score))
                 .then_with(|| a.user_name.cmp(&b.user_name)),
 
-            OrderBy::AverageScore => cmp_f64(a.average_score, b.average_score)
+            ScoringMetric::AverageScore => cmp_f64(a.average_score, b.average_score)
                 .then_with(|| a.matches_played.cmp(&b.matches_played))
                 .then_with(|| cmp_f64(a.win_rate, b.win_rate))
                 .then_with(|| a.user_name.cmp(&b.user_name)),
@@ -93,7 +98,7 @@ pub async fn get_scoreboard(
     let podium: Vec<ScoreboardEntry> = entries.iter().take(3).cloned().collect();
 
     // Flip if they want score ascending
-    if order_dir == OrderDir::Ascending {
+    if order_dir == Some(OrderDir::Ascending) {
         entries.reverse();
     }
 

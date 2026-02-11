@@ -11,13 +11,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TableRowSkeleton } from "@/components/ui/table.skeleton";
+import { useConfirmation } from "@/context/confirmation-context";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { cn } from "@/lib/classname";
 import { formatDate } from "@/lib/format-date";
 import { groupsApi } from "../api";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
-import { useConfirmation } from "@/context/confirmation-context";
 import type { GroupMember } from "../types";
 
 type SortProp = "name" | "email" | "role" | "joined_at";

@@ -2,6 +2,7 @@ import { Route, Router } from "@solidjs/router";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import type { ParentComponent } from "solid-js";
 import { Sidebar } from "@/components/layout/sidebar";
+import { ConfirmationProvider } from "@/context/confirmation-context";
 import { ProtectedRoute } from "@/features/auth/components/protected-route";
 import { AuthProvider } from "@/features/auth/context/auth-provider";
 import { Login } from "@/features/auth/views/login";
@@ -20,7 +21,6 @@ import { PlayerStats } from "@/features/stats/views/player-stats";
 import { EditUser } from "@/features/users/views/edit-user";
 import { UserSettings } from "@/features/users/views/settings";
 import { HomePage } from "@/pages/home-page";
-import { ConfirmationProvider } from "@/context/confirmation-context";
 
 const queryClient = new QueryClient();
 

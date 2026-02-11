@@ -9,12 +9,10 @@ import {
   COLOUR_MAP,
 } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { cn } from "@/lib/classname";
 import { usersApi } from "../api";
-import { capitaliseFirstLetter } from "@/lib/capitalise";
 
 const COLOURS = Object.keys(COLOUR_MAP) as AvatarColour[];
 const AVATARS = Object.keys(AVATAR_SVGS) as AvatarIcon[];

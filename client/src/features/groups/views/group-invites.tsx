@@ -12,11 +12,11 @@ import {
 import { TableRowSkeleton } from "@/components/ui/table.skeleton";
 import { useConfirmation } from "@/context/confirmation-context";
 import { invitesApi } from "@/features/invites/api";
+import type { InviteSummary } from "@/features/invites/types/invite";
 import { cn } from "@/lib/classname";
 import { formatDate, formatDateTime } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupInvites } from "../hooks/use-group-invites";
-import type { InviteSummary } from "@/features/invites/types/invite";
 
 function isExpired(expiry: string) {
   const expiryDate = new Date(expiry);

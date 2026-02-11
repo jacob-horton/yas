@@ -1,7 +1,7 @@
 use sqlx::{PgExecutor, Postgres};
 use uuid::Uuid;
 
-use crate::models::game::GameDb;
+use crate::models::game::{GameDb, ScoringMetric};
 
 pub struct GameRepo {}
 
@@ -12,13 +12,15 @@ impl GameRepo {
         group_id: Uuid,
         name: &str,
         players_per_match: i32,
+        metric: ScoringMetric,
     ) -> Result<GameDb, sqlx::Error> {
         sqlx::query_as::<_, GameDb>(
-            "INSERT INTO games (group_id, name, players_per_match) VALUES ($1, $2, $3) RETURNING *",
+            "INSERT INTO games (group_id, name, players_per_match, metric) VALUES ($1, $2, $3, $4) RETURNING *",
         )
         .bind(group_id)
         .bind(name)
         .bind(players_per_match)
+        .bind(metric)
         .fetch_one(executor)
         .await
     }

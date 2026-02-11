@@ -39,8 +39,8 @@ pub struct GroupMemberDetailsDb {
 }
 
 #[derive(Debug, Serialize, Deserialize, Type, PartialEq, Eq)]
-#[sqlx(type_name = "user_role", rename_all = "lowercase")]
-#[serde(rename_all = "lowercase")]
+#[sqlx(type_name = "user_role", rename_all = "snake_case")]
+#[serde(rename_all = "snake_case")]
 pub enum GroupMemberRole {
     Member,
     Admin,

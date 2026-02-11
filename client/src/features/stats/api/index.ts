@@ -36,6 +36,7 @@ export class StatsApi implements StatsApiContract {
         order_dir: sort.direction,
       };
     }
+
     return api
       .get(`/games/${this.gameId}/scoreboard`, { params })
       .then((resp) => resp.data);
