@@ -11,14 +11,7 @@ export type PlayerStatsRouteParams = {
 };
 
 export type PlayerStatsSummary = {
-  period: StatsPeriod;
   lifetime: StatsLifetime;
-};
-
-export type StatsPeriod = {
-  average_score: number;
-  win_rate: number;
-  best_score: number;
 };
 
 export type StatsLifetime = {

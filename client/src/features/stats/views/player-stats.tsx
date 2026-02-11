@@ -51,33 +51,10 @@ const LIFETIME_STATS: StatData[] = [
   },
 ];
 
-const PERIOD_STATS: StatData[] = [
-  {
-    label: "WIN RATE",
-    getValue: (d) => `${(d.period.win_rate * 100).toFixed(0)}%`,
-  },
-  {
-    label: "BEST SCORE",
-    getValue: (d) => d.period.best_score.toFixed(0),
-  },
-  {
-    label: "AVERAGE SCORE",
-    getValue: (d) => d.period.average_score.toFixed(2),
-  },
-  {
-    label: "CURRENT RANK",
-    getValue: (d) => ordinalSuffix(d.period.rank),
-  },
-];
-
 const StatsLayout: ParentComponent = (props) => (
-  <div class="flex flex-row flex-wrap items-center justify-center gap-8">
+  <div class="flex items-center justify-center gap-4 overflow-x-auto">
     {props.children}
   </div>
-);
-
-const StatsGroup: ParentComponent = (props) => (
-  <div class="grid w-fit grid-cols-2 gap-4">{props.children}</div>
 );
 
 export const PlayerStats = () => {
@@ -108,44 +85,20 @@ export const PlayerStats = () => {
         <Suspense
           fallback={
             <StatsLayout>
-              {/* Loop over config just for the Labels */}
-              <StatsGroup>
-                <For each={LIFETIME_STATS}>
-                  {(stat) => <StatCardSkeleton label={stat.label} />}
-                </For>
-              </StatsGroup>
-              <StatsGroup>
-                <For each={PERIOD_STATS}>
-                  {(stat) => <StatCardSkeleton label={stat.label} />}
-                </For>
-              </StatsGroup>
+              <For each={LIFETIME_STATS}>
+                {(stat) => <StatCardSkeleton label={stat.label} />}
+              </For>
             </StatsLayout>
           }
         >
           <Show when={summary.data}>
             {(data) => (
               <StatsLayout>
-                <StatsGroup>
-                  <For each={LIFETIME_STATS}>
-                    {(stat) => (
-                      <StatCard
-                        label={stat.label}
-                        stat={stat.getValue(data())}
-                      />
-                    )}
-                  </For>
-                </StatsGroup>
-
-                <StatsGroup>
-                  <For each={PERIOD_STATS}>
-                    {(stat) => (
-                      <StatCard
-                        label={stat.label}
-                        stat={stat.getValue(data())}
-                      />
-                    )}
-                  </For>
-                </StatsGroup>
+                <For each={LIFETIME_STATS}>
+                  {(stat) => (
+                    <StatCard label={stat.label} stat={stat.getValue(data())} />
+                  )}
+                </For>
               </StatsLayout>
             )}
           </Show>

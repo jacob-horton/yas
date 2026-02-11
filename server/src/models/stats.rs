@@ -62,7 +62,6 @@ pub struct ScoreboardEntry {
 pub struct StatsParams {
     pub order_by: Option<ScoringMetric>,
     pub order_dir: Option<OrderDir>,
-    pub num_matches: Option<i32>,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]
@@ -137,15 +136,7 @@ impl From<Scoreboard> for ScoreboardResponse {
 
 #[derive(Debug)]
 pub struct PlayerStatsSummary {
-    pub period: StatsPeriod,
     pub lifetime: StatsLifetime,
-}
-
-#[derive(Debug, FromRow)]
-pub struct StatsPeriod {
-    pub average_score: f64,
-    pub win_rate: f64,
-    pub best_score: i64,
 }
 
 #[derive(Debug, FromRow)]
@@ -158,15 +149,7 @@ pub struct StatsLifetime {
 
 #[derive(Serialize)]
 pub struct PlayerStatsSummaryResponse {
-    pub period: StatsPeriodResponse,
     pub lifetime: StatsLifetimeResponse,
-}
-
-#[derive(Serialize)]
-pub struct StatsPeriodResponse {
-    pub average_score: f64,
-    pub win_rate: f64,
-    pub best_score: i64,
 }
 
 #[derive(Serialize)]
@@ -188,20 +171,9 @@ impl From<StatsLifetime> for StatsLifetimeResponse {
     }
 }
 
-impl From<StatsPeriod> for StatsPeriodResponse {
-    fn from(value: StatsPeriod) -> Self {
-        Self {
-            average_score: value.average_score,
-            win_rate: value.win_rate,
-            best_score: value.best_score,
-        }
-    }
-}
-
 impl From<PlayerStatsSummary> for PlayerStatsSummaryResponse {
     fn from(value: PlayerStatsSummary) -> Self {
         Self {
-            period: value.period.into(),
             lifetime: value.lifetime.into(),
         }
     }

@@ -16,7 +16,6 @@ pub async fn get_scoreboard(
     state: &AppState,
     user_id: Uuid,
     game_id: Uuid,
-    num_matches: i32,
     order_by: Option<ScoringMetric>,
     order_dir: Option<OrderDir>,
 ) -> Result<Scoreboard, AppError> {
@@ -39,7 +38,7 @@ pub async fn get_scoreboard(
     // Raw match data (last `n` matches for each player)
     let raw_data = state
         .stats_repo
-        .get_last_n_matches_per_player(&state.pool, game_id, num_matches)
+        .get_all_matches(&state.pool, game_id)
         .await?;
 
     // Group by user
@@ -123,7 +122,6 @@ pub async fn get_player_history(
     user_id: Uuid,
     game_id: Uuid,
     player_id: Uuid,
-    num_matches: i32,
 ) -> Result<Vec<PlayerMatchDb>, AppError> {
     let game = state
         .game_repo
@@ -141,13 +139,12 @@ pub async fn get_player_history(
         return Err(GroupError::MemberNotFound.into());
     }
 
-    // Get last `n` games
-    let last_n_games = state
+    let player_history = state
         .stats_repo
-        .get_last_n_matches_single_player(&state.pool, game_id, player_id, num_matches)
+        .get_player_history(&state.pool, game_id, player_id)
         .await?;
 
-    Ok(last_n_games)
+    Ok(player_history)
 }
 
 pub async fn get_player_summary(
@@ -155,7 +152,6 @@ pub async fn get_player_summary(
     user_id: Uuid,
     game_id: Uuid,
     player_id: Uuid,
-    num_matches: i32,
 ) -> Result<PlayerStatsSummary, AppError> {
     let game = state
         .game_repo
@@ -178,14 +174,8 @@ pub async fn get_player_summary(
         .get_lifetime_stats(&state.pool, game_id, player_id)
         .await?;
 
-    let period_stats = state
-        .stats_repo
-        .get_period_stats(&state.pool, game_id, player_id, num_matches)
-        .await?;
-
     let stats = PlayerStatsSummary {
         lifetime: lifetime_stats,
-        period: period_stats,
     };
 
     Ok(stats)

@@ -1,51 +1,43 @@
 use uuid::Uuid;
 
-use crate::models::stats::{
-    PlayerMatchDb, RawHighlight, RawMatchStats, StatsLifetime, StatsPeriod,
-};
+use crate::models::stats::{PlayerMatchDb, RawHighlight, RawMatchStats, StatsLifetime};
 
 pub struct StatsRepo {}
 
 impl StatsRepo {
-    pub async fn get_last_n_matches_per_player(
+    pub async fn get_all_matches(
         &self,
         pool: &sqlx::PgPool,
         game_id: Uuid,
-        n: i32,
     ) -> Result<Vec<RawMatchStats>, sqlx::Error> {
         sqlx::query_as::<_, RawMatchStats>(
             r#"
-            WITH ranked_scores AS (
-                SELECT
-                    lb.user_id,
-                    lb.match_id,
-                    lb.score,
-                    lb.rank as rank_in_match,
-                    m.played_at,
-                    ROW_NUMBER() OVER (PARTITION BY lb.user_id ORDER BY m.played_at DESC) as history_index
-                FROM match_leaderboards lb
-                JOIN matches m ON m.id = lb.match_id
-                WHERE m.game_id = $1
-            )
-            SELECT u.name, u.avatar, u.avatar_colour, rs.user_id, rs.match_id, rs.score, rs.played_at, rs.rank_in_match
-            FROM ranked_scores as rs
-            JOIN users u ON u.id = rs.user_id
-            WHERE history_index <= $2
-            ORDER BY user_id, played_at DESC;
+            SELECT
+                u.name,
+                u.avatar,
+                u.avatar_colour,
+                lb.user_id,
+                lb.match_id,
+                lb.score,
+                m.played_at,
+                lb.rank as rank_in_match
+            FROM match_leaderboards lb
+            JOIN matches m ON m.id = lb.match_id
+            JOIN users u ON u.id = lb.user_id
+            WHERE m.game_id = $1
+            ORDER BY lb.user_id, m.played_at DESC;
             "#,
         )
         .bind(game_id)
-        .bind(n as i64)
         .fetch_all(pool)
         .await
     }
 
-    pub async fn get_last_n_matches_single_player(
+    pub async fn get_player_history(
         &self,
         pool: &sqlx::PgPool,
         game_id: Uuid,
         user_id: Uuid,
-        n: i32,
     ) -> Result<Vec<PlayerMatchDb>, sqlx::Error> {
         sqlx::query_as::<_, PlayerMatchDb>(
             r#"
@@ -58,12 +50,10 @@ impl StatsRepo {
             JOIN match_leaderboards lb ON m.id = lb.match_id
             WHERE m.game_id = $1 AND lb.user_id = $2
             ORDER BY m.played_at DESC
-            LIMIT $3
             "#,
         )
         .bind(game_id)
         .bind(user_id)
-        .bind(n as i64)
         .fetch_all(pool)
         .await
     }
@@ -101,45 +91,6 @@ impl StatsRepo {
         )
         .bind(game_id)
         .bind(user_id)
-        .fetch_one(pool)
-        .await
-    }
-
-    pub async fn get_period_stats(
-        &self,
-        pool: &sqlx::PgPool,
-        game_id: Uuid,
-        user_id: Uuid,
-        n: i32,
-    ) -> Result<StatsPeriod, sqlx::Error> {
-        sqlx::query_as::<_, StatsPeriod>(
-            r#"
-            WITH recent_activity AS (
-                SELECT
-                    m.id as match_id,
-                    lb.score,
-                    lb.rank
-                FROM matches m
-                JOIN match_leaderboards lb ON m.id = lb.match_id
-                WHERE m.game_id = $1 AND lb.user_id = $2
-                ORDER BY m.played_at DESC
-                LIMIT $3
-            )
-            SELECT
-                COALESCE(AVG(ra.score), 0)::FLOAT8 as average_score,
-                COALESCE(MAX(ra.score), 0)::BIGINT as best_score,
-
-                CASE
-                    WHEN COUNT(*) = 0 THEN 0.0
-                    ELSE COUNT(*) FILTER (WHERE ra.rank = 1)::FLOAT8 / COUNT(*)::FLOAT8
-                END as win_rate
-
-            FROM recent_activity ra;
-            "#,
-        )
-        .bind(game_id)
-        .bind(user_id)
-        .bind(n)
         .fetch_one(pool)
         .await
     }
