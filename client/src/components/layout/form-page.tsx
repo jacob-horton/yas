@@ -1,4 +1,5 @@
 import type { JSX, ParentComponent } from "solid-js";
+import { Container } from "./container";
 import { Page } from "./page";
 
 export type Props = {
@@ -8,10 +9,12 @@ export type Props = {
 
 export const FormPage: ParentComponent<Props> = (props) => {
   return (
-    <Page title={props.title} showBack narrow>
-      <form onSubmit={props.onSubmit} class="flex flex-col gap-6">
-        {props.children}
-      </form>
+    <Page title={props.title} showBack>
+      <Container narrow>
+        <form onSubmit={props.onSubmit} class="flex flex-col gap-6">
+          {props.children}
+        </form>
+      </Container>
     </Page>
   );
 };

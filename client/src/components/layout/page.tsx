@@ -1,7 +1,7 @@
 import { useNavigate } from "@solidjs/router";
 import { For, type ParentComponent, Show } from "solid-js";
-import { cn } from "@/lib/classname";
 import { Button, type Variant } from "../ui/button";
+import { Container } from "./container";
 
 type Props = {
   title: string;
@@ -11,7 +11,6 @@ type Props = {
     onAction: () => void;
     danger?: boolean;
   }[];
-  narrow?: boolean;
   showBack?: boolean;
   class?: string;
 };
@@ -20,37 +19,33 @@ export const Page: ParentComponent<Props> = (props) => {
   const navigate = useNavigate();
 
   return (
-    <div
-      class={cn(
-        "mx-auto h-full w-full max-w-7xl px-4",
-        { "max-w-3xl": props.narrow },
-        props.class,
-      )}
-    >
-      <header class="flex items-center justify-between">
-        <h1 class="flex items-center gap-2 py-6 font-semibold text-3xl text-gray-800">
-          <Show when={props.showBack}>
-            <Button
-              variant="ghost"
-              onClick={() => navigate(-1)}
-              icon="chevronLeft"
-            />
-          </Show>
-          {props.title}
-        </h1>
-        <For each={props.actions ?? []}>
-          {(action) => (
-            <Button
-              onClick={action.onAction}
-              variant={action.variant}
-              danger={action.danger}
-            >
-              {action.text}
-            </Button>
-          )}
-        </For>
-      </header>
-      <div>{props.children}</div>
+    <div class="h-full w-full">
+      <Container>
+        <header class="flex items-center justify-between">
+          <h1 class="flex items-center gap-2 py-6 font-semibold text-3xl text-gray-800">
+            <Show when={props.showBack}>
+              <Button
+                variant="ghost"
+                onClick={() => navigate(-1)}
+                icon="chevronLeft"
+              />
+            </Show>
+            {props.title}
+          </h1>
+          <For each={props.actions ?? []}>
+            {(action) => (
+              <Button
+                onClick={action.onAction}
+                variant={action.variant}
+                danger={action.danger}
+              >
+                {action.text}
+              </Button>
+            )}
+          </For>
+        </header>
+      </Container>
+      <div class={props.class}>{props.children}</div>
     </div>
   );
 };

@@ -26,6 +26,12 @@
   }
 }
 
+/* biome-ignore lint/suspicious/noUnknownAtRules: Supported by tailwind */
+@utility no-scrollbar {
+  /* biome-ignore lint/suspicious/noUnknownAtRules: Supported by tailwind */
+  @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
+}
+
 .aurora-gradient {
   background-color: hsla(0, 100%, 50%, 1);
   background-image:

@@ -58,7 +58,7 @@ export const HighlightStatCard: Component<Props> = (props) => {
   return (
     <div
       class={cn(
-        "flex h-28 w-74 min-w-74 items-center gap-4 rounded-md border px-4 py-2",
+        "flex h-28 w-80 min-w-80 items-center gap-4 rounded-md border px-4 py-2",
         COLOUR_MAP[props.colour].bg,
         COLOUR_MAP[props.colour].text,
         COLOUR_MAP[props.colour].border,

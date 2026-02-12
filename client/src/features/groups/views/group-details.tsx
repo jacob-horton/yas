@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/solid-query";
 import { Suspense } from "solid-js";
+import { Container } from "@/components/layout/container";
 import { Page } from "@/components/layout/page";
 import { TextSkeleton } from "@/components/ui/text.skeleton";
 import { QK_MY_GROUPS } from "@/features/users/constants";
@@ -29,11 +30,13 @@ export const GroupDetails = () => {
         },
       ]}
     >
-      <Suspense fallback={<TextSkeleton lines={3} />}>
-        <p>{groupDetails.data?.id}</p>
-        <p>{groupDetails.data?.name}</p>
-        <p>{formatDate(groupDetails.data?.created_at ?? "")}</p>
-      </Suspense>
+      <Container>
+        <Suspense fallback={<TextSkeleton lines={3} />}>
+          <p>{groupDetails.data?.id}</p>
+          <p>{groupDetails.data?.name}</p>
+          <p>{formatDate(groupDetails.data?.created_at ?? "")}</p>
+        </Suspense>
+      </Container>
     </Page>
   );
 };

@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from "@solidjs/router";
 import { createSignal, For, Suspense } from "solid-js";
+import { Container } from "@/components/layout/container";
 import { Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
 import {
@@ -70,8 +71,9 @@ export const Scoreboard = () => {
           onAction: () => navigate(`record`),
         },
       ]}
+      class="flex flex-col gap-12"
     >
-      <div class="flex flex-col items-stretch gap-6 overflow-x-auto">
+      <Container class="flex flex-col items-stretch pt-8">
         <div class="flex gap-6 self-center overflow-x-auto">
           <Suspense
             fallback={
@@ -94,8 +96,10 @@ export const Scoreboard = () => {
             </For>
           </Suspense>
         </div>
+      </Container>
 
-        <div class="flex items-center justify-center gap-4 overflow-x-auto py-6">
+      <div class="no-scrollbar flex snap-x overflow-x-auto px-6">
+        <div class="mx-auto flex flex-nowrap gap-4">
           <Suspense
             fallback={
               <For each={Array(4)}>{() => <HighlightStatCardSkeleton />}</For>
@@ -161,7 +165,9 @@ export const Scoreboard = () => {
             />
           </Suspense>
         </div>
+      </div>
 
+      <Container>
         <div class="max-h-[550px] overflow-y-auto">
           <Table
             sortedBy={effectiveSort()}
@@ -212,7 +218,7 @@ export const Scoreboard = () => {
             </Suspense>
           </Table>
         </div>
-      </div>
+      </Container>
     </Page>
   );
 };

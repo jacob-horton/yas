@@ -1,6 +1,7 @@
 import { useNavigate } from "@solidjs/router";
 import { formatDistanceToNow } from "date-fns";
 import { type Component, For, Suspense } from "solid-js";
+import { Container } from "@/components/layout/container";
 import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";
 import {
@@ -100,45 +101,49 @@ export const Invites = () => {
         },
       ]}
     >
-      <Table headings={TABLE_HEADINGS} caption="All invites for this group">
-        <Suspense fallback={<TableRowSkeleton numCols={5} />}>
-          <For each={invites.data}>
-            {(invite) => (
-              <TableRow>
-                <TableCell>{invite.name}</TableCell>
-                <TableCell>{invite.created_by_name}</TableCell>
-                <TableCell>
-                  {invite.uses}
-                  {invite.max_uses && <>/{invite.max_uses}</>}
-                </TableCell>
-                <TableCell>{formatDate(invite.created_at)}</TableCell>
-                <TableCell>
-                  <ExpiryCell expiresAt={invite.expires_at} />
-                </TableCell>
-                <TableCell>
-                  <div class="flex gap-1">
-                    <Button
-                      icon="copy"
-                      variant="ghost"
-                      class="text-gray-400"
-                      onClick={() =>
-                        navigator.clipboard.writeText(getInviteLink(invite.id))
-                      }
-                    />
-                    <Button
-                      danger
-                      icon="delete"
-                      variant="ghost"
-                      class="text-gray-400"
-                      onClick={() => handleDelete(invite)}
-                    />
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </For>
-        </Suspense>
-      </Table>
+      <Container>
+        <Table headings={TABLE_HEADINGS} caption="All invites for this group">
+          <Suspense fallback={<TableRowSkeleton numCols={5} />}>
+            <For each={invites.data}>
+              {(invite) => (
+                <TableRow>
+                  <TableCell>{invite.name}</TableCell>
+                  <TableCell>{invite.created_by_name}</TableCell>
+                  <TableCell>
+                    {invite.uses}
+                    {invite.max_uses && <>/{invite.max_uses}</>}
+                  </TableCell>
+                  <TableCell>{formatDate(invite.created_at)}</TableCell>
+                  <TableCell>
+                    <ExpiryCell expiresAt={invite.expires_at} />
+                  </TableCell>
+                  <TableCell>
+                    <div class="flex gap-1">
+                      <Button
+                        icon="copy"
+                        variant="ghost"
+                        class="text-gray-400"
+                        onClick={() =>
+                          navigator.clipboard.writeText(
+                            getInviteLink(invite.id),
+                          )
+                        }
+                      />
+                      <Button
+                        danger
+                        icon="delete"
+                        variant="ghost"
+                        class="text-gray-400"
+                        onClick={() => handleDelete(invite)}
+                      />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </For>
+          </Suspense>
+        </Table>
+      </Container>
     </Page>
   );
 };

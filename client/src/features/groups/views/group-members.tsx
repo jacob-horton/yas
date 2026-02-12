@@ -1,4 +1,5 @@
 import { createSignal, For, Suspense } from "solid-js";
+import { Container } from "@/components/layout/container";
 import { Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -63,47 +64,49 @@ export const GroupMembers = () => {
 
   return (
     <Page title="Group Members">
-      <Table
-        headings={TABLE_HEADINGS}
-        caption="All members of this group"
-        sortedBy={sort()}
-        onSort={setSort}
-      >
-        <Suspense fallback={<TableRowSkeleton numCols={5} />}>
-          <For each={members.data}>
-            {(member) => (
-              <TableRow
-                class={cn({
-                  "font-semibold": member.id === auth.user()?.id,
-                })}
-              >
-                <TableCell class="flex items-center gap-3">
-                  <Avatar
-                    class="size-7"
-                    avatar={member.avatar}
-                    colour={member.avatar_colour}
-                  />
-                  {member.name}
-                </TableCell>
-                <TableCell>{member.email}</TableCell>
-                <TableCell>
-                  <Role role={member.role} />
-                </TableCell>
-                <TableCell>{formatDate(member.joined_at)}</TableCell>
-                <TableCell class="w-14">
-                  <Button
-                    class="text-gray-400"
-                    variant="ghost"
-                    icon="delete"
-                    danger
-                    onClick={() => handleRemove(member)}
-                  />
-                </TableCell>
-              </TableRow>
-            )}
-          </For>
-        </Suspense>
-      </Table>
+      <Container>
+        <Table
+          headings={TABLE_HEADINGS}
+          caption="All members of this group"
+          sortedBy={sort()}
+          onSort={setSort}
+        >
+          <Suspense fallback={<TableRowSkeleton numCols={5} />}>
+            <For each={members.data}>
+              {(member) => (
+                <TableRow
+                  class={cn({
+                    "font-semibold": member.id === auth.user()?.id,
+                  })}
+                >
+                  <TableCell class="flex items-center gap-3">
+                    <Avatar
+                      class="size-7"
+                      avatar={member.avatar}
+                      colour={member.avatar_colour}
+                    />
+                    {member.name}
+                  </TableCell>
+                  <TableCell>{member.email}</TableCell>
+                  <TableCell>
+                    <Role role={member.role} />
+                  </TableCell>
+                  <TableCell>{formatDate(member.joined_at)}</TableCell>
+                  <TableCell class="w-14">
+                    <Button
+                      class="text-gray-400"
+                      variant="ghost"
+                      icon="delete"
+                      danger
+                      onClick={() => handleRemove(member)}
+                    />
+                  </TableCell>
+                </TableRow>
+              )}
+            </For>
+          </Suspense>
+        </Table>
+      </Container>
     </Page>
   );
 };
