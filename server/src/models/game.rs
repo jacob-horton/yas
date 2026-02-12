@@ -37,7 +37,7 @@ impl From<GameDb> for GameResponse {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Type, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 #[sqlx(type_name = "scoring_metric", rename_all = "snake_case")]
 pub enum ScoringMetric {

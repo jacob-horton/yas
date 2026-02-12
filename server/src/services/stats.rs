@@ -9,7 +9,7 @@ use crate::{
         },
     },
 };
-use std::{cmp::Ordering, collections::HashMap};
+use std::collections::HashMap;
 use uuid::Uuid;
 
 pub async fn get_scoreboard(
@@ -73,28 +73,33 @@ pub async fn get_scoreboard(
         });
     }
 
-    let order_by = order_by.unwrap_or(game.metric.clone());
-
-    // Sort callback - ascending based on sort_by
-    let compare_stats = |a: &ScoreboardEntry, b: &ScoreboardEntry| {
-        let cmp_f64 = |x: f64, y: f64| x.partial_cmp(&y).unwrap_or(Ordering::Equal);
-
-        match order_by {
-            ScoringMetric::WinRate => cmp_f64(a.win_rate, b.win_rate)
+    let get_comparator = |metric: ScoringMetric, a: &ScoreboardEntry, b: &ScoreboardEntry| {
+        match metric {
+            ScoringMetric::WinRate => a
+                .win_rate
+                .total_cmp(&b.win_rate)
                 .then_with(|| a.matches_played.cmp(&b.matches_played))
-                .then_with(|| cmp_f64(a.average_score, b.average_score))
-                .then_with(|| a.user_name.cmp(&b.user_name)),
+                .then_with(|| a.average_score.total_cmp(&b.average_score)),
 
-            ScoringMetric::AverageScore => cmp_f64(a.average_score, b.average_score)
+            ScoringMetric::AverageScore => a
+                .average_score
+                .total_cmp(&b.average_score)
                 .then_with(|| a.matches_played.cmp(&b.matches_played))
-                .then_with(|| cmp_f64(a.win_rate, b.win_rate))
-                .then_with(|| a.user_name.cmp(&b.user_name)),
+                .then_with(|| a.win_rate.total_cmp(&b.win_rate)),
         }
-        .reverse()
+        .then_with(|| a.user_name.cmp(&b.user_name))
+        .reverse() // Default to descending
     };
 
-    entries.sort_by(compare_stats);
+    // Take podium as top 3 based on game metric
+    entries.sort_by(|a, b| get_comparator(game.metric, a, b));
     let podium: Vec<ScoreboardEntry> = entries.iter().take(3).cloned().collect();
+
+    // If user wants different sort than metric, sort the entries by that
+    let order_by = order_by.unwrap_or(game.metric);
+    if order_by != game.metric {
+        entries.sort_by(|a, b| get_comparator(order_by, a, b));
+    }
 
     // Flip if they want score ascending
     if order_dir == Some(OrderDir::Ascending) {
