@@ -19,4 +19,5 @@ export type StatsLifetime = {
   best_score: number;
   total_games: number;
   win_rate: number;
+  rank: number;
 };

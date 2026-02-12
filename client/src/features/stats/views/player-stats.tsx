@@ -1,5 +1,4 @@
 import { useParams } from "@solidjs/router";
-import type { ParentComponent } from "solid-js";
 import { For, Show, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import {
@@ -15,7 +14,7 @@ import { formatDate } from "@/lib/format-date";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_TEXT_COLOURS } from "@/lib/rank-colours";
 import { ChartComponent } from "../components/chart";
-import { StatCard, type Colour, type Icon } from "../components/stat-card";
+import { type Colour, type Icon, StatCard } from "../components/stat-card";
 import { StatCardSkeleton } from "../components/stat-card.skeleton";
 import { usePlayerHistory } from "../hooks/use-player-history";
 import { usePlayerSummary } from "../hooks/use-player-summary";
@@ -59,6 +58,12 @@ const LIFETIME_STATS: StatData[] = [
     label: "Total Games",
     getValue: (d) => d.lifetime.total_games.toFixed(0),
   },
+  {
+    icon: "hash",
+    colour: "yellow",
+    label: "Current Rank",
+    getValue: (d) => ordinalSuffix(d.lifetime.rank),
+  },
 ];
 
 export const PlayerStats = () => {
@@ -75,10 +80,11 @@ export const PlayerStats = () => {
 
   const player = useUser(() => params.playerId);
 
+  // TODO: gap + vertical padding around whole thing
   return (
     <Page title={`Stats for ${player.data?.name ?? "Loading"}`} showBack>
       <div class="flex flex-col gap-8 pb-42">
-        <div class="flex items-center justify-center gap-4 pt-6 overflow-x-auto">
+        <div class="flex items-center justify-center gap-4 overflow-x-auto py-6">
           <Suspense
             fallback={
               <For each={LIFETIME_STATS}>
@@ -103,7 +109,7 @@ export const PlayerStats = () => {
           </Suspense>
         </div>
 
-        <div class="py-6">
+        <div class="pb-6">
           <ChartComponent
             data={
               history.data

@@ -1,4 +1,5 @@
 import ChartColumnIcon from "lucide-solid/icons/chart-column";
+import HashIcon from "lucide-solid/icons/hash";
 import Layers2Icon from "lucide-solid/icons/layers-2";
 import StarIcon from "lucide-solid/icons/star";
 import TrophyIcon from "lucide-solid/icons/trophy";
@@ -8,11 +9,11 @@ import { cn } from "@/lib/classname";
 
 const COLOUR_MAP = {
   orange: {
-    text: "text-amber-500",
-    textSubtle: "text-amber-400",
-    bg: "bg-amber-50/50",
-    bgDark: "bg-amber-100/75",
-    border: "border-amber-200",
+    text: "text-orange-500",
+    textSubtle: "text-orange-400",
+    bg: "bg-orange-50/50",
+    bgDark: "bg-orange-100/75",
+    border: "border-orange-200",
   },
   green: {
     text: "text-emerald-500",
@@ -35,6 +36,13 @@ const COLOUR_MAP = {
     bgDark: "bg-blue-100/75",
     border: "border-blue-200",
   },
+  yellow: {
+    text: "text-yellow-600",
+    textSubtle: "text-yellow-500",
+    bg: "bg-yellow-50",
+    bgDark: "bg-yellow-100",
+    border: "border-yellow-300",
+  },
 } as const;
 
 const ICON_MAP = {
@@ -42,6 +50,7 @@ const ICON_MAP = {
   star: StarIcon,
   chart: ChartColumnIcon,
   stack: Layers2Icon,
+  hash: HashIcon,
 } as const;
 
 export type Icon = keyof typeof ICON_MAP;

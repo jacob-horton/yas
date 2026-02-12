@@ -54,6 +54,7 @@ pub struct ScoreboardEntry {
     pub user_avatar_colour: AvatarColour,
     pub matches_played: i64,
     pub average_score: f64,
+    pub best_score: i32,
     pub wins: i64,
     pub win_rate: f64,
 }
@@ -142,9 +143,10 @@ pub struct PlayerStatsSummary {
 #[derive(Debug, FromRow)]
 pub struct StatsLifetime {
     pub average_score: f64,
-    pub best_score: i64,
+    pub best_score: i32,
     pub total_games: i64,
     pub win_rate: f64,
+    pub rank: i64,
 }
 
 #[derive(Serialize)]
@@ -155,9 +157,10 @@ pub struct PlayerStatsSummaryResponse {
 #[derive(Serialize)]
 pub struct StatsLifetimeResponse {
     pub average_score: f64,
-    pub best_score: i64,
+    pub best_score: i32,
     pub total_games: i64,
     pub win_rate: f64,
+    pub rank: i64,
 }
 
 impl From<StatsLifetime> for StatsLifetimeResponse {
@@ -167,6 +170,7 @@ impl From<StatsLifetime> for StatsLifetimeResponse {
             best_score: value.best_score,
             total_games: value.total_games,
             win_rate: value.win_rate,
+            rank: value.rank,
         }
     }
 }

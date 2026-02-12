@@ -47,9 +47,14 @@ pub async fn get_scoreboard(
     Query(query): Query<StatsParams>,
     AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let scoreboard =
-        services::stats::get_scoreboard(&state, user.id, game_id, query.order_by, query.order_dir)
-            .await?;
+    let scoreboard = services::stats::get_scoreboard_and_stats(
+        &state,
+        user.id,
+        game_id,
+        query.order_by,
+        query.order_dir,
+    )
+    .await?;
 
     let response: ScoreboardResponse = scoreboard.into();
 
