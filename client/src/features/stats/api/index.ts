@@ -1,11 +1,11 @@
 import type { Sort } from "@/components/ui/table";
 import type { Scoreboard } from "@/features/games/types/scoreboard";
 import { api } from "@/lib/api";
-import type { MatchStats, PlayerStatsSummary } from "../types";
+import type { MatchStats, PlayerHighlightStats } from "../types";
 
 export interface StatsApiContract {
   getPlayerHistory(playerId: string): Promise<MatchStats[]>;
-  getPlayerSummary(playerId: string): Promise<PlayerStatsSummary>;
+  getPlayerHighlights(playerId: string): Promise<PlayerHighlightStats>;
   getScoreboard<T extends string>(sort?: Sort<T>): Promise<Scoreboard>;
 }
 
@@ -19,9 +19,11 @@ export class StatsApi implements StatsApiContract {
       .then((resp) => resp.data);
   }
 
-  public async getPlayerSummary(playerId: string): Promise<PlayerStatsSummary> {
+  public async getPlayerHighlights(
+    playerId: string,
+  ): Promise<PlayerHighlightStats> {
     return api
-      .get(`/games/${this.gameId}/players/${playerId}/summary`)
+      .get(`/games/${this.gameId}/players/${playerId}/highlights`)
       .then((resp) => resp.data);
   }
 

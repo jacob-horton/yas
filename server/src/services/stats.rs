@@ -4,7 +4,7 @@ use crate::{
     models::{
         game::{GameDb, ScoringMetric},
         stats::{
-            HighlightsResponse, OrderDir, PlayerMatchDb, PlayerStatsSummary, RawMatchStats,
+            HighlightsResponse, OrderDir, PlayerHighlightStats, PlayerMatchDb, RawMatchStats,
             Scoreboard, ScoreboardEntry, StatsLifetime,
         },
     },
@@ -172,12 +172,12 @@ pub async fn get_player_history(
     Ok(player_history)
 }
 
-pub async fn get_player_summary(
+pub async fn get_player_highlights(
     state: &AppState,
     user_id: Uuid,
     game_id: Uuid,
     player_id: Uuid,
-) -> Result<PlayerStatsSummary, AppError> {
+) -> Result<PlayerHighlightStats, AppError> {
     let game = state
         .game_repo
         .get(&state.pool, game_id)
@@ -201,7 +201,7 @@ pub async fn get_player_summary(
         .find(|(_, entry)| entry.user_id == player_id)
         .ok_or_else(|| GroupError::MemberNotFound)?;
 
-    let stats = PlayerStatsSummary {
+    let stats = PlayerHighlightStats {
         lifetime: StatsLifetime {
             win_rate: entry.win_rate,
             average_score: entry.average_score,

@@ -1,11 +1,11 @@
 meta {
-  name: Get User Summary
+  name: Get Player Highlights
   type: http
   seq: 2
 }
 
 get {
-  url: {{base_url}}/api/games/{{game_id}}/players/{{player_id}}/summary
+  url: {{base_url}}/api/games/{{game_id}}/players/{{player_id}}/highlights
   body: none
   auth: inherit
 }

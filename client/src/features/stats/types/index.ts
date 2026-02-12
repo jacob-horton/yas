@@ -10,11 +10,11 @@ export type PlayerStatsRouteParams = {
   playerId: string;
 };
 
-export type PlayerStatsSummary = {
-  lifetime: StatsLifetime;
+export type PlayerHighlightStats = {
+  lifetime: HighlightStatsLifetime;
 };
 
-export type StatsLifetime = {
+export type HighlightStatsLifetime = {
   average_score: number;
   best_score: number;
   total_games: number;

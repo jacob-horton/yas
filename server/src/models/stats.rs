@@ -136,7 +136,7 @@ impl From<Scoreboard> for ScoreboardResponse {
 }
 
 #[derive(Debug)]
-pub struct PlayerStatsSummary {
+pub struct PlayerHighlightStats {
     pub lifetime: StatsLifetime,
 }
 
@@ -150,12 +150,12 @@ pub struct StatsLifetime {
 }
 
 #[derive(Serialize)]
-pub struct PlayerStatsSummaryResponse {
-    pub lifetime: StatsLifetimeResponse,
+pub struct PlayerHighlightsResponse {
+    pub lifetime: HighlightsLifetimeResponse,
 }
 
 #[derive(Serialize)]
-pub struct StatsLifetimeResponse {
+pub struct HighlightsLifetimeResponse {
     pub average_score: f64,
     pub best_score: i32,
     pub total_games: i64,
@@ -163,7 +163,7 @@ pub struct StatsLifetimeResponse {
     pub rank: i64,
 }
 
-impl From<StatsLifetime> for StatsLifetimeResponse {
+impl From<StatsLifetime> for HighlightsLifetimeResponse {
     fn from(value: StatsLifetime) -> Self {
         Self {
             average_score: value.average_score,
@@ -175,8 +175,8 @@ impl From<StatsLifetime> for StatsLifetimeResponse {
     }
 }
 
-impl From<PlayerStatsSummary> for PlayerStatsSummaryResponse {
-    fn from(value: PlayerStatsSummary) -> Self {
+impl From<PlayerHighlightStats> for PlayerHighlightsResponse {
+    fn from(value: PlayerHighlightStats) -> Self {
         Self {
             lifetime: value.lifetime.into(),
         }

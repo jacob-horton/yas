@@ -11,7 +11,7 @@ use crate::{
     AppState,
     errors::AppError,
     extractors::auth::AuthUser,
-    models::stats::{PlayerMatchResponse, PlayerStatsSummaryResponse},
+    models::stats::{PlayerHighlightsResponse, PlayerMatchResponse},
     services,
 };
 
@@ -27,14 +27,14 @@ pub async fn get_user_history(
     Ok((StatusCode::OK, Json(response)))
 }
 
-pub async fn get_user_summary(
+pub async fn get_player_highlights(
     State(state): State<AppState>,
     Path((game_id, player_id)): Path<(Uuid, Uuid)>,
     AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let stats = services::stats::get_player_summary(&state, user.id, game_id, player_id).await?;
+    let stats = services::stats::get_player_highlights(&state, user.id, game_id, player_id).await?;
 
-    let response: PlayerStatsSummaryResponse = stats.into();
+    let response: PlayerHighlightsResponse = stats.into();
 
     Ok((StatusCode::OK, Json(response)))
 }
@@ -46,7 +46,7 @@ pub fn router() -> Router<AppState> {
             get(get_user_history),
         )
         .route(
-            "/games/:gameId/players/:playerId/summary",
-            get(get_user_summary),
+            "/games/:gameId/players/:playerId/highlights",
+            get(get_player_highlights),
         )
 }

@@ -17,9 +17,9 @@ import { RANK_TEXT_COLOURS } from "@/lib/rank-colours";
 import { ChartComponent } from "../components/chart";
 import { type Colour, type Icon, StatCard } from "../components/stat-card";
 import { StatCardSkeleton } from "../components/stat-card.skeleton";
+import { usePlayerHighlights } from "../hooks/use-player-highlights";
 import { usePlayerHistory } from "../hooks/use-player-history";
-import { usePlayerSummary } from "../hooks/use-player-summary";
-import type { PlayerStatsRouteParams, PlayerStatsSummary } from "../types";
+import type { PlayerHighlightStats, PlayerStatsRouteParams } from "../types";
 
 const TABLE_HEADINGS = [
   { label: "Date" },
@@ -31,7 +31,7 @@ type StatData = {
   icon: Icon;
   colour: Colour;
   label: string;
-  getValue: (data: PlayerStatsSummary) => string;
+  getValue: (data: PlayerHighlightStats) => string;
 };
 
 const LIFETIME_STATS: StatData[] = [
@@ -74,7 +74,7 @@ export const PlayerStats = () => {
     () => params.playerId,
   );
 
-  const summary = usePlayerSummary(
+  const highlights = usePlayerHighlights(
     () => params.gameId,
     () => params.playerId,
   );
@@ -96,7 +96,7 @@ export const PlayerStats = () => {
               </For>
             }
           >
-            <Show when={summary.data}>
+            <Show when={highlights.data}>
               {(data) => (
                 <For each={LIFETIME_STATS}>
                   {(stat) => (
