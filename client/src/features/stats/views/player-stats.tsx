@@ -15,7 +15,7 @@ import { formatDate } from "@/lib/format-date";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_TEXT_COLOURS } from "@/lib/rank-colours";
 import { ChartComponent } from "../components/chart";
-import { StatCard } from "../components/stat-card";
+import { StatCard, type Colour, type Icon } from "../components/stat-card";
 import { StatCardSkeleton } from "../components/stat-card.skeleton";
 import { usePlayerHistory } from "../hooks/use-player-history";
 import { usePlayerSummary } from "../hooks/use-player-summary";
@@ -28,34 +28,38 @@ const TABLE_HEADINGS = [
 ] as const satisfies Heading<string>[];
 
 type StatData = {
+  icon: Icon;
+  colour: Colour;
   label: string;
   getValue: (data: PlayerStatsSummary) => string;
 };
 
 const LIFETIME_STATS: StatData[] = [
   {
-    label: "WIN RATE",
+    icon: "trophy",
+    colour: "green",
+    label: "Win Rate",
     getValue: (d) => `${(d.lifetime.win_rate * 100).toFixed(0)}%`,
   },
   {
-    label: "BEST SCORE",
+    icon: "star",
+    colour: "orange",
+    label: "Best Score",
     getValue: (d) => d.lifetime.best_score.toFixed(0),
   },
   {
-    label: "AVERAGE SCORE",
+    icon: "chart",
+    colour: "purple",
+    label: "Average Score",
     getValue: (d) => d.lifetime.average_score.toFixed(2),
   },
   {
-    label: "TOTAL GAMES",
+    icon: "stack",
+    colour: "blue",
+    label: "Total Games",
     getValue: (d) => d.lifetime.total_games.toFixed(0),
   },
 ];
-
-const StatsLayout: ParentComponent = (props) => (
-  <div class="flex items-center justify-center gap-4 overflow-x-auto">
-    {props.children}
-  </div>
-);
 
 export const PlayerStats = () => {
   const params = useParams<PlayerStatsRouteParams>();
@@ -74,35 +78,40 @@ export const PlayerStats = () => {
   return (
     <Page title={`Stats for ${player.data?.name ?? "Loading"}`} showBack>
       <div class="flex flex-col gap-8 pb-42">
-        <ChartComponent
-          data={
-            history.data
-              ?.map((s) => ({ score: s.score, rank: s.rank_in_match }))
-              .toReversed() ?? []
-          }
-        />
-
-        <Suspense
-          fallback={
-            <StatsLayout>
+        <div class="flex items-center justify-center gap-4 pt-6 overflow-x-auto">
+          <Suspense
+            fallback={
               <For each={LIFETIME_STATS}>
                 {(stat) => <StatCardSkeleton label={stat.label} />}
               </For>
-            </StatsLayout>
-          }
-        >
-          <Show when={summary.data}>
-            {(data) => (
-              <StatsLayout>
+            }
+          >
+            <Show when={summary.data}>
+              {(data) => (
                 <For each={LIFETIME_STATS}>
                   {(stat) => (
-                    <StatCard label={stat.label} stat={stat.getValue(data())} />
+                    <StatCard
+                      icon={stat.icon}
+                      colour={stat.colour}
+                      label={stat.label}
+                      stat={stat.getValue(data())}
+                    />
                   )}
                 </For>
-              </StatsLayout>
-            )}
-          </Show>
-        </Suspense>
+              )}
+            </Show>
+          </Suspense>
+        </div>
+
+        <div class="py-6">
+          <ChartComponent
+            data={
+              history.data
+                ?.map((s) => ({ score: s.score, rank: s.rank_in_match }))
+                .toReversed() ?? []
+            }
+          />
+        </div>
 
         <Table headings={TABLE_HEADINGS} caption="Match history">
           <Suspense fallback={<TableRowSkeleton numCols={3} />}>

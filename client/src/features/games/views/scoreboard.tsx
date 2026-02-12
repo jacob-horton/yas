@@ -95,13 +95,15 @@ export const Scoreboard = () => {
           </Suspense>
         </div>
 
-        <div class="flex flex-wrap gap-4">
+        <div class="flex items-center justify-center gap-4 overflow-x-auto py-6">
           <Suspense
             fallback={
               <For each={Array(4)}>{() => <HighlightStatCardSkeleton />}</For>
             }
           >
             <HighlightStatCard
+              colour="orange"
+              icon="crown"
               label="Grandmaster"
               subtext="Highest win rate"
               value={`${((scoreboardData.data?.highlights.highest_win_rate.value ?? 0) * 100).toFixed(0)}%`}
@@ -111,6 +113,8 @@ export const Scoreboard = () => {
             />
 
             <HighlightStatCard
+              colour="green"
+              icon="wheat"
               label="Point Farmer"
               subtext="Highest average score"
               value={
@@ -125,6 +129,8 @@ export const Scoreboard = () => {
             />
 
             <HighlightStatCard
+              colour="purple"
+              icon="mountain"
               label="Peak Performer"
               subtext="Highest single score"
               value={
@@ -139,6 +145,8 @@ export const Scoreboard = () => {
             />
 
             <HighlightStatCard
+              colour="blue"
+              icon="infinity"
               label="Addict"
               subtext="Most games played"
               value={

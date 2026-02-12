@@ -1,15 +1,83 @@
+import ChartColumnIcon from "lucide-solid/icons/chart-column";
+import Layers2Icon from "lucide-solid/icons/layers-2";
+import StarIcon from "lucide-solid/icons/star";
+import TrophyIcon from "lucide-solid/icons/trophy";
 import type { Component } from "solid-js";
+import { Dynamic } from "solid-js/web";
+import { cn } from "@/lib/classname";
+
+const COLOUR_MAP = {
+  orange: {
+    text: "text-amber-500",
+    textSubtle: "text-amber-400",
+    bg: "bg-amber-50/50",
+    bgDark: "bg-amber-100/75",
+    border: "border-amber-200",
+  },
+  green: {
+    text: "text-emerald-500",
+    textSubtle: "text-emerald-400",
+    bg: "bg-emerald-50/50",
+    bgDark: "bg-emerald-100/75",
+    border: "border-emerald-200",
+  },
+  purple: {
+    text: "text-violet-500",
+    textSubtle: "text-violet-400",
+    bg: "bg-violet-50/50",
+    bgDark: "bg-violet-100/75",
+    border: "border-violet-200",
+  },
+  blue: {
+    text: "text-blue-500",
+    textSubtle: "text-blue-400",
+    bg: "bg-blue-50/50",
+    bgDark: "bg-blue-100/75",
+    border: "border-blue-200",
+  },
+} as const;
+
+const ICON_MAP = {
+  trophy: TrophyIcon,
+  star: StarIcon,
+  chart: ChartColumnIcon,
+  stack: Layers2Icon,
+} as const;
+
+export type Icon = keyof typeof ICON_MAP;
+export type Colour = keyof typeof COLOUR_MAP;
 
 type Props = {
+  icon: Icon;
+  colour: Colour;
   label: string;
   stat: string;
 };
 
 export const StatCard: Component<Props> = (props) => {
   return (
-    <div class="flex h-28 w-40 flex-col items-center justify-center gap-2 rounded-md border px-4 py-2 text-center">
-      <p class="font-mono-nums font-semibold text-3xl">{props.stat}</p>
-      <p class="font-normal text-gray-400 text-sm">{props.label}</p>
+    <div
+      class={cn(
+        "flex h-28 w-74 min-w-74 items-center gap-4 rounded-md border px-4 py-2",
+        COLOUR_MAP[props.colour].bg,
+        COLOUR_MAP[props.colour].text,
+        COLOUR_MAP[props.colour].border,
+      )}
+    >
+      <div class={cn("m-2 rounded-full p-4", COLOUR_MAP[props.colour].bgDark)}>
+        <Dynamic component={ICON_MAP[props.icon]} size={40} />
+      </div>
+      <div>
+        <p
+          class={cn(
+            "font-semibold text-sm",
+            COLOUR_MAP[props.colour].textSubtle,
+          )}
+        >
+          {props.label}
+        </p>
+        <p class="font-mono-nums font-semibold text-3xl">{props.stat}</p>
+      </div>
     </div>
   );
 };
