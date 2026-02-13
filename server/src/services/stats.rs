@@ -1,16 +1,20 @@
 use crate::{
     AppState,
-    errors::{AppError, GameError, GroupError},
+    errors::{AppError, GameError, GroupError, StatsError},
     models::{
         game::{GameDb, ScoringMetric},
+        group::OrderBy,
         stats::{
-            HighlightsResponse, OrderDir, PlayerHighlightStats, PlayerMatchDb, RawMatchStats,
-            Scoreboard, ScoreboardEntry, StatsLifetime,
+            Distribution, DistributionWithMaxMin, HighlightsResponse, OrderDir,
+            PlayerHighlightStats, PlayerMatchDb, RawMatchStats, Scoreboard, ScoreboardEntry,
+            StatsLifetime,
         },
     },
 };
 use std::{cmp::Ordering, collections::HashMap};
 use uuid::Uuid;
+
+const MIN_MATCHES_FOR_DISTRIBUTION: usize = 5;
 
 fn get_comparator(metric: ScoringMetric, a: &ScoreboardEntry, b: &ScoreboardEntry) -> Ordering {
     match metric {
@@ -212,4 +216,94 @@ pub async fn get_player_highlights(
     };
 
     Ok(stats)
+}
+
+fn get_player_distribution(
+    all_matches: &Vec<RawMatchStats>,
+    player_id: Uuid,
+) -> Result<DistributionWithMaxMin, AppError> {
+    let player_data: Vec<_> = all_matches
+        .iter()
+        .filter(|m| m.user_id == player_id)
+        .collect();
+
+    if player_data.len() < MIN_MATCHES_FOR_DISTRIBUTION {
+        return Err(StatsError::NotEnoughData.into());
+    }
+
+    let scores: Vec<_> = player_data.iter().map(|d| d.score).collect();
+    let mean = scores.iter().sum::<i32>() as f64 / scores.len() as f64;
+    let variance = scores
+        .iter()
+        .map(|&x| (x as f64 - mean).powi(2))
+        .sum::<f64>()
+        / (scores.len() as f64 - 1.0);
+
+    let dist = Distribution::Gamma {
+        lambda: mean / variance,
+        alpha: mean.powi(2) / variance,
+    };
+
+    let min = scores
+        .iter()
+        .min()
+        .expect("Min not found despite having data");
+    let max = scores
+        .iter()
+        .max()
+        .expect("Max not found despite having data");
+
+    Ok(DistributionWithMaxMin {
+        min_score: *min,
+        max_score: *max,
+        distribution: dist,
+    })
+}
+
+pub async fn get_distributions(
+    state: &AppState,
+    user_id: Uuid,
+    game_id: Uuid,
+) -> Result<HashMap<Uuid, DistributionWithMaxMin>, AppError> {
+    let game = state
+        .game_repo
+        .get(&state.pool, game_id)
+        .await?
+        .ok_or(GameError::NotFound)?;
+
+    // Check user is in group
+    let is_member = state
+        .group_repo
+        .are_members(&state.pool, game.group_id, &[user_id])
+        .await?;
+
+    if !is_member {
+        return Err(GroupError::MemberNotFound.into());
+    }
+
+    let raw_data = state
+        .stats_repo
+        .get_all_matches(&state.pool, game.id)
+        .await?;
+
+    // TODO: just loop through raw data once - we don't need to know members
+    let members = state
+        .group_repo
+        .get_members(
+            &state.pool,
+            game.group_id,
+            OrderBy::Name,
+            OrderDir::Ascending,
+        )
+        .await?;
+
+    let mut distributions = HashMap::<Uuid, DistributionWithMaxMin>::new();
+    for player in members {
+        // TODO: handle better. Skip players that don't have enough data, error if a different err
+        if let Ok(dist) = get_player_distribution(&raw_data, player.id) {
+            distributions.insert(player.id, dist);
+        }
+    }
+
+    Ok(distributions)
 }

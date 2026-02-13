@@ -21,3 +21,17 @@ export type HighlightStatsLifetime = {
   win_rate: number;
   rank: number;
 };
+
+type GammaDistribution = {
+  type: "gamma";
+  lambda: number;
+  alpha: number;
+};
+
+type PlayerStatsEntry = {
+  distribution: GammaDistribution;
+  min_score: number;
+  max_score: number;
+};
+
+export type DistributionData = Record<string, PlayerStatsEntry>;

@@ -89,6 +89,12 @@ pub enum MatchError {
 }
 
 #[derive(Debug, Error)]
+pub enum StatsError {
+    #[error("Not enough data")]
+    NotEnoughData,
+}
+
+#[derive(Debug, Error)]
 pub enum AppError {
     #[error(transparent)]
     Auth(#[from] AuthError),
@@ -107,6 +113,9 @@ pub enum AppError {
 
     #[error(transparent)]
     Match(#[from] MatchError),
+
+    #[error(transparent)]
+    Stats(#[from] StatsError),
 
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -188,6 +197,10 @@ impl IntoResponse for AppError {
                         "Internal server error".to_string(),
                     )
                 }
+            },
+
+            AppError::Stats(err) => match err {
+                StatsError::NotEnoughData => (StatusCode::UNPROCESSABLE_ENTITY, err.to_string()),
             },
 
             AppError::InternalServerError(e) => {

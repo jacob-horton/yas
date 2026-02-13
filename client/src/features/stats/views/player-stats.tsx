@@ -14,7 +14,7 @@ import { cn } from "@/lib/classname";
 import { formatDate } from "@/lib/format-date";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_TEXT_COLOURS } from "@/lib/rank-colours";
-import { ChartComponent } from "../components/chart";
+import { PlayerHistoryChart } from "../components/player-history-chart";
 import { type Colour, type Icon, StatCard } from "../components/stat-card";
 import { StatCardSkeleton } from "../components/stat-card.skeleton";
 import { usePlayerHighlights } from "../hooks/use-player-highlights";
@@ -115,7 +115,7 @@ export const PlayerStats = () => {
       </div>
 
       <Container class="flex flex-col gap-8">
-        <ChartComponent
+        <PlayerHistoryChart
           data={
             history.data
               ?.map((s) => ({ score: s.score, rank: s.rank_in_match }))

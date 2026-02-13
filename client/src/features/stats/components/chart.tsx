@@ -1,40 +1,57 @@
-import Chart, { type ScriptableContext } from "chart.js/auto";
+import Chart, {
+  type InteractionMode,
+  type ScriptableContext,
+  type TooltipItem,
+} from "chart.js/auto";
 import {
   type Component,
   createEffect,
+  createMemo,
   createSignal,
   onCleanup,
   onMount,
 } from "solid-js";
-import { ordinalSuffix } from "@/lib/ordinal-suffix";
 
-function calculateBackgroundGradient(context: ScriptableContext<"line">) {
-  const chart = context.chart;
-  const { ctx, chartArea } = chart;
+function getBackgroundGradient(baseColor: string) {
+  return (context: ScriptableContext<"line">) => {
+    const chart = context.chart;
+    const { ctx, chartArea } = chart;
 
-  // If chart isn't ready, just return solid colour for now
-  if (!chartArea) {
-    return "oklch(49.6% 0.265 301.924 / 0.4)";
-  }
+    if (!chartArea) {
+      return `oklch(from ${baseColor} l c h / 0.8)`;
+    }
 
-  // Create gradient that's the height of the chart
-  const gradient = ctx.createLinearGradient(
-    0,
-    chartArea.top,
-    0,
-    chartArea.bottom,
-  );
+    const gradient = ctx.createLinearGradient(
+      0,
+      chartArea.top,
+      0,
+      chartArea.bottom,
+    );
 
-  gradient.addColorStop(0, "oklch(49.6% 0.265 301.924 / 0.5)");
-  gradient.addColorStop(1, "oklch(49.6% 0.265 301.924 / 0.0)");
+    gradient.addColorStop(0, `oklch(from ${baseColor} l c h / 0.8)`);
+    gradient.addColorStop(1, `oklch(from ${baseColor} l c h / 0)`);
 
-  return gradient;
+    return gradient;
+  };
 }
 
-type DataPoint = { score: number; rank: number };
+type DataPoint = { x: number; y: number };
+type Dataset = {
+  label?: string;
+  data: DataPoint[];
+  colour: string;
+};
 
 export type ChartProps = {
-  data: DataPoint[];
+  datasets: Dataset[];
+
+  formatTooltipTitle?: (
+    tooltipItems: TooltipItem<"line">[],
+  ) => string | string[];
+  formatTooltipLabel?: (tooltipItem: TooltipItem<"line">) => string | string[];
+
+  interactionMode?: InteractionMode;
+  interactionIntersect?: boolean;
 };
 
 export const ChartComponent: Component<ChartProps> = (props) => {
@@ -43,36 +60,31 @@ export const ChartComponent: Component<ChartProps> = (props) => {
   );
   const [chart, setChart] = createSignal<Chart | null>(null);
 
+  const datasets = createMemo(() => {
+    return props.datasets.map((dataset) => ({
+      label: dataset.label,
+      data: dataset.data,
+      backgroundColor: getBackgroundGradient(dataset.colour),
+      borderColor: dataset.colour,
+      fill: true,
+      borderWidth: 5,
+      pointRadius: 8,
+      pointHoverRadius: 8,
+      pointBackgroundColor: "rgba(0, 0, 0, 0)",
+      pointBorderColor: "rgba(0, 0, 0, 0)",
+      pointHoverBackgroundColor: "#fff",
+      pointHoverBorderColor: dataset.colour,
+      pointHoverBorderWidth: 3,
+    }));
+  });
+
   onMount(() => {
     const ctx = canvas()?.getContext("2d");
     if (!ctx) return;
 
     const newChart = new Chart(ctx, {
       type: "line",
-      data: {
-        datasets: [
-          {
-            label: "Score",
-            parsing: { key: "score" },
-            data: props.data.map((d, i) => ({
-              y: d.score,
-              x: i,
-              rank: d.rank,
-            })),
-            backgroundColor: calculateBackgroundGradient,
-            borderColor: "oklch(54.1% 0.281 293.009)",
-            fill: true,
-            borderWidth: 5,
-            pointRadius: 8,
-            pointHoverRadius: 8,
-            pointBackgroundColor: "rgba(0, 0, 0, 0)",
-            pointBorderColor: "rgba(0, 0, 0, 0)",
-            pointHoverBackgroundColor: "#fff",
-            pointHoverBorderColor: "oklch(54.1% 0.281 293.009)",
-            pointHoverBorderWidth: 3,
-          },
-        ],
-      },
+      data: { datasets: datasets() },
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -94,8 +106,8 @@ export const ChartComponent: Component<ChartProps> = (props) => {
           },
         },
         interaction: {
-          mode: "index",
-          intersect: false,
+          mode: props.interactionMode || "index",
+          intersect: props.interactionIntersect ?? false,
         },
         plugins: {
           legend: { display: false },
@@ -115,15 +127,8 @@ export const ChartComponent: Component<ChartProps> = (props) => {
             },
 
             callbacks: {
-              title: (tooltipItems) => {
-                const raw = tooltipItems[0].raw as { rank: number };
-                return ordinalSuffix(raw.rank);
-              },
-
-              label: (context) => {
-                const raw = context.raw as { y: number };
-                return `Score: ${raw.y}`;
-              },
+              title: props.formatTooltipTitle,
+              label: props.formatTooltipLabel,
             },
           },
         },
@@ -149,18 +154,14 @@ export const ChartComponent: Component<ChartProps> = (props) => {
 
   createEffect(() => {
     const activeChart = chart();
-    const currentData = props.data;
+    const currentDatasets = datasets();
 
-    if (activeChart) {
-      activeChart.data.datasets[0].data = currentData.map((d, i) => ({
-        y: d.score,
-        x: i,
-        rank: d.rank,
-      }));
+    if (activeChart && currentDatasets.length > 0) {
+      activeChart.data.datasets = currentDatasets;
 
-      if (activeChart.data.labels?.length !== currentData.length) {
-        activeChart.data.labels = Array.from(Array(currentData.length).keys());
-      }
+      const maxPoints = Math.max(...currentDatasets.map((d) => d.data.length));
+
+      activeChart.data.labels = Array.from({ length: maxPoints }, (_, i) => i);
 
       activeChart.update();
     }

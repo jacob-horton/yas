@@ -39,6 +39,16 @@ pub async fn get_player_highlights(
     Ok((StatusCode::OK, Json(response)))
 }
 
+pub async fn get_distributions(
+    State(state): State<AppState>,
+    Path(game_id): Path<Uuid>,
+    AuthUser(user): AuthUser,
+) -> Result<impl IntoResponse, AppError> {
+    let distribution = services::stats::get_distributions(&state, user.id, game_id).await?;
+
+    Ok((StatusCode::OK, Json(distribution)))
+}
+
 pub fn router() -> Router<AppState> {
     Router::new()
         .route(
@@ -49,4 +59,5 @@ pub fn router() -> Router<AppState> {
             "/games/:gameId/players/:playerId/highlights",
             get(get_player_highlights),
         )
+        .route("/games/:gameId/distributions", get(get_distributions))
 }

@@ -262,3 +262,16 @@ impl From<Vec<RawHighlight>> for HighlightsResponse {
         response
     }
 }
+
+#[derive(Serialize, Clone, Debug)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum Distribution {
+    Gamma { lambda: f64, alpha: f64 },
+}
+
+#[derive(Serialize, Clone, Debug)]
+pub struct DistributionWithMaxMin {
+    pub distribution: Distribution,
+    pub min_score: i32,
+    pub max_score: i32,
+}
