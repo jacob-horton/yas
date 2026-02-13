@@ -7,6 +7,7 @@ import SettingsIcon from "lucide-solid/icons/settings";
 import SlidersHorizontalIcon from "lucide-solid/icons/sliders-horizontal";
 import UsersIcon from "lucide-solid/icons/users";
 import { type Component, For, Index, Show, Suspense } from "solid-js";
+import { Authorised } from "@/features/auth/components/authorised";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { useGroupGames } from "@/features/groups/hooks/use-group-games";
@@ -17,7 +18,6 @@ import { Button } from "../ui/button";
 import { Dropdown } from "../ui/dropdown";
 import { NavItem } from "../ui/nav-item";
 import { NavItemSkeleton } from "../ui/nav-item.skeleton";
-import { Authorised } from "@/features/auth/components/authorised";
 
 export const Sidebar: Component = () => {
   const { user } = useAuth();

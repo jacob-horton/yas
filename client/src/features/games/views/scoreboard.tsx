@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/table";
 import { TableRowSkeleton } from "@/components/ui/table.skeleton";
 import { useAuth } from "@/features/auth/context/auth-provider";
+import { useGroup } from "@/features/groups/context/group-provider";
+import { hasPermission } from "@/features/groups/types";
 import { cn } from "@/lib/classname";
 import { HighlightStatCard } from "../components/highlight-stat-card";
 import { HighlightStatCardSkeleton } from "../components/highlight-stat-card.skeleton";
@@ -19,8 +21,6 @@ import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams, ScoringMetric } from "../types/game";
-import { useGroup } from "@/features/groups/context/group-provider";
-import { hasPermission } from "@/features/groups/types";
 
 const TABLE_CAPTION = "Stats of all players playing this game";
 

@@ -1,9 +1,9 @@
-import { createSignal, For, Suspense } from "solid-js";
+import { createMemo, createSignal, For, Suspense } from "solid-js";
 import { Container } from "@/components/layout/container";
 import { Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Role } from "@/components/ui/role";
+import { RolePicker } from "@/components/ui/role-picker";
 import {
   type Heading,
   type Sort,
@@ -13,14 +13,19 @@ import {
 } from "@/components/ui/table";
 import { TableRowSkeleton } from "@/components/ui/table.skeleton";
 import { useConfirmation } from "@/context/confirmation-context";
+import { Authorised } from "@/features/auth/components/authorised";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { cn } from "@/lib/classname";
 import { formatDate } from "@/lib/format-date";
 import { groupsApi } from "../api";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
-import type { GroupMember } from "../types";
-import { Authorised } from "@/features/auth/components/authorised";
+import {
+  type GroupMember,
+  hasPermission,
+  MEMBER_ROLES,
+  type MemberRole,
+} from "../types";
 
 type SortProp = "name" | "email" | "role" | "joined_at";
 const DEFAULT_SORT: Sort<SortProp> = {
@@ -63,6 +68,17 @@ export const GroupMembers = () => {
     }
   };
 
+  const handleUpdateRole = async (member: GroupMember, role: MemberRole) => {
+    await groupsApi.group(group.groupId()).member(member.id).updateRole(role);
+    members.refetch();
+  };
+
+  const selectableRoles = createMemo(() =>
+    MEMBER_ROLES.filter(
+      (role) => role !== "owner" && hasPermission(group.userRole(), role),
+    ),
+  );
+
   return (
     <Page title="Group Members">
       <Container>
@@ -90,7 +106,16 @@ export const GroupMembers = () => {
                   </TableCell>
                   <TableCell>{member.email}</TableCell>
                   <TableCell>
-                    <Role role={member.role} />
+                    <RolePicker
+                      possibleRoles={selectableRoles()}
+                      currentRole={member.role}
+                      onChange={(role) => handleUpdateRole(member, role)}
+                      disabled={
+                        !hasPermission(group.userRole(), member.role, true) ||
+                        selectableRoles().length <= 1 ||
+                        member.role === "owner"
+                      }
+                    />
                   </TableCell>
                   <TableCell>{formatDate(member.joined_at)}</TableCell>
                   <TableCell class="w-14">

@@ -46,7 +46,7 @@ pub struct GroupMemberDetailsDb {
     pub avatar_colour: AvatarColour,
 }
 
-#[derive(Debug, Serialize, Deserialize, Type, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, Type, PartialEq, Eq)]
 #[sqlx(type_name = "user_role", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum GroupMemberRole {
@@ -67,6 +67,14 @@ impl GroupMemberRole {
             (GroupMemberRole::Admin, GroupAction::CreateMatch) => true,
             (GroupMemberRole::Admin, GroupAction::CreateGame) => true,
             (GroupMemberRole::Admin, GroupAction::RemoveMember(GroupMemberRole::Member)) => true,
+            (
+                GroupMemberRole::Admin,
+                // Admins can promote people to admin, but not demote them
+                GroupAction::UpdateRole(
+                    GroupMemberRole::Member | GroupMemberRole::Admin,
+                    GroupMemberRole::Admin,
+                ),
+            ) => true,
 
             // Deny everything else
             _ => false,
@@ -141,6 +149,11 @@ impl From<GroupMemberDetailsDb> for GroupMemberResponse {
 pub struct CreateGroupReq {
     #[validate(length(min = 3, max = 50, message = "Name must be between 3 and 50 chars"))]
     pub name: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SetRoleReq {
+    pub role: GroupMemberRole,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq)]

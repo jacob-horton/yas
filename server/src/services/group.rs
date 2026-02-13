@@ -2,7 +2,8 @@ use crate::AppState;
 use crate::errors::{AppError, GroupError};
 use crate::models::game::GameDb;
 use crate::models::group::{
-    CreateGroupReq, GroupDb, GroupMemberDetailsDb, GroupMemberRole, GroupWithRole, OrderBy,
+    CreateGroupReq, GroupDb, GroupMemberDb, GroupMemberDetailsDb, GroupMemberRole, GroupWithRole,
+    OrderBy,
 };
 use crate::models::stats::OrderDir;
 use crate::policies::GroupAction;
@@ -143,7 +144,7 @@ pub async fn remove_group_member(
     // Find member that's being removed
     let member_to_be_deleted = state
         .group_repo
-        .get_member(&state.pool, group_id, user_id)
+        .get_member(&state.pool, group_id, member_id)
         .await?
         .ok_or(GroupError::MemberNotFound)?;
 
@@ -161,4 +162,41 @@ pub async fn remove_group_member(
         .map_err(GroupError::Database)?;
 
     Ok(())
+}
+
+pub async fn set_member_role(
+    state: &AppState,
+    user_id: Uuid,
+    group_id: Uuid,
+    member_id: Uuid,
+    role: GroupMemberRole,
+) -> Result<GroupMemberDb, AppError> {
+    // Check user is a member
+    let user_member = state
+        .group_repo
+        .get_member(&state.pool, group_id, user_id)
+        .await?
+        .ok_or(GroupError::MemberNotFound)?;
+
+    // Update member role
+    let member_to_be_updated = state
+        .group_repo
+        .get_member(&state.pool, group_id, member_id)
+        .await?
+        .ok_or(GroupError::MemberNotFound)?;
+
+    if !user_member
+        .role
+        .can_perform(GroupAction::UpdateRole(member_to_be_updated.role, role))
+    {
+        return Err(GroupError::Forbidden.into());
+    }
+
+    let member = state
+        .group_repo
+        .update_member_role(&state.pool, group_id, member_id, role)
+        .await
+        .map_err(GroupError::Database)?;
+
+    Ok(member)
 }

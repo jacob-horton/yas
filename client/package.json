@@ -30,6 +30,7 @@
     "vite-plugin-solid-svg": "^0.8.1"
   },
   "dependencies": {
+    "@ark-ui/solid": "^5.31.0",
     "@solidjs/router": "^0.15.3",
     "@tanstack/solid-query": "^5.90.23",
     "axios": "^1.12.2",

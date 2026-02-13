@@ -208,4 +208,23 @@ impl GroupRepo {
 
         Ok(exists)
     }
+
+    pub async fn update_member_role<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        group_id: Uuid,
+        member_id: Uuid,
+        role: GroupMemberRole,
+    ) -> Result<GroupMemberDb, sqlx::Error> {
+        let member = sqlx::query_as::<_, GroupMemberDb>(
+            "UPDATE group_members SET role = $1 WHERE group_id = $2 AND user_id = $3 RETURNING *",
+        )
+        .bind(role)
+        .bind(group_id)
+        .bind(member_id)
+        .fetch_one(executor)
+        .await?;
+
+        Ok(member)
+    }
 }

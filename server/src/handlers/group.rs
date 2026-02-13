@@ -3,7 +3,7 @@ use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::{delete, get, post},
+    routing::{delete, get, post, put},
 };
 use uuid::Uuid;
 
@@ -14,7 +14,7 @@ use crate::{
     models::{
         group::{
             CreateGroupReq, GroupMemberResponse, GroupMembersParams, GroupResponse,
-            GroupWithRoleResponse, OrderBy,
+            GroupWithRoleResponse, OrderBy, SetRoleReq,
         },
         stats::OrderDir,
     },
@@ -84,6 +84,17 @@ async fn remove_group_member(
     Ok(StatusCode::NO_CONTENT)
 }
 
+async fn set_member_role(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    Path((group_id, member_id)): Path<(Uuid, Uuid)>,
+    Json(payload): Json<SetRoleReq>,
+) -> Result<impl IntoResponse, AppError> {
+    services::group::set_member_role(&state, user.id, group_id, member_id, payload.role).await?;
+
+    Ok(StatusCode::NO_CONTENT)
+}
+
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/groups", post(create_group))
@@ -93,5 +104,9 @@ pub fn router() -> Router<AppState> {
         .route(
             "/groups/:groupId/member/:memberId",
             delete(remove_group_member),
+        )
+        .route(
+            "/groups/:groupId/member/:memberId/role",
+            put(set_member_role),
         )
 }

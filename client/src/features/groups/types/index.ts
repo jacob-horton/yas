@@ -7,7 +7,8 @@ export type Group = {
   my_role: MemberRole;
 };
 
-export type MemberRole = "member" | "admin" | "owner";
+export const MEMBER_ROLES = ["member", "admin", "owner"];
+export type MemberRole = (typeof MEMBER_ROLES)[number];
 
 export type GroupMember = {
   id: string;
@@ -30,15 +31,15 @@ export const ROLE_HIERARCHY: Record<MemberRole, number> = {
   owner: 2,
 };
 
-export const hasPermission = (
+export function hasPermission(
   myRole: MemberRole | undefined,
   targetRole: MemberRole,
   strict = false,
-) => {
+) {
   if (!myRole) return false;
 
   const myLevel = ROLE_HIERARCHY[myRole];
   const targetLevel = ROLE_HIERARCHY[targetRole];
 
   return strict ? myLevel > targetLevel : myLevel >= targetLevel;
-};
+}

@@ -6,4 +6,5 @@ pub enum GroupAction {
     CreateGame,
     CreateMatch,
     RemoveMember(GroupMemberRole),
+    UpdateRole(GroupMemberRole, GroupMemberRole), // (From, To)
 }
