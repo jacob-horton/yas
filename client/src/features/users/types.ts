@@ -9,6 +9,7 @@ export type CreateUserRequest = {
 export type User = {
   id: string;
   name: string;
+  role: string;
   email: string;
   avatar: AvatarIcon;
   avatar_colour: AvatarColour;

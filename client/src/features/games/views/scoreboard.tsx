@@ -29,9 +29,9 @@ export const Scoreboard = () => {
 
   const userId = () => auth.user()?.id;
 
-  const [sort, setSort] = createSignal<Sort<ScoringMetric> | undefined>(
-    undefined,
-  );
+  const [sort, setSort] = createSignal<
+    Sort<ScoringMetric | "name"> | undefined
+  >(undefined);
 
   const scoreboardData = useScoreboardData(() => params.gameId, sort);
 
@@ -51,7 +51,7 @@ export const Scoreboard = () => {
 
   const tableHeadings = [
     { label: "No.", class: "w-12" },
-    { label: "Name" },
+    { label: "Name", sortProp: "name" },
     { label: "Win Rate", sortProp: "win_rate", defaultDirection: "descending" },
     {
       label: "Points/Game",

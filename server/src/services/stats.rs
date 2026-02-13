@@ -2,8 +2,7 @@ use crate::{
     AppState,
     errors::{AppError, GameError, GroupError, StatsError},
     models::{
-        game::{GameDb, ScoringMetric},
-        group::OrderBy,
+        game::{GameDb, OrderBy},
         stats::{
             Distribution, DistributionWithMaxMin, HighlightsResponse, OrderDir,
             PlayerHighlightStats, PlayerMatchDb, RawMatchStats, Scoreboard, ScoreboardEntry,
@@ -16,19 +15,26 @@ use uuid::Uuid;
 
 const MIN_MATCHES_FOR_DISTRIBUTION: usize = 5;
 
-fn get_comparator(metric: ScoringMetric, a: &ScoreboardEntry, b: &ScoreboardEntry) -> Ordering {
-    match metric {
-        ScoringMetric::WinRate => a
+fn get_comparator(order: OrderBy, a: &ScoreboardEntry, b: &ScoreboardEntry) -> Ordering {
+    match order {
+        OrderBy::WinRate => a
             .win_rate
             .total_cmp(&b.win_rate)
             .then_with(|| a.matches_played.cmp(&b.matches_played))
             .then_with(|| a.average_score.total_cmp(&b.average_score)),
 
-        ScoringMetric::AverageScore => a
+        OrderBy::AverageScore => a
             .average_score
             .total_cmp(&b.average_score)
             .then_with(|| a.matches_played.cmp(&b.matches_played))
             .then_with(|| a.win_rate.total_cmp(&b.win_rate)),
+
+        OrderBy::Name => a
+            .user_name
+            .cmp(&b.user_name)
+            .then_with(|| a.win_rate.total_cmp(&b.win_rate))
+            .then_with(|| a.matches_played.cmp(&b.matches_played))
+            .then_with(|| a.average_score.total_cmp(&b.average_score)),
     }
     .then_with(|| a.user_name.cmp(&b.user_name))
     .reverse() // Default to descending
@@ -38,7 +44,7 @@ pub async fn get_scoreboard_and_stats(
     state: &AppState,
     user_id: Uuid,
     game_id: Uuid,
-    order_by: Option<ScoringMetric>,
+    order_by: Option<OrderBy>,
     order_dir: Option<OrderDir>,
 ) -> Result<Scoreboard, AppError> {
     let game = state
@@ -63,8 +69,9 @@ pub async fn get_scoreboard_and_stats(
     let podium: Vec<ScoreboardEntry> = entries.iter().take(3).cloned().collect();
 
     // If user wants different sort than metric, sort the entries by that
-    let order_by = order_by.unwrap_or(game.metric);
-    if order_by != game.metric {
+    let game_metric_ordering: OrderBy = game.metric.into();
+    let order_by = order_by.unwrap_or(game_metric_ordering);
+    if order_by != game_metric_ordering {
         entries.sort_by(|a, b| get_comparator(order_by, a, b));
     }
 
@@ -141,7 +148,7 @@ async fn get_scoreboard_entries(
         });
     }
 
-    entries.sort_by(|a, b| get_comparator(game.metric, a, b));
+    entries.sort_by(|a, b| get_comparator(game.metric.into(), a, b));
 
     return Ok(entries);
 }
@@ -292,7 +299,7 @@ pub async fn get_distributions(
         .get_members(
             &state.pool,
             game.group_id,
-            OrderBy::Name,
+            crate::models::group::OrderBy::Name,
             OrderDir::Ascending,
         )
         .await?;

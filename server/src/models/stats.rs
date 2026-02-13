@@ -3,7 +3,7 @@ use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
 use crate::models::{
-    game::{GameDb, GameResponse, ScoringMetric},
+    game::{GameDb, GameResponse, OrderBy},
     user::{Avatar, AvatarColour},
 };
 
@@ -61,7 +61,7 @@ pub struct ScoreboardEntry {
 
 #[derive(Deserialize)]
 pub struct StatsParams {
-    pub order_by: Option<ScoringMetric>,
+    pub order_by: Option<OrderBy>,
     pub order_dir: Option<OrderDir>,
 }
 

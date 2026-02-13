@@ -45,6 +45,24 @@ pub enum ScoringMetric {
     AverageScore,
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Type, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+#[sqlx(type_name = "TEXT", rename_all = "snake_case")]
+pub enum OrderBy {
+    WinRate,
+    AverageScore,
+    Name,
+}
+
+impl From<ScoringMetric> for OrderBy {
+    fn from(value: ScoringMetric) -> Self {
+        match value {
+            ScoringMetric::WinRate => OrderBy::WinRate,
+            ScoringMetric::AverageScore => OrderBy::AverageScore,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Validate)]
 pub struct CreateGameReq {
     #[validate(length(min = 3, max = 50, message = "Name must be between 3 and 50 chars"))]
