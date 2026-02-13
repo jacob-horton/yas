@@ -16,7 +16,6 @@ import { useGroup } from "@/features/groups/context/group-provider";
 import { hasPermission } from "@/features/groups/types";
 import { cn } from "@/lib/classname";
 import { HighlightStatCard } from "../components/highlight-stat-card";
-import { HighlightStatCardSkeleton } from "../components/highlight-stat-card.skeleton";
 import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
@@ -107,70 +106,67 @@ export const Scoreboard = () => {
 
       <div class="no-scrollbar flex snap-x overflow-x-auto px-6">
         <div class="mx-auto flex flex-nowrap gap-4">
-          <Suspense
-            fallback={
-              <For each={Array(4)}>{() => <HighlightStatCardSkeleton />}</For>
+          <HighlightStatCard
+            colour="orange"
+            icon="crown"
+            label="MVP"
+            subtext="Highest win rate"
+            loading={!scoreboardData.data}
+            value={`${((scoreboardData.data?.highlights.highest_win_rate.value ?? 0) * 100).toFixed(0)}%`}
+            userName={
+              scoreboardData.data?.highlights.highest_win_rate.user_name ?? ""
             }
-          >
-            <HighlightStatCard
-              colour="orange"
-              icon="crown"
-              label="MVP"
-              subtext="Highest win rate"
-              value={`${((scoreboardData.data?.highlights.highest_win_rate.value ?? 0) * 100).toFixed(0)}%`}
-              userName={
-                scoreboardData.data?.highlights.highest_win_rate.user_name ?? ""
-              }
-            />
+          />
 
-            <HighlightStatCard
-              colour="green"
-              icon="wheat"
-              label="Point Farmer"
-              subtext="Highest average score"
-              value={
-                scoreboardData.data?.highlights.highest_average_score.value.toFixed(
-                  2,
-                ) ?? "0"
-              }
-              userName={
-                scoreboardData.data?.highlights.highest_average_score
-                  .user_name ?? ""
-              }
-            />
+          <HighlightStatCard
+            colour="green"
+            icon="wheat"
+            label="Point Farmer"
+            subtext="Highest average score"
+            loading={!scoreboardData.data}
+            value={
+              scoreboardData.data?.highlights.highest_average_score.value.toFixed(
+                2,
+              ) ?? "0"
+            }
+            userName={
+              scoreboardData.data?.highlights.highest_average_score.user_name ??
+              ""
+            }
+          />
 
-            <HighlightStatCard
-              colour="purple"
-              icon="mountain"
-              label="Peak Performer"
-              subtext="Highest single score"
-              value={
-                scoreboardData.data?.highlights.highest_single_score.value.toFixed(
-                  0,
-                ) ?? "0"
-              }
-              userName={
-                scoreboardData.data?.highlights.highest_single_score
-                  .user_name ?? ""
-              }
-            />
+          <HighlightStatCard
+            colour="purple"
+            icon="mountain"
+            label="Peak Performer"
+            subtext="Highest single score"
+            loading={!scoreboardData.data}
+            value={
+              scoreboardData.data?.highlights.highest_single_score.value.toFixed(
+                0,
+              ) ?? "0"
+            }
+            userName={
+              scoreboardData.data?.highlights.highest_single_score.user_name ??
+              ""
+            }
+          />
 
-            <HighlightStatCard
-              colour="blue"
-              icon="infinity"
-              label="Addict"
-              subtext="Most games played"
-              value={
-                scoreboardData.data?.highlights.most_games_played.value.toFixed(
-                  0,
-                ) ?? "0"
-              }
-              userName={
-                scoreboardData.data?.highlights.most_games_played.user_name ??
-                ""
-              }
-            />
-          </Suspense>
+          <HighlightStatCard
+            colour="blue"
+            icon="infinity"
+            label="Addict"
+            subtext="Most games played"
+            loading={!scoreboardData.data}
+            value={
+              scoreboardData.data?.highlights.most_games_played.value.toFixed(
+                0,
+              ) ?? "0"
+            }
+            userName={
+              scoreboardData.data?.highlights.most_games_played.user_name ?? ""
+            }
+          />
         </div>
       </div>
 

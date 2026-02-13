@@ -4,10 +4,11 @@ import MountainIcon from "lucide-solid/icons/mountain-snow";
 import WheatIcon from "lucide-solid/icons/wheat";
 import type { Component } from "solid-js";
 import { Dynamic } from "solid-js/web";
+import { TextSkeleton } from "@/components/ui/text.skeleton";
 import { cn } from "@/lib/classname";
 
 // TODO: reduce duplication with other stat card
-const COLOUR_MAP = {
+export const COLOUR_MAP = {
   orange: {
     text: "text-amber-500",
     textSubtle: "text-ember-400",
@@ -38,7 +39,7 @@ const COLOUR_MAP = {
   },
 } as const;
 
-const ICON_MAP = {
+export const ICON_MAP = {
   crown: CrownIcon,
   wheat: WheatIcon,
   mountain: MountainIcon,
@@ -52,6 +53,7 @@ type Props = {
   subtext: string;
   userName: string;
   value: string;
+  loading?: boolean;
 };
 
 export const HighlightStatCard: Component<Props> = (props) => {
@@ -84,8 +86,17 @@ export const HighlightStatCard: Component<Props> = (props) => {
         </div>
 
         <div class="flex items-center justify-between">
-          <p class="font-semibold">{props.userName}</p>
-          <p>{props.value}</p>
+          {props.loading ? (
+            <>
+              <TextSkeleton class="w-18" />
+              <TextSkeleton class="w-8" />
+            </>
+          ) : (
+            <>
+              <p class="font-semibold">{props.userName}</p>
+              <p>{props.value}</p>
+            </>
+          )}
         </div>
       </div>
     </div>

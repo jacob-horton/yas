@@ -6,6 +6,7 @@ import TrophyIcon from "lucide-solid/icons/trophy";
 import type { Component } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { cn } from "@/lib/classname";
+import { TextSkeleton } from "@/components/ui/text.skeleton";
 
 const COLOUR_MAP = {
   orange: {
@@ -60,7 +61,8 @@ type Props = {
   icon: Icon;
   colour: Colour;
   label: string;
-  stat: string;
+  stat?: string;
+  loading?: boolean;
 };
 
 export const StatCard: Component<Props> = (props) => {
@@ -85,7 +87,13 @@ export const StatCard: Component<Props> = (props) => {
         >
           {props.label}
         </p>
-        <p class="font-mono-nums font-semibold text-3xl">{props.stat}</p>
+        <span class="font-mono-nums font-semibold text-3xl">
+          {props.loading ? (
+            <TextSkeleton class="w-18 pt-1" />
+          ) : (
+            <p>{props.stat}</p>
+          )}
+        </span>
       </div>
     </div>
   );

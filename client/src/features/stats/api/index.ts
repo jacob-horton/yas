@@ -38,7 +38,6 @@ export class StatsApi implements StatsApiContract {
       .then((resp) => resp.data);
   }
 
-  // public async getScoreboard(): Promise<Scoreboard> {
   public async getScoreboard<T extends string>(
     sort?: Sort<T>,
   ): Promise<Scoreboard> {

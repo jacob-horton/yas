@@ -16,7 +16,6 @@ import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_TEXT_COLOURS } from "@/lib/rank-colours";
 import { PlayerHistoryChart } from "../components/player-history-chart";
 import { type Colour, type Icon, StatCard } from "../components/stat-card";
-import { StatCardSkeleton } from "../components/stat-card.skeleton";
 import { usePlayerHighlights } from "../hooks/use-player-highlights";
 import { usePlayerHistory } from "../hooks/use-player-history";
 import type { PlayerHighlightStats, PlayerStatsRouteParams } from "../types";
@@ -89,28 +88,19 @@ export const PlayerStats = () => {
     >
       <div class="no-scrollbar flex w-full overflow-x-auto px-6 py-6">
         <div class="mx-auto flex flex-nowrap gap-4">
-          <Suspense
-            fallback={
-              <For each={LIFETIME_STATS}>
-                {(stat) => <StatCardSkeleton label={stat.label} />}
-              </For>
-            }
-          >
-            <Show when={highlights.data}>
-              {(data) => (
-                <For each={LIFETIME_STATS}>
-                  {(stat) => (
-                    <StatCard
-                      icon={stat.icon}
-                      colour={stat.colour}
-                      label={stat.label}
-                      stat={stat.getValue(data())}
-                    />
-                  )}
-                </For>
-              )}
-            </Show>
-          </Suspense>
+          <For each={LIFETIME_STATS}>
+            {(stat) => (
+              <StatCard
+                icon={stat.icon}
+                colour={stat.colour}
+                label={stat.label}
+                loading={!highlights.data}
+                stat={
+                  highlights.data ? stat.getValue(highlights.data) : undefined
+                }
+              />
+            )}
+          </For>
         </div>
       </div>
 
