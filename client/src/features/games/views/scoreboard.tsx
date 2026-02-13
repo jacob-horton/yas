@@ -19,6 +19,8 @@ import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams, ScoringMetric } from "../types/game";
+import { useGroup } from "@/features/groups/context/group-provider";
+import { hasPermission } from "@/features/groups/types";
 
 const TABLE_CAPTION = "Stats of all players playing this game";
 
@@ -28,6 +30,7 @@ export const Scoreboard = () => {
   const auth = useAuth();
 
   const userId = () => auth.user()?.id;
+  const group = useGroup();
 
   const [sort, setSort] = createSignal<
     Sort<ScoringMetric | "name"> | undefined
@@ -64,13 +67,17 @@ export const Scoreboard = () => {
   return (
     <Page
       title={scoreboardData.data?.game.name ?? "Loading"}
-      actions={[
-        {
-          text: "Record Match",
-          variant: "primary",
-          onAction: () => navigate(`record`),
-        },
-      ]}
+      actions={
+        hasPermission(group.userRole(), "admin")
+          ? [
+              {
+                text: "Record Match",
+                variant: "primary",
+                onAction: () => navigate(`record`),
+              },
+            ]
+          : []
+      }
       class="flex flex-col gap-12"
     >
       <Container class="flex flex-col items-stretch pt-8">
@@ -108,7 +115,7 @@ export const Scoreboard = () => {
             <HighlightStatCard
               colour="orange"
               icon="crown"
-              label="Grandmaster"
+              label="MVP"
               subtext="Highest win rate"
               value={`${((scoreboardData.data?.highlights.highest_win_rate.value ?? 0) * 100).toFixed(0)}%`}
               userName={

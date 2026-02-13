@@ -7,34 +7,36 @@ import { QK_MY_GROUPS } from "@/features/users/constants";
 import { formatDate } from "@/lib/format-date";
 import { groupsApi } from "../api";
 import { useGroup } from "../context/group-provider";
-import { useGroupDetails } from "../hooks/use-group-details";
+import { hasPermission } from "../types";
 
 export const GroupDetails = () => {
   const queryClient = useQueryClient();
-
   const group = useGroup();
-  const groupDetails = useGroupDetails(group);
 
   return (
     <Page
       title="Group Details"
-      actions={[
-        {
-          text: "Delete group",
-          onAction: async () => {
-            await groupsApi.group(group()).delete();
-            queryClient.invalidateQueries({ queryKey: [QK_MY_GROUPS] });
-          },
-          variant: "secondary",
-          danger: true,
-        },
-      ]}
+      actions={
+        hasPermission(group.userRole(), "admin")
+          ? [
+              {
+                text: "Delete group",
+                onAction: async () => {
+                  await groupsApi.group(group.groupId()).delete();
+                  queryClient.invalidateQueries({ queryKey: [QK_MY_GROUPS] });
+                },
+                variant: "secondary",
+                danger: true,
+              },
+            ]
+          : []
+      }
     >
       <Container>
         <Suspense fallback={<TextSkeleton lines={3} />}>
-          <p>{groupDetails.data?.id}</p>
-          <p>{groupDetails.data?.name}</p>
-          <p>{formatDate(groupDetails.data?.created_at ?? "")}</p>
+          <p>{group.groupQuery.data?.id}</p>
+          <p>{group.groupQuery.data?.name}</p>
+          <p>{formatDate(group.groupQuery.data?.created_at ?? "")}</p>
         </Suspense>
       </Container>
     </Page>

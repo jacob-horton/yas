@@ -18,6 +18,8 @@ import { cn } from "@/lib/classname";
 import { formatDate, formatDateTime } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupInvites } from "../hooks/use-group-invites";
+import { hasPermission } from "../types";
+import { Authorised } from "@/features/auth/components/authorised";
 
 function isExpired(expiry: string) {
   const expiryDate = new Date(expiry);
@@ -66,7 +68,7 @@ const TABLE_HEADINGS = [
 
 export const Invites = () => {
   const group = useGroup();
-  const invites = useGroupInvites(group);
+  const invites = useGroupInvites(group.groupId);
 
   const navigate = useNavigate();
 
@@ -93,13 +95,17 @@ export const Invites = () => {
   return (
     <Page
       title="Invites"
-      actions={[
-        {
-          text: "Create Invite",
-          variant: "primary",
-          onAction: () => navigate("create"),
-        },
-      ]}
+      actions={
+        hasPermission(group.userRole(), "admin")
+          ? [
+              {
+                text: "Create Invite",
+                variant: "primary",
+                onAction: () => navigate("create"),
+              },
+            ]
+          : []
+      }
     >
       <Container>
         <Table headings={TABLE_HEADINGS} caption="All invites for this group">
@@ -129,13 +135,25 @@ export const Invites = () => {
                           )
                         }
                       />
-                      <Button
-                        danger
-                        icon="delete"
-                        variant="ghost"
-                        class="text-gray-400"
-                        onClick={() => handleDelete(invite)}
-                      />
+                      <Authorised
+                        minRole="admin"
+                        fallback={
+                          <Button
+                            class="text-gray-200"
+                            variant="ghost"
+                            icon="delete"
+                            disabled
+                          />
+                        }
+                      >
+                        <Button
+                          danger
+                          icon="delete"
+                          variant="ghost"
+                          class="text-gray-400"
+                          onClick={() => handleDelete(invite)}
+                        />
+                      </Authorised>
                     </div>
                   </TableCell>
                 </TableRow>

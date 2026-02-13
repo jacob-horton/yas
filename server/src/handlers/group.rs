@@ -12,7 +12,10 @@ use crate::{
     errors::AppError,
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     models::{
-        group::{CreateGroupReq, GroupMemberResponse, GroupMembersParams, GroupResponse, OrderBy},
+        group::{
+            CreateGroupReq, GroupMemberResponse, GroupMembersParams, GroupResponse,
+            GroupWithRoleResponse, OrderBy,
+        },
         stats::OrderDir,
     },
     services,
@@ -38,7 +41,7 @@ async fn get_group_details(
 ) -> Result<impl IntoResponse, AppError> {
     let group = services::group::get_group(&state, user.id, group_id).await?;
 
-    let response: GroupResponse = group.into();
+    let response: GroupWithRoleResponse = group.into();
     Ok((StatusCode::OK, Json(response)))
 }
 

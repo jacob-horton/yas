@@ -43,6 +43,8 @@ export const Button: ParentComponent<{
             props.danger && props.variant === "ghost",
           "border-red-700 text-red-700 hover:bg-red-100":
             props.danger && props.variant === "secondary",
+          "cursor-not-allowed bg-transparent text-gray-400 hover:bg-transparent":
+            props.variant === "ghost" && props.disabled,
         },
         props.class,
       )}

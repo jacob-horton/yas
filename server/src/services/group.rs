@@ -2,7 +2,7 @@ use crate::AppState;
 use crate::errors::{AppError, GroupError};
 use crate::models::game::GameDb;
 use crate::models::group::{
-    CreateGroupReq, GroupDb, GroupMemberDetailsDb, GroupMemberRole, OrderBy,
+    CreateGroupReq, GroupDb, GroupMemberDetailsDb, GroupMemberRole, GroupWithRole, OrderBy,
 };
 use crate::models::stats::OrderDir;
 use crate::policies::GroupAction;
@@ -60,15 +60,22 @@ pub async fn get_group(
     state: &AppState,
     user_id: Uuid,
     group_id: Uuid,
-) -> Result<GroupDb, AppError> {
+) -> Result<GroupWithRole, AppError> {
     // Check user is a member
-    state
+    let member = state
         .group_repo
         .get_member(&state.pool, group_id, user_id)
         .await?
         .ok_or(GroupError::MemberNotFound)?;
 
-    get_group_without_auth_check(state, group_id).await
+    let group_db = get_group_without_auth_check(state, group_id).await?;
+
+    Ok(GroupWithRole {
+        id: group_db.id,
+        name: group_db.name,
+        created_at: group_db.created_at,
+        my_role: member.role,
+    })
 }
 
 pub async fn delete_group(state: &AppState, user_id: Uuid, group_id: Uuid) -> Result<(), AppError> {

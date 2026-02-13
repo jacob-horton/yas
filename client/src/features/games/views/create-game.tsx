@@ -32,9 +32,9 @@ export const CreateGame = () => {
       metric: metric(),
     };
 
-    const res = await groupsApi.group(group()).createGame(game);
+    const res = await groupsApi.group(group.groupId()).createGame(game);
     queryClient.invalidateQueries({ queryKey: [QK_GROUP_GAMES] });
-    navigate(`/groups/${group()}/games/${res.id}`);
+    navigate(`/groups/${group.groupId()}/games/${res.id}`);
   }
 
   return (

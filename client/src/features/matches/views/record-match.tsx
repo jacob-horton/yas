@@ -16,7 +16,7 @@ export const RecordGame = () => {
   const game = useGame(() => params.gameId);
 
   const group = useGroup();
-  const members = useGroupMembers(group);
+  const members = useGroupMembers(group.groupId);
 
   const navigate = useNavigate();
 

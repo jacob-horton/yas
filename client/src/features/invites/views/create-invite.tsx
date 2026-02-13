@@ -30,7 +30,7 @@ export const CreateInvite = () => {
       throw new Error("Max uses must be a valid number");
     }
 
-    await groupsApi.group(group()).createInvite({
+    await groupsApi.group(group.groupId()).createInvite({
       name: name(),
       max_uses,
       expires_at,

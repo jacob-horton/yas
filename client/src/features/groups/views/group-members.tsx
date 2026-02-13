@@ -20,6 +20,7 @@ import { groupsApi } from "../api";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
 import type { GroupMember } from "../types";
+import { Authorised } from "@/features/auth/components/authorised";
 
 type SortProp = "name" | "email" | "role" | "joined_at";
 const DEFAULT_SORT: Sort<SortProp> = {
@@ -40,7 +41,7 @@ export const GroupMembers = () => {
   const group = useGroup();
 
   const [sort, setSort] = createSignal<Sort<SortProp>>(DEFAULT_SORT);
-  const members = useGroupMembers(group, sort);
+  const members = useGroupMembers(group.groupId, sort);
 
   const { showConfirm } = useConfirmation();
   const handleRemove = async (member: GroupMember) => {
@@ -57,7 +58,7 @@ export const GroupMembers = () => {
     });
 
     if (isConfirmed) {
-      await groupsApi.group(group()).member(member.id).delete();
+      await groupsApi.group(group.groupId()).member(member.id).delete();
       members.refetch();
     }
   };
@@ -93,13 +94,25 @@ export const GroupMembers = () => {
                   </TableCell>
                   <TableCell>{formatDate(member.joined_at)}</TableCell>
                   <TableCell class="w-14">
-                    <Button
-                      class="text-gray-400"
-                      variant="ghost"
-                      icon="delete"
-                      danger
-                      onClick={() => handleRemove(member)}
-                    />
+                    <Authorised
+                      strictlyAbove={member.role}
+                      fallback={
+                        <Button
+                          class="text-gray-200"
+                          variant="ghost"
+                          icon="delete"
+                          disabled
+                        />
+                      }
+                    >
+                      <Button
+                        class="text-gray-400"
+                        variant="ghost"
+                        icon="delete"
+                        danger
+                        onClick={() => handleRemove(member)}
+                      />
+                    </Authorised>
                   </TableCell>
                 </TableRow>
               )}

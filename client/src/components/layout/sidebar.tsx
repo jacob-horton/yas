@@ -17,13 +17,14 @@ import { Button } from "../ui/button";
 import { Dropdown } from "../ui/dropdown";
 import { NavItem } from "../ui/nav-item";
 import { NavItemSkeleton } from "../ui/nav-item.skeleton";
+import { Authorised } from "@/features/auth/components/authorised";
 
 export const Sidebar: Component = () => {
   const { user } = useAuth();
   const groups = useMyGroups();
 
   const group = useGroup();
-  const games = useGroupGames(group);
+  const games = useGroupGames(group.groupId);
 
   const navigate = useNavigate();
 
@@ -60,7 +61,7 @@ export const Sidebar: Component = () => {
         <Dropdown
           label="Group"
           // TODO: default value
-          value={group() ?? ""}
+          value={group.groupId() ?? ""}
           onChange={(group) => navigate(`/groups/${group}`)}
           options={
             groups.data?.map((g) => ({ label: g.name, value: g.id })) ?? []
@@ -107,7 +108,9 @@ export const Sidebar: Component = () => {
             </For>
           </Suspense>
 
-          <NavItem href="games/create" icon={PlusIcon} name="Create game" />
+          <Authorised minRole="admin">
+            <NavItem href="games/create" icon={PlusIcon} name="Create game" />
+          </Authorised>
         </div>
       </div>
     </nav>
