@@ -14,6 +14,11 @@ import {
   scoringMetrics,
 } from "../types/game";
 
+const SCORING_METRIC_MAP = {
+  win_rate: "Win rate",
+  average_score: "Average score",
+};
+
 export const CreateGame = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -58,7 +63,10 @@ export const CreateGame = () => {
         label="Scoring metric"
         value={metric()}
         onChange={setMetric}
-        options={scoringMetrics.map((m) => ({ label: m, value: m }))}
+        options={scoringMetrics.map((m) => ({
+          label: SCORING_METRIC_MAP[m],
+          value: m,
+        }))}
       />
 
       <span class="flex gap-4">
