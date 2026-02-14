@@ -8,7 +8,7 @@ export type Group = {
   my_role: MemberRole;
 };
 
-export const MEMBER_ROLES = ["member", "admin", "owner"];
+export const MEMBER_ROLES = ["viewer", "member", "admin", "owner"];
 export type MemberRole = (typeof MEMBER_ROLES)[number];
 
 export type GroupMember = {
@@ -27,9 +27,10 @@ export type CreateGroupRequest = {
 };
 
 export const ROLE_HIERARCHY: Record<MemberRole, number> = {
-  member: 0,
-  admin: 1,
-  owner: 2,
+  viewer: 0,
+  member: 1,
+  admin: 2,
+  owner: 3,
 };
 
 export function hasPermission(

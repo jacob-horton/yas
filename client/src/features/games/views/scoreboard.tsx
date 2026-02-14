@@ -68,7 +68,7 @@ export const Scoreboard = () => {
     <Page
       title={scoreboardData.data?.game.name ?? "Loading"}
       actions={
-        hasPermission(group.userRole(), "admin")
+        hasPermission(group.userRole(), "member")
           ? [
               {
                 text: "Record Match",

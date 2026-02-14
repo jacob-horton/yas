@@ -1,7 +1,7 @@
 import { Menu } from "@ark-ui/solid";
 import CheckIcon from "lucide-solid/icons/check";
 import ChevronDownIcon from "lucide-solid/icons/chevron-down";
-import { Show } from "solid-js";
+import { createMemo, Show } from "solid-js";
 import { Portal } from "solid-js/web";
 import type { MemberRole } from "@/features/groups/types";
 import { cn } from "@/lib/classname";
@@ -14,6 +14,10 @@ type RolePickerProps = {
 };
 
 const ROLE_CONFIG: Record<MemberRole, { label: string; colour: string }> = {
+  viewer: {
+    label: "Viewer",
+    colour: "bg-gray-100 text-gray-700 border-gray-200",
+  },
   member: {
     label: "Member",
     colour: "bg-gray-100 text-gray-700 border-gray-200",
@@ -29,14 +33,19 @@ const ROLE_CONFIG: Record<MemberRole, { label: string; colour: string }> = {
 };
 
 export const RolePicker = (props: RolePickerProps) => {
+  // Hide dropdown if marked as disabled, or there's ony one possible option
+  const disabled = createMemo(
+    () => props.disabled || props.possibleRoles.length <= 1,
+  );
+
   return (
     <Menu.Root onSelect={(item) => props.onChange(item.value as MemberRole)}>
       <Menu.Trigger
-        disabled={props.disabled}
+        disabled={disabled()}
         class={cn(
           "flex items-center gap-1.5 rounded-full border px-3 py-0.5 text-sm transition-colors",
           ROLE_CONFIG[props.currentRole].colour,
-          props.disabled
+          disabled()
             ? "cursor-default opacity-100"
             : "cursor-pointer hover:opacity-80",
         )}

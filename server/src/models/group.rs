@@ -52,6 +52,7 @@ pub struct GroupMemberDetailsDb {
 #[sqlx(type_name = "user_role", rename_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum GroupMemberRole {
+    Viewer,
     Member,
     Admin,
     Owner,
@@ -77,6 +78,9 @@ impl GroupMemberRole {
                     GroupMemberRole::Admin,
                 ),
             ) => true,
+
+            // Member actions
+            (GroupMemberRole::Member, GroupAction::CreateMatch) => true,
 
             // Deny everything else
             _ => false,

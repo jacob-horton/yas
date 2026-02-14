@@ -163,13 +163,6 @@ impl GroupRepo {
             OrderBy::Email => "users.email",
         };
 
-        // Reverse if role (in db: member = 1, admin = 2, owner = 3)
-        let order_dir = if order_by == OrderBy::Role {
-            order_dir.reverse()
-        } else {
-            order_dir
-        };
-
         let direction = match order_dir {
             OrderDir::Ascending => "ASC",
             OrderDir::Descending => "DESC",

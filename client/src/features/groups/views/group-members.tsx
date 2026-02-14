@@ -73,6 +73,7 @@ export const GroupMembers = () => {
     members.refetch();
   };
 
+  // Allow promoting people up to (and including) your role
   const selectableRoles = createMemo(() =>
     MEMBER_ROLES.filter(
       (role) => role !== "owner" && hasPermission(group.userRole(), role),
@@ -110,9 +111,13 @@ export const GroupMembers = () => {
                       possibleRoles={selectableRoles()}
                       currentRole={member.role}
                       onChange={(role) => handleUpdateRole(member, role)}
+                      // Only allow changing people below your role, and you must be admin or above
                       disabled={
+                        // Can change people below your role
                         !hasPermission(group.userRole(), member.role, true) ||
-                        selectableRoles().length <= 1 ||
+                        // Can only change if admin or above
+                        !hasPermission(group.userRole(), "admin") ||
+                        // Cannot change owner role (owner can demote themselves otherwise)
                         member.role === "owner"
                       }
                     />
