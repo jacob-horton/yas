@@ -26,10 +26,10 @@ const queryClient = new QueryClient();
 
 const WithSidebar: ParentComponent = (props) => {
   return (
-    <div class="flex">
+    <div class="flex h-full">
       <GroupProvider>
         <Sidebar />
-        <main class="h-full flex-1 overflow-y-auto">{props.children}</main>
+        <main class="h-full min-w-0 flex-1">{props.children}</main>
       </GroupProvider>
     </div>
   );
@@ -40,7 +40,7 @@ export default function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
         <ConfirmationProvider>
-          <div class="flex h-screen w-full flex-col overflow-hidden bg-white dark:bg-gray-900">
+          <div class="flex h-screen max-h-screen min-h-screen w-full flex-col overflow-hidden bg-white dark:bg-gray-900">
             <Router>
               {/* Protected routes */}
               <Route path="/" component={ProtectedRoute}>

@@ -78,7 +78,7 @@ export const Scoreboard = () => {
             ]
           : []
       }
-      class="flex flex-col gap-12"
+      class="gap-12"
     >
       <div class="no-scrollbar flex snap-x overflow-x-auto px-6">
         <div class="mx-auto flex flex-nowrap items-end gap-4">
@@ -180,7 +180,7 @@ export const Scoreboard = () => {
         </div>
       </div>
 
-      <Container class="mb-8 max-h-[550px] overflow-y-auto">
+      <Container class="mb-8">
         <Table
           sortedBy={effectiveSort()}
           onSort={setSort}

@@ -1,5 +1,6 @@
 import { useNavigate } from "@solidjs/router";
 import { For, type ParentComponent, Show } from "solid-js";
+import { cn } from "@/lib/classname";
 import { Button, type Variant } from "../ui/button";
 import { Container } from "./container";
 
@@ -22,7 +23,7 @@ export const Page: ParentComponent<Props> = (props) => {
   const navigate = useNavigate();
 
   return (
-    <div class="h-screen w-full">
+    <div class="flex h-full w-full flex-col overflow-y-auto">
       <Container class="py-10" narrow={props.narrow}>
         <header class="flex items-center justify-between gap-4 whitespace-nowrap">
           <h1 class="flex items-center gap-2 font-semibold text-3xl">
@@ -50,7 +51,9 @@ export const Page: ParentComponent<Props> = (props) => {
           </div>
         </header>
       </Container>
-      <div class={props.class}>{props.children}</div>
+      <div class={cn("flex flex-1 flex-col", props.class)}>
+        {props.children}
+      </div>
     </div>
   );
 };
