@@ -25,7 +25,7 @@ impl StatsRepo {
             JOIN matches m ON m.id = lb.match_id
             JOIN users u ON u.id = lb.user_id
             WHERE m.game_id = $1
-            ORDER BY lb.user_id, m.played_at DESC;
+            ORDER BY m.played_at DESC;
             "#,
         )
         .bind(game_id)

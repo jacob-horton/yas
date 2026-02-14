@@ -57,6 +57,10 @@ pub struct ScoreboardEntry {
     pub best_score: i32,
     pub wins: i64,
     pub win_rate: f64,
+
+    pub rank_diff: i32,
+    pub average_score_diff: f64,
+    pub win_rate_diff: f64,
 }
 
 #[derive(Deserialize)]
@@ -107,6 +111,10 @@ pub struct ScoreboardEntryResponse {
     pub average_score: f64,
     pub wins: i64,
     pub win_rate: f64,
+
+    pub rank_diff: i32,
+    pub average_score_diff: f64,
+    pub win_rate_diff: f64,
 }
 
 impl From<ScoreboardEntry> for ScoreboardEntryResponse {
@@ -120,6 +128,10 @@ impl From<ScoreboardEntry> for ScoreboardEntryResponse {
             average_score: entry.average_score,
             wins: entry.wins,
             win_rate: entry.win_rate,
+
+            rank_diff: entry.rank_diff,
+            average_score_diff: entry.average_score_diff,
+            win_rate_diff: entry.win_rate_diff,
         }
     }
 }

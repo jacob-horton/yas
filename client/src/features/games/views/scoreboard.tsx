@@ -3,6 +3,7 @@ import { createSignal, For, Show, Suspense } from "solid-js";
 import { Container } from "@/components/layout/container";
 import { Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
+import { Change } from "@/components/ui/change";
 import {
   type Heading,
   type Sort,
@@ -199,12 +200,14 @@ export const Scoreboard = () => {
                     <TableCell>
                       <span
                         class={cn(
+                          "flex items-center gap-2",
                           score.user_id === userId()
                             ? "font-bold text-gray-600"
                             : "text-gray-400",
                         )}
                       >
                         {index() + 1}
+                        <Change value={score.rank_diff} />
                       </span>
                     </TableCell>
                     <TableCell class="flex items-center gap-3">
@@ -216,14 +219,22 @@ export const Scoreboard = () => {
                       {score.user_name}
                     </TableCell>
                     <TableCell>
-                      <span class="flex w-64 min-w-16 items-center">
+                      <span class="flex w-4/5 min-w-32 items-center gap-2">
                         <ProgressBar percentage={score.win_rate * 100} />
-                        <span class="w-20 min-w-10 text-right">
-                          {(score.win_rate * 100).toFixed(0)}%
+                        <span class="flex items-center gap-2">
+                          <span class="min-w-14 text-right">
+                            {(score.win_rate * 100).toFixed(0)}%
+                          </span>
+                          <Change value={score.win_rate_diff} />
                         </span>
                       </span>
                     </TableCell>
-                    <TableCell>{score.average_score.toFixed(2)}</TableCell>
+                    <TableCell>
+                      <span class="flex items-center gap-2">
+                        {score.average_score.toFixed(2)}
+                        <Change value={score.average_score_diff} />
+                      </span>
+                    </TableCell>
                   </TableRow>
                 )}
               </For>

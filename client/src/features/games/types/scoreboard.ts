@@ -36,4 +36,8 @@ export type ScoreboardEntry = {
   average_score: number;
   matches_played: number;
   wins: number;
+
+  rank_diff: number;
+  average_score_diff: number;
+  win_rate_diff: number;
 };
