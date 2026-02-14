@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { createSignal, For, Show, Suspense } from "solid-js";
+import { createMemo, createSignal, For, Show, Suspense } from "solid-js";
 import { Container } from "@/components/layout/container";
-import { Page } from "@/components/layout/page";
+import { Page, type Action } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
 import { Change } from "@/components/ui/change";
 import {
@@ -63,21 +63,33 @@ export const Scoreboard = () => {
     },
   ] as const satisfies Heading<string>[];
 
+  const actions = createMemo(() => {
+    const actions: Action[] = [];
+
+    if (hasPermission(group.userRole(), "admin")) {
+      actions.push({
+        text: "Edit game",
+        variant: "secondary",
+        onAction: () => navigate("edit"),
+      });
+    }
+
+    if (hasPermission(group.userRole(), "member")) {
+      actions.push({
+        text: "Record Match",
+        variant: "primary",
+        onAction: () => navigate("record"),
+      });
+    }
+
+    return actions;
+  });
+
   // TODO: proper loading for scoreboard name
   return (
     <Page
       title={scoreboardData.data?.game.name ?? "Loading"}
-      actions={
-        hasPermission(group.userRole(), "member")
-          ? [
-              {
-                text: "Record Match",
-                variant: "primary",
-                onAction: () => navigate(`record`),
-              },
-            ]
-          : []
-      }
+      actions={actions()}
       class="gap-12"
     >
       <div class="no-scrollbar flex snap-x overflow-x-auto px-6">

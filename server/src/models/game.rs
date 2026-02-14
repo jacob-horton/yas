@@ -77,3 +77,18 @@ pub struct CreateGameReq {
 
     pub metric: ScoringMetric,
 }
+
+#[derive(Debug, Deserialize, Validate)]
+pub struct UpdateGameReq {
+    #[validate(length(min = 3, max = 50, message = "Name must be between 3 and 50 chars"))]
+    pub name: String,
+
+    #[validate(range(
+        min = 2,
+        max = 50,
+        message = "Number of players per match must be between 2 and 50"
+    ))]
+    pub players_per_match: i32,
+
+    pub metric: ScoringMetric,
+}

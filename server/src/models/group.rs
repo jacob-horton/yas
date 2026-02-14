@@ -69,6 +69,7 @@ impl GroupMemberRole {
             (GroupMemberRole::Admin, GroupAction::DeleteInvite) => true,
             (GroupMemberRole::Admin, GroupAction::CreateMatch) => true,
             (GroupMemberRole::Admin, GroupAction::CreateGame) => true,
+            (GroupMemberRole::Admin, GroupAction::UpdateGame) => true,
             (GroupMemberRole::Admin, GroupAction::RemoveMember(GroupMemberRole::Member)) => true,
             (
                 GroupMemberRole::Admin,

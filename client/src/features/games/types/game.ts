@@ -18,3 +18,9 @@ export type CreateGameRequest = {
   players_per_match: number;
   metric: ScoringMetric;
 };
+
+export type UpdateGameRequest = {
+  name: string;
+  players_per_match: number;
+  metric: ScoringMetric;
+};

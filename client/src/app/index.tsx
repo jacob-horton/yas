@@ -21,6 +21,7 @@ import { PlayerStats } from "@/features/stats/views/player-stats";
 import { EditUser } from "@/features/users/views/edit-user";
 import { UserSettings } from "@/features/users/views/settings";
 import { HomePage } from "@/pages/home-page";
+import { EditGame } from "@/features/games/views/edit-game";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ export default function App() {
 
                   <Route path="/games/:gameId" component={Scoreboard} />
                   <Route path="/games/:gameId/record" component={RecordGame} />
+                  <Route path="/games/:gameId/edit" component={EditGame} />
                   <Route path="/games/create" component={CreateGame} />
 
                   <Route

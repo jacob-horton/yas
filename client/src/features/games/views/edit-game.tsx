@@ -1,45 +1,58 @@
-import { useNavigate } from "@solidjs/router";
+import { useNavigate, useParams } from "@solidjs/router";
 import { useQueryClient } from "@tanstack/solid-query";
-import { createSignal } from "solid-js";
+import type { Component } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
-import { groupsApi } from "@/features/groups/api";
-import { QK_GROUP_GAMES } from "@/features/groups/constants";
 import { useGroup } from "@/features/groups/context/group-provider";
-import { SCORING_METRIC_LABELS } from "../constants";
+import { useGame } from "@/features/matches/hooks/use-game";
+import { gamesApi } from "../api";
+import { QK_GAME, SCORING_METRIC_LABELS } from "../constants";
 import {
-  type CreateGameRequest,
+  type Game,
   type ScoringMetric,
   scoringMetrics,
+  type UpdateGameRequest,
 } from "../types/game";
 
-export const CreateGame = () => {
+type Props = {
+  initialData: Game;
+};
+
+// TODO: reduce duplication with create?
+const EditGameForm: Component<Props> = (props) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const group = useGroup();
 
-  const [name, setName] = createSignal("");
-  const [numPlayers, setNumPlayers] = createSignal("");
-  const [metric, setMetric] = createSignal<ScoringMetric>(scoringMetrics[0]);
+  const [name, setName] = createSignal(props.initialData.name ?? "");
+  const [numPlayers, setNumPlayers] = createSignal(
+    props.initialData.players_per_match.toString() ?? "",
+  );
+  const [metric, setMetric] = createSignal<ScoringMetric>(
+    props.initialData.metric ?? scoringMetrics[0],
+  );
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
 
-    const game: CreateGameRequest = {
+    const updateGame: UpdateGameRequest = {
       name: name(),
       players_per_match: Number.parseInt(numPlayers(), 10),
       metric: metric(),
     };
 
-    const res = await groupsApi.group(group.groupId()).createGame(game);
-    queryClient.invalidateQueries({ queryKey: [QK_GROUP_GAMES] });
+    const res = await gamesApi.game(props.initialData.id).update(updateGame);
+    queryClient.invalidateQueries({
+      queryKey: [QK_GAME, props.initialData.id],
+    });
     navigate(`/groups/${group.groupId()}/games/${res.id}`);
   }
 
   return (
-    <FormPage title="Create Game" onSubmit={handleSubmit}>
+    <FormPage title="Edit Game" onSubmit={handleSubmit}>
       <Input
         label="Name"
         value={name()}
@@ -66,11 +79,23 @@ export const CreateGame = () => {
       />
 
       <span class="flex gap-4">
-        <Button type="submit">Create</Button>
+        <Button type="submit">Update</Button>
         <Button variant="secondary" onClick={() => navigate(-1)}>
           Cancel
         </Button>
       </span>
     </FormPage>
+  );
+};
+
+export const EditGame = () => {
+  const params = useParams();
+  const game = useGame(() => params.gameId);
+
+  // TODO: better loading state
+  return (
+    <Show when={game.data} fallback={<p>Loading game details...</p>}>
+      {(data) => <EditGameForm initialData={data()} />}
+    </Show>
   );
 };

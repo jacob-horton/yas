@@ -1,6 +1,6 @@
 use crate::AppState;
 use crate::errors::{AppError, GameError, GroupError};
-use crate::models::game::{CreateGameReq, GameDb};
+use crate::models::game::{CreateGameReq, GameDb, UpdateGameReq};
 use crate::policies::GroupAction;
 
 use uuid::Uuid;
@@ -26,6 +26,44 @@ pub async fn create_game(
         .create(
             &state.pool,
             group_id,
+            &payload.name,
+            payload.players_per_match,
+            payload.metric,
+        )
+        .await
+        .map_err(GameError::Database)?;
+
+    Ok(game)
+}
+
+pub async fn update_game(
+    state: &AppState,
+    user_id: Uuid,
+    game_id: Uuid,
+    payload: UpdateGameReq,
+) -> Result<GameDb, AppError> {
+    let game = state
+        .game_repo
+        .get(&state.pool, game_id)
+        .await?
+        .ok_or(GameError::NotFound)?;
+
+    // Check permissions of user
+    let member = state
+        .group_repo
+        .get_member(&state.pool, game.group_id, user_id)
+        .await?
+        .ok_or(GroupError::MemberNotFound)?;
+
+    if !member.role.can_perform(GroupAction::UpdateGame) {
+        return Err(GroupError::Forbidden.into());
+    }
+
+    let game = state
+        .game_repo
+        .update(
+            &state.pool,
+            game_id,
             &payload.name,
             payload.players_per_match,
             payload.metric,

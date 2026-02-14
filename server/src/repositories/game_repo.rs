@@ -25,6 +25,25 @@ impl GameRepo {
         .await
     }
 
+    pub async fn update<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        game_id: Uuid,
+        name: &str,
+        players_per_match: i32,
+        metric: ScoringMetric,
+    ) -> Result<GameDb, sqlx::Error> {
+        sqlx::query_as::<_, GameDb>(
+            "UPDATE games SET name = $1, players_per_match = $2, metric = $3 WHERE id = $4 RETURNING *",
+        )
+        .bind(name)
+        .bind(players_per_match)
+        .bind(metric)
+        .bind(game_id)
+        .fetch_one(executor)
+        .await
+    }
+
     pub async fn get<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,

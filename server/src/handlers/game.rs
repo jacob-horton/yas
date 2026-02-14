@@ -3,7 +3,7 @@ use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::{get, post},
+    routing::{get, post, put},
 };
 use uuid::Uuid;
 
@@ -12,7 +12,7 @@ use crate::{
     errors::AppError,
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     models::{
-        game::{CreateGameReq, GameResponse},
+        game::{CreateGameReq, GameResponse, UpdateGameReq},
         stats::{ScoreboardResponse, StatsParams},
     },
     services,
@@ -25,6 +25,18 @@ pub async fn create_game(
     ValidatedJson(payload): ValidatedJson<CreateGameReq>,
 ) -> Result<impl IntoResponse, AppError> {
     let game = services::game::create_game(&state, user.id, group_id, payload).await?;
+
+    let response: GameResponse = game.into();
+    Ok((StatusCode::CREATED, Json(response)))
+}
+
+pub async fn update_game(
+    State(state): State<AppState>,
+    Path(game_id): Path<Uuid>,
+    AuthUser(user): AuthUser,
+    ValidatedJson(payload): ValidatedJson<UpdateGameReq>,
+) -> Result<impl IntoResponse, AppError> {
+    let game = services::game::update_game(&state, user.id, game_id, payload).await?;
 
     let response: GameResponse = game.into();
     Ok((StatusCode::CREATED, Json(response)))
@@ -87,6 +99,7 @@ pub fn router() -> Router<AppState> {
         .route("/groups/:id/games", post(create_game))
         .route("/groups/:id/games", get(get_games_in_group))
         .route("/games/:id", get(get_game_details))
+        .route("/games/:id", put(update_game))
         .route("/games/:id/scoreboard", get(get_scoreboard))
         .route("/games/:id/last-players", get(get_last_players))
 }
