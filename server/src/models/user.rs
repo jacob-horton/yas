@@ -11,6 +11,8 @@ pub enum Avatar {
     Basketball,
     Bear,
     Bomb,
+    Cactus,
+    Cat,
     Controller,
     Crab,
     Flower,
@@ -21,6 +23,7 @@ pub enum Avatar {
     Helmet,
     Lightbulb,
     Lily,
+    Magnet,
     Octopus,
     Penguin,
     PenroseTriangle,
@@ -30,6 +33,7 @@ pub enum Avatar {
     Robot,
     Rocket,
     Rose,
+    ShibaInu,
     Wizard,
 }
 

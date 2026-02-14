@@ -3,6 +3,7 @@ import { Dynamic } from "solid-js/web";
 import BasketballSvg from "@/assets/avatars/basketball.svg";
 import BearSvg from "@/assets/avatars/bear.svg";
 import BombSvg from "@/assets/avatars/bomb.svg";
+import CactusSvg from "@/assets/avatars/cactus.svg";
 import CatSvg from "@/assets/avatars/cat.svg";
 import ControllerSvg from "@/assets/avatars/controller.svg";
 import CrabSvg from "@/assets/avatars/crab.svg";
@@ -14,6 +15,7 @@ import HeadphonesSvg from "@/assets/avatars/headphones.svg";
 import HelmetSvg from "@/assets/avatars/helmet.svg";
 import LightbulbSvg from "@/assets/avatars/lightbulb.svg";
 import LilySvg from "@/assets/avatars/lily.svg";
+import MagnetSvg from "@/assets/avatars/magnet.svg";
 import OctopusSvg from "@/assets/avatars/octopus.svg";
 import PenguinSvg from "@/assets/avatars/penguin.svg";
 import PenroseTriangleSvg from "@/assets/avatars/penrose-triangle.svg";
@@ -23,6 +25,7 @@ import PlantSvg from "@/assets/avatars/plant.svg";
 import RobotSvg from "@/assets/avatars/robot.svg";
 import RocketSvg from "@/assets/avatars/rocket.svg";
 import RoseSvg from "@/assets/avatars/rose.svg";
+import ShibaInuSvg from "@/assets/avatars/shiba-inu.svg";
 import WizardSvg from "@/assets/avatars/wizard.svg";
 import { cn } from "@/lib/classname";
 
@@ -51,6 +54,7 @@ export const AVATAR_SVGS = {
   basketball: BasketballSvg,
   bear: BearSvg,
   bomb: BombSvg,
+  cactus: CactusSvg,
   cat: CatSvg,
   controller: ControllerSvg,
   crab: CrabSvg,
@@ -62,6 +66,7 @@ export const AVATAR_SVGS = {
   helmet: HelmetSvg,
   lightbulb: LightbulbSvg,
   lily: LilySvg,
+  magnet: MagnetSvg,
   octopus: OctopusSvg,
   penguin: PenguinSvg,
   penrose_triangle: PenroseTriangleSvg,
@@ -71,6 +76,7 @@ export const AVATAR_SVGS = {
   robot: RobotSvg,
   rocket: RocketSvg,
   rose: RoseSvg,
+  shiba_inu: ShibaInuSvg,
   wizard: WizardSvg,
 } as const;
 
