@@ -84,7 +84,7 @@ export const PlayerStats = () => {
     <Page
       title={`Stats for ${player.data?.name ?? "Loading"}`}
       showBack
-      class="flex flex-col gap-8 pb-16"
+      class="flex flex-col gap-8"
     >
       <div class="no-scrollbar flex w-full overflow-x-auto px-6 py-6">
         <div class="mx-auto flex flex-nowrap gap-4">

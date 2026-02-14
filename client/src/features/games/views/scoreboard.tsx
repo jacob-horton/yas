@@ -180,7 +180,7 @@ export const Scoreboard = () => {
         </div>
       </div>
 
-      <Container class="mb-8">
+      <Container>
         <Table
           sortedBy={effectiveSort()}
           onSort={setSort}

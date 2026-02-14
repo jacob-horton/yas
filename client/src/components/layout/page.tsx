@@ -23,8 +23,8 @@ export const Page: ParentComponent<Props> = (props) => {
   const navigate = useNavigate();
 
   return (
-    <div class="flex h-full w-full flex-col overflow-y-auto">
-      <Container class="py-10" narrow={props.narrow}>
+    <div class="flex h-full w-full flex-col gap-10 overflow-y-auto py-10">
+      <Container narrow={props.narrow}>
         <header class="flex items-center justify-between gap-4 whitespace-nowrap">
           <h1 class="flex items-center gap-2 font-semibold text-3xl">
             <Show when={props.showBack}>
@@ -51,6 +51,7 @@ export const Page: ParentComponent<Props> = (props) => {
           </div>
         </header>
       </Container>
+
       <div class={cn("flex flex-1 flex-col", props.class)}>
         {props.children}
       </div>
