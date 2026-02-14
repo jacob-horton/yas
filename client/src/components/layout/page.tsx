@@ -3,14 +3,16 @@ import { For, type ParentComponent, Show } from "solid-js";
 import { Button, type Variant } from "../ui/button";
 import { Container } from "./container";
 
+export type Action = {
+  variant: Variant;
+  text: string;
+  onAction: () => void;
+  danger?: boolean;
+};
+
 type Props = {
   title: string;
-  actions?: {
-    variant: Variant;
-    text: string;
-    onAction: () => void;
-    danger?: boolean;
-  }[];
+  actions?: Action[];
   showBack?: boolean;
   class?: string;
 };
@@ -32,17 +34,19 @@ export const Page: ParentComponent<Props> = (props) => {
             </Show>
             {props.title}
           </h1>
-          <For each={props.actions ?? []}>
-            {(action) => (
-              <Button
-                onClick={action.onAction}
-                variant={action.variant}
-                danger={action.danger}
-              >
-                {action.text}
-              </Button>
-            )}
-          </For>
+          <div class="flex gap-4">
+            <For each={props.actions ?? []}>
+              {(action) => (
+                <Button
+                  onClick={action.onAction}
+                  variant={action.variant}
+                  danger={action.danger}
+                >
+                  {action.text}
+                </Button>
+              )}
+            </For>
+          </div>
         </header>
       </Container>
       <div class={props.class}>{props.children}</div>

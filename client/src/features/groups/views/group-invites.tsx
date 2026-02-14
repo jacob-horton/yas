@@ -75,7 +75,7 @@ export const Invites = () => {
   const { showConfirm } = useConfirmation();
   const handleDelete = async (invite: InviteSummary) => {
     const isConfirmed = await showConfirm({
-      title: `Delete Invite`,
+      title: "Delete Invite",
       description: (
         <p>
           Are you sure you would like to delete <strong>{invite.name}</strong>?

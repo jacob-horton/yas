@@ -2,9 +2,9 @@ import { useQueryClient } from "@tanstack/solid-query";
 import CalendarIcon from "lucide-solid/icons/calendar-1";
 import UserStarIcon from "lucide-solid/icons/user-star";
 import UsersIcon from "lucide-solid/icons/users";
-import { type ParentComponent, Show, Suspense } from "solid-js";
+import { type ParentComponent, Show, Suspense, createMemo } from "solid-js";
 import { Dynamic } from "solid-js/web";
-import { Page } from "@/components/layout/page";
+import { Page, type Action } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
 import { QK_MY_GROUPS } from "@/features/users/constants";
 import { formatDate } from "@/lib/format-date";
@@ -12,6 +12,8 @@ import { groupsApi } from "../api";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
 import { hasPermission } from "../types";
+import { useAuth } from "@/features/auth/context/auth-provider";
+import { useConfirmation } from "@/context/confirmation-context";
 
 // TODO: one full icon map
 const ICON_MAP = {
@@ -43,25 +45,75 @@ export const GroupDetails = () => {
   const queryClient = useQueryClient();
   const group = useGroup();
   const members = useGroupMembers(group.groupId);
+  const auth = useAuth();
+
+  const { showConfirm } = useConfirmation();
+  const handleDelete = async () => {
+    const isConfirmed = await showConfirm({
+      title: "Delete Group",
+      description: (
+        <p>
+          Are you sure you would like to delete{" "}
+          <strong>{group.groupQuery.data?.name}</strong>? This cannot be undone.
+        </p>
+      ),
+      confirmText: "Delete",
+      danger: true,
+    });
+
+    if (isConfirmed) {
+      await groupsApi.group(group.groupId()).delete();
+      queryClient.invalidateQueries({ queryKey: [QK_MY_GROUPS] });
+    }
+  };
+
+  const handleLeave = async () => {
+    const isConfirmed = await showConfirm({
+      title: "Leave Group",
+      description: (
+        <p>
+          Are you sure you would like to leave{" "}
+          <strong>{group.groupQuery.data?.name}</strong>? This cannot be undone.
+        </p>
+      ),
+      confirmText: "Leave",
+      danger: true,
+    });
+
+    if (isConfirmed) {
+      await groupsApi
+        .group(group.groupId())
+        .member(auth.user()?.id ?? "")
+        .delete();
+      queryClient.invalidateQueries({ queryKey: [QK_MY_GROUPS] });
+    }
+  };
+
+  const actions = createMemo(() => {
+    const actions: Action[] = [
+      {
+        text: "Leave group",
+        onAction: handleLeave,
+        variant: "secondary",
+      },
+    ];
+
+    if (hasPermission(group.userRole(), "admin")) {
+      actions.push({
+        text: "Delete group",
+        onAction: handleDelete,
+        variant: "secondary",
+        danger: true,
+      });
+    }
+
+    return actions;
+  });
 
   return (
     <Page
       title={group.groupQuery.data?.name ?? "Loading..."}
-      actions={
-        hasPermission(group.userRole(), "admin")
-          ? [
-              {
-                text: "Delete group",
-                onAction: async () => {
-                  await groupsApi.group(group.groupId()).delete();
-                  queryClient.invalidateQueries({ queryKey: [QK_MY_GROUPS] });
-                },
-                variant: "secondary",
-                danger: true,
-              },
-            ]
-          : []
-      }
+      actions={actions()}
     >
       <div class="no-scrollbar flex snap-x overflow-x-auto px-6">
         <div class="flex w-full flex-nowrap gap-4">

@@ -149,9 +149,11 @@ pub async fn remove_group_member(
         .await?
         .ok_or(GroupError::MemberNotFound)?;
 
-    if !user_member
-        .role
-        .can_perform(GroupAction::RemoveMember(member_to_be_deleted.role))
+    // Can remove if it's yourself, or someone lower rank
+    if member_id != user_id
+        && !user_member
+            .role
+            .can_perform(GroupAction::RemoveMember(member_to_be_deleted.role))
     {
         return Err(GroupError::Forbidden.into());
     }
