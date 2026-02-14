@@ -17,6 +17,7 @@ pub struct GroupDb {
     pub id: Uuid,
     pub name: String,
     pub created_at: DateTime<Utc>,
+    pub created_by: Uuid,
 }
 
 #[derive(Debug, FromRow)]
@@ -24,6 +25,7 @@ pub struct GroupWithRole {
     pub id: Uuid,
     pub name: String,
     pub created_at: DateTime<Utc>,
+    pub created_by: Uuid,
     pub my_role: GroupMemberRole,
 }
 
@@ -87,6 +89,7 @@ pub struct GroupResponse {
     pub id: Uuid,
     pub name: String,
     pub created_at: String,
+    pub created_by: Uuid,
 }
 
 #[derive(Debug, Serialize)]
@@ -94,6 +97,7 @@ pub struct GroupWithRoleResponse {
     pub id: Uuid,
     pub name: String,
     pub created_at: String,
+    pub created_by: Uuid,
     pub my_role: GroupMemberRole,
 }
 
@@ -103,6 +107,7 @@ impl From<GroupDb> for GroupResponse {
             id: group.id,
             name: group.name,
             created_at: group.created_at.to_rfc3339(),
+            created_by: group.created_by,
         }
     }
 }
@@ -114,6 +119,7 @@ impl From<GroupWithRole> for GroupWithRoleResponse {
             name: group.name,
             created_at: group.created_at.to_rfc3339(),
             my_role: group.my_role,
+            created_by: group.created_by,
         }
     }
 }

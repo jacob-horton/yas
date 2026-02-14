@@ -4,6 +4,7 @@ export type Group = {
   id: string;
   name: string;
   created_at: string;
+  created_by: string;
   my_role: MemberRole;
 };
 

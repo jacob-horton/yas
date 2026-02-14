@@ -75,6 +75,7 @@ pub async fn get_group(
         id: group_db.id,
         name: group_db.name,
         created_at: group_db.created_at,
+        created_by: group_db.created_by,
         my_role: member.role,
     })
 }

@@ -27,7 +27,7 @@ export const ConfirmationModalUI: Component<UIProps> = (props) => {
             />
 
             <div class="pointer-events-auto relative z-10 w-full max-w-[450px] transform rounded-md bg-white p-6 shadow-xl transition-all duration-300 ease-out group-data-[state=closed]:pointer-events-none group-data-[state=closed]:scale-95 group-data-[state=open]:scale-100 group-data-[state=closed]:opacity-0 group-data-[state=open]:opacity-100">
-              <h3 class="font-semibold text-gray-900 text-lg leading-6">
+              <h3 class="font-semibold text-gray-800 text-lg leading-6">
                 {opts().title}
               </h3>
 

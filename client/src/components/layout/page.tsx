@@ -20,9 +20,9 @@ export const Page: ParentComponent<Props> = (props) => {
 
   return (
     <div class="h-full w-full">
-      <Container>
+      <Container class="py-10">
         <header class="flex items-center justify-between">
-          <h1 class="flex items-center gap-2 py-6 font-semibold text-3xl text-gray-800">
+          <h1 class="flex items-center gap-2 font-semibold text-3xl text-gray-800">
             <Show when={props.showBack}>
               <Button
                 variant="ghost"

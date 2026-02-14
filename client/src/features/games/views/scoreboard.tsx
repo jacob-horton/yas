@@ -79,7 +79,7 @@ export const Scoreboard = () => {
       }
       class="flex flex-col gap-12"
     >
-      <Container class="flex flex-col items-stretch pt-8">
+      <Container class="flex flex-col items-stretch pt-4">
         <div class="flex gap-6 self-center overflow-x-auto">
           <Suspense
             fallback={
