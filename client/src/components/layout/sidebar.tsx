@@ -29,7 +29,7 @@ export const Sidebar: Component = () => {
   const navigate = useNavigate();
 
   return (
-    <nav class="flex h-full w-80 min-w-80 flex-col gap-4 border-gray-200 border-r p-4 text-gray-800">
+    <nav class="flex h-full w-80 min-w-80 flex-col gap-4 border-gray-200 border-r bg-white p-4 dark:border-gray-600 dark:bg-gray-900">
       <div class="flex items-center gap-3 px-2 py-4">
         <div class="flex size-10 min-h-10 min-w-10 items-center justify-center rounded-full border p-1">
           <Suspense fallback={<AvatarSkeleton />}>
@@ -51,7 +51,7 @@ export const Sidebar: Component = () => {
         </div>
         <A
           href="/settings"
-          class="ml-auto rounded-md p-1.5 text-gray-300 transition hover:bg-gray-100 hover:text-gray-400"
+          class="ml-auto rounded-md p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-500 dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-400"
         >
           <SettingsIcon />
         </A>
@@ -78,7 +78,7 @@ export const Sidebar: Component = () => {
 
       <div class="flex flex-col gap-6">
         <div class="flex flex-col gap-1">
-          <span class="flex items-center gap-3 px-2 text-gray-300 text-sm">
+          <span class="flex items-center gap-3 px-2 text-gray-400 text-sm dark:text-gray-500">
             <SlidersHorizontalIcon size={18} />
             <p class="font-semibold">MANAGE GROUP</p>
             <div class="flex-grow border-gray-200 border-t" />
@@ -90,7 +90,7 @@ export const Sidebar: Component = () => {
         </div>
 
         <div class="flex flex-col gap-1">
-          <span class="flex items-center gap-3 px-2 text-gray-300 text-sm">
+          <span class="flex items-center gap-3 px-2 text-gray-400 text-sm dark:text-gray-500">
             <GamePadIcon size={18} />
             <p class="font-semibold">GAMES</p>
             <div class="flex-grow border-gray-200 border-t" />

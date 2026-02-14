@@ -6,11 +6,21 @@
 @import "tailwindcss";
 
 /* biome-ignore lint/suspicious/noUnknownAtRules: Supported by tailwind */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* biome-ignore lint/suspicious/noUnknownAtRules: Supported by tailwind */
 @theme {
   --font-sans: "Poppins", sans-serif;
   --font-mono-nums: "Inter", "Poppins", sans-serif; /* Monospaced numbers */
 
   --default-border-width: 1.5px;
+  --text-default: var(--color-gray-800);
+  --border-default: var(--color-gray-800);
+}
+
+.dark {
+  --text-default: var(--color-gray-100);
+  --border-default: var(--color-gray-600);
 }
 
 /* Mono font for numbers in table */
@@ -22,7 +32,11 @@
   }
 
   * {
-    border-color: var(--color-gray-800);
+    border-color: var(--border-default);
+  }
+
+  body {
+    color: var(--text-default);
   }
 }
 

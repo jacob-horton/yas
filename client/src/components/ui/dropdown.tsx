@@ -154,8 +154,10 @@ export const Dropdown: Component<{
           class={cn(
             "group flex h-full w-full items-center rounded-md border font-semibold transition",
             {
-              "border-violet-500": isOpen() && !props.error,
-              "focus-within:border-violet-500": !props.error,
+              "border-violet-500 dark:border-violet-700":
+                isOpen() && !props.error,
+              "focus-within:border-violet-500 dark:focus-within:border-violet-700":
+                !props.error,
               "border-red-500 bg-red-100 focus-within:border-red-500":
                 !!props.error,
             },
@@ -163,8 +165,9 @@ export const Dropdown: Component<{
         >
           <div
             class={cn("h-full w-2 rounded-l-sm bg-transparent transition", {
-              "bg-violet-500": isOpen() && !props.error,
-              "group-focus-within:bg-violet-500": !props.error,
+              "bg-violet-500 dark:bg-violet-700": isOpen() && !props.error,
+              "group-focus-within:bg-violet-500 dark:group-focus-within:bg-violet-700":
+                !props.error,
               "bg-red-500": isOpen() && !!props.error,
               "group-focus-within:bg-red-500": !!props.error,
             })}
@@ -213,7 +216,7 @@ export const Dropdown: Component<{
             role="listbox"
             aria-labelledby={labelId}
             tabIndex={-1}
-            class="absolute top-full left-0 z-10 mt-2 w-full overflow-y-auto rounded-md border bg-white shadow-lg outline-none"
+            class="absolute top-full left-0 z-10 mt-2 w-full overflow-y-auto rounded-md border bg-white shadow-lg outline-none dark:bg-gray-900"
           >
             <For
               each={props.options}
@@ -230,9 +233,12 @@ export const Dropdown: Component<{
                   tabIndex={-1}
                   aria-selected={props.value === option.value}
                   class={cn(
-                    "cursor-pointer px-3 py-2 text-black outline-none transition hover:bg-gray-100 focus:bg-gray-100",
+                    "cursor-pointer px-3 py-2 outline-none transition hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-gray-200/10 dark:hover:bg-gray-200/10",
                     { "font-semibold": props.value === option.value },
-                    { "cursor-not-allowed text-gray-300": option.disabled },
+                    {
+                      "cursor-not-allowed text-gray-400 dark:text-gray-500":
+                        option.disabled,
+                    },
                   )}
                   onClick={() => {
                     if (option.disabled) return;

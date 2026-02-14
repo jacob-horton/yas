@@ -2,18 +2,18 @@ import { useQueryClient } from "@tanstack/solid-query";
 import CalendarIcon from "lucide-solid/icons/calendar-1";
 import UserStarIcon from "lucide-solid/icons/user-star";
 import UsersIcon from "lucide-solid/icons/users";
-import { type ParentComponent, Show, Suspense, createMemo } from "solid-js";
+import { createMemo, type ParentComponent, Show, Suspense } from "solid-js";
 import { Dynamic } from "solid-js/web";
-import { Page, type Action } from "@/components/layout/page";
+import { type Action, Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
+import { useConfirmation } from "@/context/confirmation-context";
+import { useAuth } from "@/features/auth/context/auth-provider";
 import { QK_MY_GROUPS } from "@/features/users/constants";
 import { formatDate } from "@/lib/format-date";
 import { groupsApi } from "../api";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
 import { hasPermission } from "../types";
-import { useAuth } from "@/features/auth/context/auth-provider";
-import { useConfirmation } from "@/context/confirmation-context";
 
 // TODO: one full icon map
 const ICON_MAP = {
@@ -31,7 +31,7 @@ type DetailCardProps = {
 
 const DetailCard: ParentComponent<DetailCardProps> = (props) => {
   return (
-    <div class="flex min-h-32 min-w-76 flex-1 flex-col justify-between gap-6 whitespace-nowrap rounded-md border px-6 py-4 text-gray-800">
+    <div class="flex min-h-32 min-w-76 flex-1 flex-col justify-between gap-6 whitespace-nowrap rounded-md border px-6 py-4">
       <div class="flex items-center justify-between gap-2">
         <p class="font-semibold text-2xl">{props.title}</p>
         <Dynamic component={ICON_MAP[props.icon]} size={32} />

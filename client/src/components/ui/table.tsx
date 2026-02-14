@@ -79,7 +79,7 @@ export function Table<T extends string>(props: TableProps<T>) {
               <th
                 scope="col"
                 class={cn(
-                  "whitespace-nowrap bg-gray-100 px-5 py-3 text-start font-semibold",
+                  "whitespace-nowrap bg-gray-100 px-5 py-3 text-start font-semibold dark:bg-gray-800",
                   {
                     "rounded-s-md": i() === 0,
                     "rounded-e-md": i() === props.headings.length - 1,
@@ -92,7 +92,7 @@ export function Table<T extends string>(props: TableProps<T>) {
                   {heading.sortProp && (
                     <button
                       type="button"
-                      class="cursor-pointer rounded-md p-1 hover:bg-black/5"
+                      class="cursor-pointer rounded-md p-1 transition hover:bg-black/5 dark:hover:bg-white/5"
                       onClick={() => {
                         const isActive =
                           heading.sortProp === props.sortedBy?.property;
@@ -128,7 +128,9 @@ export function Table<T extends string>(props: TableProps<T>) {
           </For>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-100">{props.children}</tbody>
+      <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+        {props.children}
+      </tbody>
     </table>
   );
 }
@@ -137,7 +139,10 @@ export const TableRow: ParentComponent<TableRowProps> = (props) => {
   return (
     <tr
       class={cn(
-        { "cursor-pointer transition hover:bg-gray-50": props.onClick },
+        {
+          "cursor-pointer transition hover:bg-gray-50 dark:hover:bg-gray-800/40":
+            props.onClick,
+        },
         props.class,
       )}
       onClick={props.onClick}

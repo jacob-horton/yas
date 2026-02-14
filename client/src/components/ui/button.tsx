@@ -10,9 +10,10 @@ export type Variant = "primary" | "secondary" | "ghost";
 export type Icon = "copy" | "chevronLeft" | "plus" | "delete";
 
 const COLOUR_MAP: Record<Variant, string> = {
-  primary: "bg-violet-500 text-white hover:bg-violet-600 transition",
-  secondary: "bg-white border hover:bg-gray-100 transition",
-  ghost: "hover:bg-gray-100 transition",
+  primary:
+    "bg-violet-500 dark:bg-violet-700 text-white hover:bg-violet-600 transition",
+  secondary: "border hover:bg-gray-100 dark:hover:bg-gray-100/10 transition",
+  ghost: "hover:bg-gray-100 dark:hover:bg-gray-100/10 transition",
 } as const;
 
 export const ICON_MAP: Record<Icon, Component> = {
@@ -41,9 +42,9 @@ export const Button: ParentComponent<{
           "cursor-not-allowed bg-gray-300": props.disabled,
           "hover:bg-red-50 hover:text-red-600":
             props.danger && props.variant === "ghost",
-          "border-red-700 text-red-700 hover:bg-red-100":
+          "border-red-700 text-red-700 hover:bg-red-100 dark:hover:bg-red-500/20":
             props.danger && props.variant === "secondary",
-          "cursor-not-allowed bg-transparent text-gray-400 hover:bg-transparent":
+          "cursor-not-allowed bg-transparent text-gray-400 hover:bg-transparent dark:text-gray-700 dark:hover:bg-transparent":
             props.variant === "ghost" && props.disabled,
         },
         props.class,

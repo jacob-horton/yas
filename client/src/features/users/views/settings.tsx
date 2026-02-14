@@ -12,7 +12,7 @@ export const UserSettings = () => {
       <Container narrow class="flex flex-col gap-4">
         <A
           href="/me/edit"
-          class="h-8 w-fit rounded-md bg-violet-500 px-6 py-1 font-semibold text-white"
+          class="h-8 w-fit rounded-md bg-violet-500 px-6 py-1 font-semibold text-white dark:bg-violet-700"
         >
           Edit Details
         </A>

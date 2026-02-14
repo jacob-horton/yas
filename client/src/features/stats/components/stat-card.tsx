@@ -5,44 +5,44 @@ import StarIcon from "lucide-solid/icons/star";
 import TrophyIcon from "lucide-solid/icons/trophy";
 import type { Component } from "solid-js";
 import { Dynamic } from "solid-js/web";
-import { cn } from "@/lib/classname";
 import { TextSkeleton } from "@/components/ui/text.skeleton";
+import { cn } from "@/lib/classname";
 
 const COLOUR_MAP = {
   orange: {
     text: "text-orange-500",
     textSubtle: "text-orange-400",
-    bg: "bg-orange-50/50",
-    bgDark: "bg-orange-100/75",
-    border: "border-orange-200",
+    bg: "bg-orange-50/50 dark:bg-orange-500/10",
+    bgDark: "bg-orange-100/75 dark:bg-orange-200/10",
+    border: "border-orange-200 dark:border-orange-500/30",
   },
   green: {
     text: "text-emerald-500",
     textSubtle: "text-emerald-400",
-    bg: "bg-emerald-50/50",
-    bgDark: "bg-emerald-100/75",
-    border: "border-emerald-200",
+    bg: "bg-emerald-50/50 dark:bg-emerald-500/10",
+    bgDark: "bg-emerald-100/75 dark:bg-emerald-200/10",
+    border: "border-emerald-200 dark:border-emerald-500/30",
   },
   purple: {
     text: "text-violet-500",
     textSubtle: "text-violet-400",
-    bg: "bg-violet-50/50",
-    bgDark: "bg-violet-100/75",
-    border: "border-violet-200",
+    bg: "bg-violet-50/50 dark:bg-violet-500/10",
+    bgDark: "bg-violet-100/75 dark:bg-violet-200/10",
+    border: "border-violet-200 dark:border-violet-500/30",
   },
   blue: {
     text: "text-blue-500",
     textSubtle: "text-blue-400",
-    bg: "bg-blue-50/50",
-    bgDark: "bg-blue-100/75",
-    border: "border-blue-200",
+    bg: "bg-blue-50/50 dark:bg-blue-500/10",
+    bgDark: "bg-blue-100/75 dark:bg-blue-200/10",
+    border: "border-blue-200 dark:border-blue-500/30",
   },
   yellow: {
     text: "text-yellow-600",
     textSubtle: "text-yellow-500",
-    bg: "bg-yellow-50",
-    bgDark: "bg-yellow-100",
-    border: "border-yellow-300",
+    bg: "bg-yellow-50 dark:bg-yellow-500/10",
+    bgDark: "bg-yellow-100 dark:bg-yellow-200/10",
+    border: "border-yellow-300 dark:border-yellow-500/30",
   },
 } as const;
 

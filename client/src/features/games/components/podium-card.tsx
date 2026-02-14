@@ -26,7 +26,7 @@ export const PodiumCard: Component<{
   return (
     <div
       class={cn(
-        "flex w-68 flex-col justify-between overflow-clip rounded-md border pb-8",
+        "flex w-68 flex-col justify-between overflow-clip rounded-md border bg-white pb-8 dark:bg-gray-800",
         RANK_SIZES[props.position],
       )}
     >
@@ -37,7 +37,7 @@ export const PodiumCard: Component<{
         )}
       >
         {ordinalSuffix(props.position)}
-        <div class="-translate-y-1/2 absolute top-full flex size-20 items-center justify-center rounded-full border bg-white p-2">
+        <div class="-translate-y-1/2 absolute top-full flex size-20 items-center justify-center rounded-full border bg-white p-2 dark:bg-gray-800">
           <Suspense fallback={<AvatarSkeleton />}>
             <Avatar colour={props.avatarColour} avatar={props.avatar} />
           </Suspense>
@@ -52,14 +52,18 @@ export const PodiumCard: Component<{
             <p class="font-mono-nums text-lg">
               {(props.winRate * 100).toFixed(0)}%
             </p>
-            <p class="font-normal text-gray-400 text-xs">WIN RATE</p>
+            <p class="font-normal text-gray-400 text-xs dark:text-gray-500">
+              WIN RATE
+            </p>
           </div>
 
           <div class="w-full font-semibold">
             <p class="font-mono-nums text-lg">
               {props.pointsPerGame.toFixed(2)}
             </p>
-            <p class="font-normal text-gray-400 text-xs">POINTS/GAME</p>
+            <p class="font-normal text-gray-400 text-xs dark:text-gray-500">
+              POINTS/GAME
+            </p>
           </div>
         </div>
       </div>

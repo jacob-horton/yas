@@ -131,7 +131,7 @@ export const GroupMembers = () => {
                       }
                     >
                       <Button
-                        class="text-gray-400"
+                        class="text-gray-400 dark:text-gray-500"
                         variant="ghost"
                         icon="delete"
                         danger

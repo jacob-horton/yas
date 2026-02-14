@@ -1,4 +1,5 @@
 import type { Component } from "solid-js";
+import { Dynamic } from "solid-js/web";
 import BasketballSvg from "@/assets/avatars/basketball.svg";
 import BearSvg from "@/assets/avatars/bear.svg";
 import BombSvg from "@/assets/avatars/bomb.svg";
@@ -24,7 +25,6 @@ import RocketSvg from "@/assets/avatars/rocket.svg";
 import RoseSvg from "@/assets/avatars/rose.svg";
 import WizardSvg from "@/assets/avatars/wizard.svg";
 import { cn } from "@/lib/classname";
-import { Dynamic } from "solid-js/web";
 
 export const COLOUR_MAP = {
   red: { text: "text-red-400", bg: "bg-red-400" },

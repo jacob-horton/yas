@@ -74,7 +74,7 @@ export const EditUser = () => {
               type="button"
               onClick={() => setAvatar(a)}
               class={cn(
-                "cursor-pointer rounded-md border bg-gray-100 p-4 hover:bg-gray-200",
+                "cursor-pointer rounded-md border bg-gray-100 p-4 transition hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700",
                 { "border-transparent": a !== avatar() },
               )}
             >
