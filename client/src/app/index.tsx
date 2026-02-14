@@ -26,10 +26,10 @@ const queryClient = new QueryClient();
 
 const WithSidebar: ParentComponent = (props) => {
   return (
-    <div class="flex h-screen max-h-screen min-h-screen">
+    <div class="flex">
       <GroupProvider>
         <Sidebar />
-        <main class="h-full w-full">{props.children}</main>
+        <main class="h-full flex-1 overflow-y-auto">{props.children}</main>
       </GroupProvider>
     </div>
   );
@@ -40,40 +40,42 @@ export default function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
         <ConfirmationProvider>
-          <Router>
-            {/* Protected routes */}
-            <Route path="/" component={ProtectedRoute}>
-              <Route path="/groups/:groupId" component={WithSidebar}>
-                <Route path="/" component={GroupDetails} />
-                <Route path="/members" component={GroupMembers} />
+          <div class="flex h-screen w-full flex-col overflow-hidden bg-white dark:bg-gray-900">
+            <Router>
+              {/* Protected routes */}
+              <Route path="/" component={ProtectedRoute}>
+                <Route path="/groups/:groupId" component={WithSidebar}>
+                  <Route path="/" component={GroupDetails} />
+                  <Route path="/members" component={GroupMembers} />
 
-                <Route path="/games/:gameId" component={Scoreboard} />
-                <Route path="/games/:gameId/record" component={RecordGame} />
-                <Route path="/games/create" component={CreateGame} />
+                  <Route path="/games/:gameId" component={Scoreboard} />
+                  <Route path="/games/:gameId/record" component={RecordGame} />
+                  <Route path="/games/create" component={CreateGame} />
+
+                  <Route
+                    path="/games/:gameId/player/:playerId"
+                    component={PlayerStats}
+                  />
+
+                  <Route path="/invites" component={Invites} />
+                  <Route path="/invites/create" component={CreateInvite} />
+                </Route>
+
+                <Route path="/" component={HomePage} />
+                <Route path="/groups/create" component={CreateGroup} />
+                <Route path="/settings" component={UserSettings} />
+                <Route path="/me/edit" component={EditUser} />
 
                 <Route
-                  path="/games/:gameId/player/:playerId"
-                  component={PlayerStats}
+                  path="/invites/:inviteId/accept"
+                  component={AcceptInvite}
                 />
-
-                <Route path="/invites" component={Invites} />
-                <Route path="/invites/create" component={CreateInvite} />
               </Route>
 
-              <Route path="/" component={HomePage} />
-              <Route path="/groups/create" component={CreateGroup} />
-              <Route path="/settings" component={UserSettings} />
-              <Route path="/me/edit" component={EditUser} />
-
-              <Route
-                path="/invites/:inviteId/accept"
-                component={AcceptInvite}
-              />
-            </Route>
-
-            <Route path="/login" component={Login} />
-            <Route path="/register" component={Register} />
-          </Router>
+              <Route path="/login" component={Login} />
+              <Route path="/register" component={Register} />
+            </Router>
+          </div>
         </ConfirmationProvider>
       </QueryClientProvider>
     </AuthProvider>

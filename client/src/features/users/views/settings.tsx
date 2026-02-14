@@ -8,7 +8,7 @@ export const UserSettings = () => {
   const auth = useAuth();
 
   return (
-    <Page title="User Settings" showBack>
+    <Page title="User Settings" showBack narrow>
       <Container narrow class="flex flex-col gap-4">
         <A
           href="/me/edit"

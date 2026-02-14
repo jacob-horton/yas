@@ -29,7 +29,7 @@ export const Sidebar: Component = () => {
   const navigate = useNavigate();
 
   return (
-    <nav class="flex h-full w-80 min-w-80 flex-col gap-4 border-gray-200 border-r bg-white p-4 dark:border-gray-600 dark:bg-gray-900">
+    <nav class="flex h-full w-80 min-w-80 shrink-0 flex-col gap-4 border-gray-200 border-r bg-white p-4 dark:border-gray-600 dark:bg-gray-900">
       <div class="flex items-center gap-3 px-2 py-4">
         <div class="flex size-10 min-h-10 min-w-10 items-center justify-center rounded-full border p-1">
           <Suspense fallback={<AvatarSkeleton />}>

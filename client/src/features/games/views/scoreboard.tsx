@@ -80,8 +80,8 @@ export const Scoreboard = () => {
       }
       class="flex flex-col gap-12"
     >
-      <Container class="flex flex-col pt-4">
-        <div class="flex items-end gap-6 self-center overflow-x-auto">
+      <div class="no-scrollbar flex snap-x overflow-x-auto px-6">
+        <div class="mx-auto flex flex-nowrap items-end gap-4">
           <Suspense
             fallback={
               <For each={Array(3)}>
@@ -112,7 +112,7 @@ export const Scoreboard = () => {
             </For>
           </Suspense>
         </div>
-      </Container>
+      </div>
 
       <div class="no-scrollbar flex snap-x overflow-x-auto px-6">
         <div class="mx-auto flex flex-nowrap gap-4">
@@ -180,67 +180,65 @@ export const Scoreboard = () => {
         </div>
       </div>
 
-      <Container>
-        <div class="max-h-[550px] overflow-y-auto">
-          <Table
-            sortedBy={effectiveSort()}
-            onSort={setSort}
-            headings={tableHeadings}
-            caption={TABLE_CAPTION}
-          >
-            <Suspense fallback={<TableRowSkeleton numCols={4} />}>
-              <For each={scoreboardData.data?.entries}>
-                {(score, index) => (
-                  <TableRow
-                    onClick={() => navigate(`player/${score.user_id}`)}
-                    class={cn({
-                      "font-semibold": score.user_id === userId(),
-                    })}
-                  >
-                    <TableCell>
-                      <span
-                        class={cn(
-                          "flex items-center gap-2",
-                          score.user_id === userId()
-                            ? "font-bold text-gray-600"
-                            : "text-gray-400",
-                        )}
-                      >
-                        {index() + 1}
-                        <Change value={score.rank_diff} />
-                      </span>
-                    </TableCell>
-                    <TableCell class="flex items-center gap-3">
-                      <Avatar
-                        class="size-7"
-                        avatar={score.user_avatar}
-                        colour={score.user_avatar_colour}
-                      />
-                      {score.user_name}
-                    </TableCell>
-                    <TableCell>
-                      <span class="flex w-4/5 min-w-32 items-center gap-2">
-                        <ProgressBar percentage={score.win_rate * 100} />
-                        <span class="flex items-center gap-2">
-                          <span class="min-w-14 text-right">
-                            {(score.win_rate * 100).toFixed(0)}%
-                          </span>
-                          <Change value={score.win_rate_diff} />
-                        </span>
-                      </span>
-                    </TableCell>
-                    <TableCell>
+      <Container class="mb-8 max-h-[550px] overflow-y-auto">
+        <Table
+          sortedBy={effectiveSort()}
+          onSort={setSort}
+          headings={tableHeadings}
+          caption={TABLE_CAPTION}
+        >
+          <Suspense fallback={<TableRowSkeleton numCols={4} />}>
+            <For each={scoreboardData.data?.entries}>
+              {(score, index) => (
+                <TableRow
+                  onClick={() => navigate(`player/${score.user_id}`)}
+                  class={cn({
+                    "font-semibold": score.user_id === userId(),
+                  })}
+                >
+                  <TableCell>
+                    <span
+                      class={cn(
+                        "flex items-center gap-2",
+                        score.user_id === userId()
+                          ? "font-bold text-gray-600"
+                          : "text-gray-400",
+                      )}
+                    >
+                      {index() + 1}
+                      <Change value={score.rank_diff} />
+                    </span>
+                  </TableCell>
+                  <TableCell class="flex items-center gap-3">
+                    <Avatar
+                      class="size-7"
+                      avatar={score.user_avatar}
+                      colour={score.user_avatar_colour}
+                    />
+                    {score.user_name}
+                  </TableCell>
+                  <TableCell>
+                    <span class="flex w-4/5 min-w-32 items-center gap-2">
+                      <ProgressBar percentage={score.win_rate * 100} />
                       <span class="flex items-center gap-2">
-                        {score.average_score.toFixed(2)}
-                        <Change value={score.average_score_diff} />
+                        <span class="min-w-14 text-right">
+                          {(score.win_rate * 100).toFixed(0)}%
+                        </span>
+                        <Change value={score.win_rate_diff} />
                       </span>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </For>
-            </Suspense>
-          </Table>
-        </div>
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span class="flex items-center gap-2">
+                      {score.average_score.toFixed(2)}
+                      <Change value={score.average_score_diff} />
+                    </span>
+                  </TableCell>
+                </TableRow>
+              )}
+            </For>
+          </Suspense>
+        </Table>
       </Container>
     </Page>
   );

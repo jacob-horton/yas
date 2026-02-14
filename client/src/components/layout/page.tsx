@@ -15,15 +15,16 @@ type Props = {
   actions?: Action[];
   showBack?: boolean;
   class?: string;
+  narrow?: boolean;
 };
 
 export const Page: ParentComponent<Props> = (props) => {
   const navigate = useNavigate();
 
   return (
-    <div class="h-screen w-full bg-white dark:bg-gray-900">
-      <Container class="py-10">
-        <header class="flex items-center justify-between">
+    <div class="h-screen w-full">
+      <Container class="py-10" narrow={props.narrow}>
+        <header class="flex items-center justify-between gap-4 whitespace-nowrap">
           <h1 class="flex items-center gap-2 font-semibold text-3xl">
             <Show when={props.showBack}>
               <Button

@@ -110,6 +110,13 @@ export const GroupDetails = () => {
     return actions;
   });
 
+  const createdBy = createMemo(() => {
+    const groupData = group.groupQuery.data;
+    const list = members.data;
+    if (!groupData || !list) return undefined;
+    return list.find((m) => m.id === groupData.created_by);
+  });
+
   return (
     <Page
       title={group.groupQuery.data?.name ?? "Loading..."}
@@ -127,25 +134,18 @@ export const GroupDetails = () => {
           </DetailCard>
           <DetailCard icon="user" title="Created By">
             <Suspense>
-              <Show when={group.groupQuery.data}>
-                {(groupData) => {
-                  const member = members.data?.find(
-                    (m) => m.id === groupData().created_by,
-                  );
-                  if (!member) {
-                    return null;
-                  }
-
+              <Show when={createdBy()}>
+                {(createdBy) => {
                   return (
                     <div class="flex items-center gap-4">
                       <div class="rounded-full border p-2">
                         <Avatar
-                          avatar={member.avatar}
-                          colour={member.avatar_colour}
+                          avatar={createdBy().avatar}
+                          colour={createdBy().avatar_colour}
                           class="size-12"
                         />
                       </div>
-                      {member.name}
+                      {createdBy().name}
                     </div>
                   );
                 }}
