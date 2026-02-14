@@ -9,6 +9,12 @@ import { cn } from "@/lib/classname";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_BG_GRADIENTS } from "@/lib/rank-colours";
 
+const RANK_SIZES: Record<number, string> = {
+  1: "h-80 text-4xl",
+  2: "h-72 text-3xl",
+  3: "h-68 text-2xl",
+};
+
 export const PodiumCard: Component<{
   avatar: AvatarIcon;
   avatarColour: AvatarColour;
@@ -18,7 +24,12 @@ export const PodiumCard: Component<{
   pointsPerGame: number;
 }> = (props) => {
   return (
-    <div class="w-68 overflow-clip rounded-md border pb-8">
+    <div
+      class={cn(
+        "flex w-68 flex-col justify-between overflow-clip rounded-md border pb-8",
+        RANK_SIZES[props.position],
+      )}
+    >
       <div
         class={cn(
           "relative border-b bg-gradient-to-br px-6 py-4 text-end font-semibold text-4xl text-white",
@@ -33,8 +44,8 @@ export const PodiumCard: Component<{
         </div>
       </div>
 
-      <div class="flex flex-col gap-5 px-6 pt-14">
-        <p class="font-semibold text-3xl">{props.name}</p>
+      <div class="flex h-full flex-col justify-between gap-4 px-6 pt-14">
+        <p class="font-semibold">{props.name}</p>
 
         <div class="flex">
           <div class="w-full font-semibold">

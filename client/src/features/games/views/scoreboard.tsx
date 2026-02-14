@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { createSignal, For, Suspense } from "solid-js";
+import { createSignal, For, Show, Suspense } from "solid-js";
 import { Container } from "@/components/layout/container";
 import { Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
@@ -79,8 +79,8 @@ export const Scoreboard = () => {
       }
       class="flex flex-col gap-12"
     >
-      <Container class="flex flex-col items-stretch pt-4">
-        <div class="flex gap-6 self-center overflow-x-auto">
+      <Container class="flex flex-col pt-4">
+        <div class="flex items-end gap-6 self-center overflow-x-auto">
           <Suspense
             fallback={
               <For each={Array(3)}>
@@ -88,17 +88,26 @@ export const Scoreboard = () => {
               </For>
             }
           >
-            <For each={scoreboardData.data?.podium}>
-              {(score, index) => (
-                <PodiumCard
-                  avatar={score.user_avatar}
-                  avatarColour={score.user_avatar_colour}
-                  name={score.user_name}
-                  winRate={score.win_rate}
-                  pointsPerGame={score.average_score}
-                  position={index() + 1}
-                />
-              )}
+            {/* Sort 2nd, 1st, 3rd for podium */}
+            <For each={[1, 0, 2]}>
+              {(index) => {
+                const score = () => scoreboardData.data?.podium?.[index];
+
+                return (
+                  <Show when={score()}>
+                    {(item) => (
+                      <PodiumCard
+                        avatar={item().user_avatar}
+                        avatarColour={item().user_avatar_colour}
+                        name={item().user_name}
+                        winRate={item().win_rate}
+                        pointsPerGame={item().average_score}
+                        position={index + 1}
+                      />
+                    )}
+                  </Show>
+                );
+              }}
             </For>
           </Suspense>
         </div>
