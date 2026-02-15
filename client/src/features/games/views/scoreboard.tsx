@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { createMemo, createSignal, For, Show, Suspense } from "solid-js";
+import { createMemo, createSignal, For, Suspense } from "solid-js";
 import { Container } from "@/components/layout/container";
-import { Page, type Action } from "@/components/layout/page";
+import { type Action, Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
 import { Change } from "@/components/ui/change";
 import {
@@ -17,7 +17,7 @@ import { useGroup } from "@/features/groups/context/group-provider";
 import { hasPermission } from "@/features/groups/types";
 import { cn } from "@/lib/classname";
 import { HighlightStatCard } from "../components/highlight-stat-card";
-import { PodiumCard, PodiumCardSkeleton } from "../components/podium-card";
+import { PodiumCard } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams, ScoringMetric } from "../types/game";
@@ -85,6 +85,19 @@ export const Scoreboard = () => {
     return actions;
   });
 
+  const getStats = (index: number) => {
+    const s = scoreboardData.data?.podium?.[index];
+    if (!s) return undefined;
+
+    return {
+      avatar: s.user_avatar,
+      avatarColour: s.user_avatar_colour,
+      name: s.user_name,
+      winRate: s.win_rate,
+      pointsPerGame: s.average_score,
+    };
+  };
+
   // TODO: proper loading for scoreboard name
   return (
     <Page
@@ -94,35 +107,12 @@ export const Scoreboard = () => {
     >
       <div class="no-scrollbar flex snap-x overflow-x-auto px-6">
         <div class="mx-auto flex flex-nowrap items-end gap-4">
-          <Suspense
-            fallback={
-              <For each={Array(3)}>
-                {(_, index) => <PodiumCardSkeleton position={index() + 1} />}
-              </For>
-            }
-          >
-            {/* Sort 2nd, 1st, 3rd for podium */}
-            <For each={[1, 0, 2]}>
-              {(index) => {
-                const score = () => scoreboardData.data?.podium?.[index];
-
-                return (
-                  <Show when={score()}>
-                    {(item) => (
-                      <PodiumCard
-                        avatar={item().user_avatar}
-                        avatarColour={item().user_avatar_colour}
-                        name={item().user_name}
-                        winRate={item().win_rate}
-                        pointsPerGame={item().average_score}
-                        position={index + 1}
-                      />
-                    )}
-                  </Show>
-                );
-              }}
-            </For>
-          </Suspense>
+          {/* Sort 2nd, 1st, 3rd for podium */}
+          <For each={[1, 0, 2]}>
+            {(index) => (
+              <PodiumCard stats={getStats(index)} position={index + 1} />
+            )}
+          </For>
         </div>
       </div>
 

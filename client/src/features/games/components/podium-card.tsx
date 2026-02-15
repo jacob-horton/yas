@@ -1,10 +1,11 @@
-import { type Component, Suspense } from "solid-js";
+import { type Component, Show } from "solid-js";
 import {
   Avatar,
   type AvatarColour,
   type AvatarIcon,
 } from "@/components/ui/avatar";
 import { AvatarSkeleton } from "@/components/ui/avatar.skeleton";
+import { TextSkeleton } from "@/components/ui/text.skeleton";
 import { cn } from "@/lib/classname";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_BG_GRADIENTS } from "@/lib/rank-colours";
@@ -15,13 +16,17 @@ const RANK_SIZES: Record<number, string> = {
   3: "h-68 text-2xl",
 };
 
-export const PodiumCard: Component<{
+type PodiumStats = {
   avatar: AvatarIcon;
   avatarColour: AvatarColour;
   name: string;
-  position: number;
   winRate: number;
   pointsPerGame: number;
+};
+
+export const PodiumCard: Component<{
+  position: number;
+  stats?: PodiumStats;
 }> = (props) => {
   return (
     <div
@@ -38,73 +43,53 @@ export const PodiumCard: Component<{
       >
         {ordinalSuffix(props.position)}
         <div class="-translate-y-1/2 absolute top-full flex size-20 items-center justify-center rounded-full border bg-white p-2 dark:bg-gray-800">
-          <Suspense fallback={<AvatarSkeleton />}>
-            <Avatar colour={props.avatarColour} avatar={props.avatar} />
-          </Suspense>
+          <Show
+            when={props.stats}
+            fallback={<AvatarSkeleton class="size-10" />}
+          >
+            {(stats) => (
+              <Avatar colour={stats().avatarColour} avatar={stats().avatar} />
+            )}
+          </Show>
         </div>
       </div>
 
       <div class="flex h-full flex-col justify-between gap-4 px-6 pt-14">
-        <p class="font-semibold">{props.name}</p>
+        <Show when={props.stats} fallback={<TextSkeleton class="w-2/3" />}>
+          {(stats) => <p class="font-semibold">{stats().name}</p>}
+        </Show>
 
         <div class="flex">
           <div class="w-full font-semibold">
-            <p class="font-mono-nums text-lg">
-              {(props.winRate * 100).toFixed(0)}%
-            </p>
+            <Show
+              when={props.stats}
+              fallback={<TextSkeleton class="w-2/3 pb-2" />}
+            >
+              {(stats) => (
+                <p class="font-mono-nums text-lg">
+                  {(stats().winRate * 100).toFixed(0)}%
+                </p>
+              )}
+            </Show>
             <p class="font-normal text-gray-400 text-xs dark:text-gray-500">
               WIN RATE
             </p>
           </div>
 
           <div class="w-full font-semibold">
-            <p class="font-mono-nums text-lg">
-              {props.pointsPerGame.toFixed(2)}
-            </p>
+            <Show
+              when={props.stats}
+              fallback={<TextSkeleton class="w-2/3 pb-2" />}
+            >
+              {(stats) => (
+                <p class="font-mono-nums text-lg">
+                  {stats().pointsPerGame.toFixed(2)}
+                </p>
+              )}
+            </Show>
             <p class="font-normal text-gray-400 text-xs dark:text-gray-500">
               POINTS/GAME
             </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// TODO: reduce duplication
-export const PodiumCardSkeleton: Component<{ position: number }> = (props) => {
-  return (
-    <div class="w-68 overflow-clip rounded-md border pb-8">
-      <div
-        class={cn(
-          "relative border-b bg-gradient-to-br px-6 py-4 text-end font-semibold text-4xl text-white",
-          RANK_BG_GRADIENTS[props.position],
-        )}
-      >
-        {ordinalSuffix(props.position)}
-        <div class="-translate-y-1/2 absolute top-full flex size-20 items-center justify-center rounded-full border bg-white">
-          <div class="size-10 rounded-full bg-gray-300" />
-        </div>
-      </div>
-
-      <div class="flex animate-pulse flex-col gap-5 px-6 pt-14">
-        <div class="flex h-9 items-center py-1">
-          <span class="h-full w-3/4 rounded-md bg-gray-200" />
-        </div>
-
-        <div class="flex">
-          <div class="w-full font-semibold">
-            <div class="flex h-7 items-center py-1">
-              <span class="h-full w-1/2 rounded-md bg-gray-200" />
-            </div>
-            <p class="font-normal text-gray-400 text-xs">WIN RATE</p>
-          </div>
-
-          <div class="w-full font-semibold">
-            <div class="flex h-7 items-center py-1">
-              <span class="h-full w-1/2 rounded-md bg-gray-200" />
-            </div>
-            <p class="font-normal text-gray-400 text-xs">POINTS/GAME</p>
           </div>
         </div>
       </div>
