@@ -9,13 +9,15 @@ import { Input } from "@/components/ui/input";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { useGame } from "@/features/matches/hooks/use-game";
 import { gamesApi } from "../api";
-import { QK_GAME, SCORING_METRIC_LABELS } from "../constants";
+import { SCORING_METRIC_LABELS } from "../constants";
 import {
   type Game,
   type ScoringMetric,
   scoringMetrics,
   type UpdateGameRequest,
 } from "../types/game";
+import { gameKeys } from "../hooks/query-keys";
+import { groupKeys } from "@/features/groups/hooks/query-keys";
 
 type Props = {
   initialData: Game;
@@ -25,7 +27,7 @@ type Props = {
 const EditGameForm: Component<Props> = (props) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const _group = useGroup();
+  const group = useGroup();
 
   const [name, setName] = createSignal(props.initialData.name ?? "");
   const [numPlayers, setNumPlayers] = createSignal(
@@ -46,7 +48,10 @@ const EditGameForm: Component<Props> = (props) => {
 
     await gamesApi.game(props.initialData.id).update(updateGame);
     queryClient.invalidateQueries({
-      queryKey: [QK_GAME, props.initialData.id],
+      queryKey: gameKeys.game(props.initialData.id),
+    });
+    queryClient.invalidateQueries({
+      queryKey: groupKeys.games(group.groupId()),
     });
     navigate(-1);
   }

@@ -35,7 +35,7 @@ export const CreateInvite = () => {
       max_uses,
       expires_at,
     });
-    navigate("..");
+    navigate(-1);
   };
 
   return (
@@ -62,7 +62,7 @@ export const CreateInvite = () => {
 
       <span class="flex gap-4">
         <Button type="submit">Create</Button>
-        <Button variant="secondary" onClick={() => navigate("..")}>
+        <Button variant="secondary" onClick={() => navigate(-1)}>
           Cancel
         </Button>
       </span>

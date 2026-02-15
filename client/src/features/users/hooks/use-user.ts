@@ -1,11 +1,11 @@
 import { keepPreviousData, useQuery } from "@tanstack/solid-query";
 import type { Accessor } from "solid-js";
 import { usersApi } from "../api";
-import { QK_USER } from "../constants";
+import { userKeys } from "./query-keys";
 
 export const useUser = (userId: Accessor<string>) => {
   return useQuery(() => ({
-    queryKey: [QK_USER, userId()],
+    queryKey: userKeys.user(userId()),
     queryFn: () => usersApi.user(userId()).get(),
     placeholderData: keepPreviousData,
   }));

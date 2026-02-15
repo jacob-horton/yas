@@ -10,8 +10,11 @@ import type { GameRouteParams } from "@/features/games/types/game";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { useGroupMembers } from "@/features/groups/hooks/use-group-members";
 import { useGame } from "../hooks/use-game";
+import { useQueryClient } from "@tanstack/solid-query";
+import { statsKeys } from "@/features/stats/hooks/query-keys";
 
 export const RecordGame = () => {
+  const queryClient = useQueryClient();
   const params = useParams<GameRouteParams>();
   const game = useGame(() => params.gameId);
 
@@ -62,7 +65,8 @@ export const RecordGame = () => {
 
     // TODO: try/catch
     await gamesApi.game(g.id).createMatch({ scores });
-    navigate("..");
+    queryClient.invalidateQueries({ queryKey: statsKeys.game(g.id) });
+    navigate(-1);
   };
 
   return (
