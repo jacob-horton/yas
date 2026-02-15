@@ -14,7 +14,7 @@ export type MemberRole = (typeof MEMBER_ROLES)[number];
 export type GroupMember = {
   id: string;
   name: string;
-  email: string;
+  email?: string;
   created_at: string;
   joined_at: string;
   role: MemberRole;

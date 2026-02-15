@@ -8,4 +8,5 @@ pub enum GroupAction {
     CreateMatch,
     RemoveMember(GroupMemberRole),
     UpdateRole(GroupMemberRole, GroupMemberRole), // (From, To)
+    ViewEmails,
 }

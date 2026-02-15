@@ -80,16 +80,26 @@ export const GroupMembers = () => {
     ),
   );
 
+  const tableHeadings = createMemo(() => {
+    if (hasPermission(group.userRole(), "admin")) {
+      return TABLE_HEADINGS;
+    }
+
+    return TABLE_HEADINGS.filter((h) => h.label !== "Email");
+  });
+
   return (
     <Page title="Group Members">
       <Container>
         <Table
-          headings={TABLE_HEADINGS}
+          headings={tableHeadings()}
           caption="All members of this group"
           sortedBy={sort()}
           onSort={setSort}
         >
-          <Suspense fallback={<TableRowSkeleton numCols={5} />}>
+          <Suspense
+            fallback={<TableRowSkeleton numCols={tableHeadings().length} />}
+          >
             <For each={members.data}>
               {(member) => (
                 <TableRow
@@ -105,7 +115,9 @@ export const GroupMembers = () => {
                     />
                     {member.name}
                   </TableCell>
-                  <TableCell>{member.email}</TableCell>
+                  <Authorised minRole="admin">
+                    <TableCell>{member.email}</TableCell>
+                  </Authorised>
                   <TableCell>
                     <RolePicker
                       possibleRoles={selectableRoles()}
@@ -126,6 +138,7 @@ export const GroupMembers = () => {
                   <TableCell class="w-14">
                     <Authorised
                       strictlyAbove={member.role}
+                      minRole="admin"
                       fallback={
                         <Button
                           class="text-gray-200"

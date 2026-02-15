@@ -2,8 +2,8 @@ use crate::AppState;
 use crate::errors::{AppError, GroupError};
 use crate::models::game::GameDb;
 use crate::models::group::{
-    CreateGroupReq, GroupDb, GroupMemberDb, GroupMemberDetailsDb, GroupMemberRole, GroupWithRole,
-    OrderBy,
+    CreateGroupReq, GroupDb, GroupMemberDb, GroupMemberDetailsDb, GroupMemberResponse,
+    GroupMemberRole, GroupWithRole, OrderBy,
 };
 use crate::models::stats::OrderDir;
 use crate::policies::GroupAction;
@@ -112,21 +112,27 @@ pub async fn get_group_members(
     group_id: Uuid,
     order_by: OrderBy,
     order_dir: OrderDir,
-) -> Result<Vec<GroupMemberDetailsDb>, AppError> {
+) -> Result<Vec<GroupMemberResponse>, AppError> {
     // Check user is a member
-    state
+    let member = state
         .group_repo
         .get_member(&state.pool, group_id, user_id)
         .await?
         .ok_or(GroupError::MemberNotFound)?;
 
-    let group_member = state
+    let group_members = state
         .group_repo
         .get_members(&state.pool, group_id, order_by, order_dir)
         .await
         .map_err(GroupError::Database)?;
 
-    Ok(group_member)
+    // Convert to response. Email is hidden if user doesn
+    let response: Vec<GroupMemberResponse> = group_members
+        .into_iter()
+        .map(|m| GroupMemberResponse::from_db(m, member.role).into())
+        .collect();
+
+    Ok(response)
 }
 
 pub async fn remove_group_member(

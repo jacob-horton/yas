@@ -132,8 +132,13 @@ impl From<GroupWithRole> for GroupWithRoleResponse {
 #[derive(Debug, Serialize)]
 pub struct GroupMemberResponse {
     pub id: Uuid,
-    pub email: String,
+
+    // Only returned for users with sufficient permissions
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+
     pub name: String,
+    // TODO: can I use datetime<utc> here?
     pub created_at: String,
     pub joined_at: String,
     pub role: GroupMemberRole,
@@ -141,17 +146,22 @@ pub struct GroupMemberResponse {
     pub avatar_colour: AvatarColour,
 }
 
-impl From<GroupMemberDetailsDb> for GroupMemberResponse {
-    fn from(group_member: GroupMemberDetailsDb) -> Self {
+impl GroupMemberResponse {
+    pub fn from_db(member: GroupMemberDetailsDb, viewer_role: GroupMemberRole) -> Self {
+        let show_email = viewer_role.can_perform(GroupAction::ViewEmails);
+
         Self {
-            id: group_member.id,
-            email: group_member.email,
-            name: group_member.name,
-            created_at: group_member.created_at.to_rfc3339(),
-            joined_at: group_member.joined_at.to_rfc3339(),
-            role: group_member.role,
-            avatar: group_member.avatar,
-            avatar_colour: group_member.avatar_colour,
+            id: member.id,
+
+            // Only set email if user has permission
+            email: if show_email { Some(member.email) } else { None },
+
+            name: member.name,
+            created_at: member.created_at.to_rfc3339(),
+            joined_at: member.joined_at.to_rfc3339(),
+            role: member.role,
+            avatar: member.avatar,
+            avatar_colour: member.avatar_colour,
         }
     }
 }

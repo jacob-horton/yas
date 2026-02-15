@@ -67,10 +67,9 @@ async fn get_group_members(
         OrderBy::Role => OrderDir::Descending,
     });
 
-    let members =
+    let response =
         services::group::get_group_members(&state, user.id, group_id, order_by, order_dir).await?;
 
-    let response: Vec<GroupMemberResponse> = members.into_iter().map(|m| m.into()).collect();
     Ok((StatusCode::OK, Json(response)))
 }
 
