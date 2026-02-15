@@ -10,11 +10,11 @@ import { cn } from "@/lib/classname";
 
 const COLOUR_MAP = {
   orange: {
-    text: "text-orange-500",
-    textSubtle: "text-orange-400",
-    bg: "bg-orange-50/50 dark:bg-orange-500/10",
-    bgDark: "bg-orange-100/75 dark:bg-orange-200/10",
-    border: "border-orange-200 dark:border-orange-500/30",
+    text: "text-amber-500",
+    textSubtle: "text-amber-400",
+    bg: "bg-amber-50/50 dark:bg-amber-500/10",
+    bgDark: "bg-amber-100/75 dark:bg-amber-200/10",
+    border: "border-amber-200 dark:border-amber-500/30",
   },
   green: {
     text: "text-emerald-500",
@@ -38,11 +38,11 @@ const COLOUR_MAP = {
     border: "border-blue-200 dark:border-blue-500/30",
   },
   yellow: {
-    text: "text-yellow-600",
-    textSubtle: "text-yellow-500",
-    bg: "bg-yellow-50 dark:bg-yellow-500/10",
-    bgDark: "bg-yellow-100 dark:bg-yellow-200/10",
-    border: "border-yellow-300 dark:border-yellow-500/30",
+    text: "text-fuchsia-500",
+    textSubtle: "text-fuchsia-400",
+    bg: "bg-fuchsia-50/50 dark:bg-fuchsia-500/10",
+    bgDark: "bg-fuchsia-100/75 dark:bg-fuchsia-200/10",
+    border: "border-fuchsia-200 dark:border-fuchsia-500/30",
   },
 } as const;
 

@@ -36,21 +36,21 @@ type StatData = {
 const LIFETIME_STATS: StatData[] = [
   {
     icon: "trophy",
-    colour: "green",
+    colour: "orange",
     label: "Win Rate",
     getValue: (d) => `${(d.lifetime.win_rate * 100).toFixed(0)}%`,
   },
   {
-    icon: "star",
-    colour: "orange",
-    label: "Best Score",
-    getValue: (d) => d.lifetime.best_score.toFixed(0),
-  },
-  {
     icon: "chart",
-    colour: "purple",
+    colour: "green",
     label: "Average Score",
     getValue: (d) => d.lifetime.average_score.toFixed(2),
+  },
+  {
+    icon: "star",
+    colour: "purple",
+    label: "Best Score",
+    getValue: (d) => d.lifetime.best_score.toFixed(0),
   },
   {
     icon: "stack",
