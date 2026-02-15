@@ -25,6 +25,9 @@ pub enum UserError {
     #[error("Not permitted to view user data")]
     NotPermittedToView,
 
+    #[error("Invalid current password")]
+    InvalidCurrentPassword,
+
     #[error(transparent)]
     Database(#[from] sqlx::Error),
 }
@@ -139,6 +142,7 @@ impl IntoResponse for AppError {
                 UserError::UserAlreadyExists => (StatusCode::CONFLICT, err.to_string()),
                 UserError::NotFound => (StatusCode::NOT_FOUND, err.to_string()),
                 UserError::NotPermittedToView => (StatusCode::FORBIDDEN, err.to_string()),
+                UserError::InvalidCurrentPassword => (StatusCode::BAD_REQUEST, err.to_string()),
                 UserError::Database(e) => {
                     eprintln!("User DB error: {:?}", e);
                     (

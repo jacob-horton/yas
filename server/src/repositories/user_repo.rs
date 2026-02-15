@@ -44,6 +44,19 @@ impl UserRepo {
         .await
     }
 
+    pub async fn update_password<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        id: &Uuid,
+        password_hash: &str,
+    ) -> Result<UserDb, sqlx::Error> {
+        sqlx::query_as::<_, UserDb>("UPDATE users SET password_hash = $1 WHERE id = $2 RETURNING *")
+            .bind(password_hash)
+            .bind(id)
+            .fetch_one(executor)
+            .await
+    }
+
     pub async fn find_by_email<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,
@@ -58,7 +71,7 @@ impl UserRepo {
     pub async fn find_by_id<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,
-        id: Uuid,
+        id: &Uuid,
     ) -> Result<Option<UserDb>, sqlx::Error> {
         sqlx::query_as::<_, UserDb>("SELECT * FROM users WHERE id = $1")
             .bind(id)

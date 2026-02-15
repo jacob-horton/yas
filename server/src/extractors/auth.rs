@@ -35,7 +35,7 @@ impl FromRequestParts<AppState> for AuthUser {
         // Verify user still exists in DB - prevents "zombie" sessions if user deleted but session still valid
         let user = state
             .user_repo
-            .find_by_id(&state.pool, user_id)
+            .find_by_id(&state.pool, &user_id)
             .await?
             .ok_or(AuthError::InvalidSession)?;
 

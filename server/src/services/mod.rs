@@ -4,3 +4,4 @@ pub mod game_match;
 pub mod group;
 pub mod invite;
 pub mod stats;
+pub mod user;

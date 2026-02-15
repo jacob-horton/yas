@@ -13,6 +13,7 @@ export interface UsersApiContract {
     avatar: string,
     avatarColour: string,
   ): Promise<User>;
+  updateMyPassword(currentPassword: string, newPassword: string): Promise<void>;
 
   user(id: string): UserApiContract;
 }
@@ -36,6 +37,16 @@ class UsersApi implements UsersApiContract {
     return api
       .patch("/users/me", { name, email, avatar, avatar_colour })
       .then((resp) => resp.data);
+  }
+
+  public async updateMyPassword(
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    return api.put(`/users/me/password`, {
+      current_password: currentPassword,
+      new_password: newPassword,
+    });
   }
 
   public async myGroups(): Promise<Group[]> {

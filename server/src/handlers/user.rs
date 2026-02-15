@@ -3,7 +3,7 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::{get, patch, post},
+    routing::{get, patch, post, put},
 };
 use tower_sessions::Session;
 use uuid::Uuid;
@@ -15,7 +15,10 @@ use crate::{
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     models::{
         group::GroupResponse,
-        user::{CreateUserReq, PublicUserDetailsResponse, UpdateUserReq, UserResponse},
+        user::{
+            CreateUserReq, PublicUserDetailsResponse, UpdatePasswordReq, UpdateUserReq,
+            UserResponse,
+        },
     },
     services,
 };
@@ -50,7 +53,7 @@ async fn get_current_user(
 ) -> Result<impl IntoResponse, AppError> {
     let user = state
         .user_repo
-        .find_by_id(&state.pool, user.id)
+        .find_by_id(&state.pool, &user.id)
         .await
         .map_err(UserError::Database)?
         .ok_or(UserError::NotFound)?;
@@ -77,7 +80,7 @@ async fn get_user(
 
     let user = state
         .user_repo
-        .find_by_id(&state.pool, user_id)
+        .find_by_id(&state.pool, &user_id)
         .await
         .map_err(UserError::Database)?
         .ok_or(UserError::NotFound)?;
@@ -122,11 +125,28 @@ async fn update_current_user(
     Ok((StatusCode::OK, Json(response)))
 }
 
+async fn update_password(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    ValidatedJson(payload): ValidatedJson<UpdatePasswordReq>,
+) -> Result<impl IntoResponse, AppError> {
+    services::user::update_password(
+        &state,
+        &user.id,
+        &payload.current_password,
+        &payload.new_password,
+    )
+    .await?;
+
+    Ok(StatusCode::NO_CONTENT)
+}
+
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/users", post(create_user))
         .route("/users/me", get(get_current_user))
         .route("/users/me", patch(update_current_user))
+        .route("/users/me/password", put(update_password))
         .route("/users/me/groups", get(get_current_user_groups))
         .route("/users/:id", get(get_user))
 }

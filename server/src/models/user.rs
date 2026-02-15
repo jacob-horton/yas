@@ -133,3 +133,15 @@ pub struct UpdateUserReq {
     pub avatar: Avatar,
     pub avatar_colour: AvatarColour,
 }
+
+#[derive(Debug, Deserialize, Validate)]
+pub struct UpdatePasswordReq {
+    pub current_password: String,
+
+    #[validate(length(
+        min = 8,
+        max = 1023,
+        message = "Password must be between 8 and 1023 chars"
+    ))]
+    pub new_password: String,
+}
