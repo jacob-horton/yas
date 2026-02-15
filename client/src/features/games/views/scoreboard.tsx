@@ -53,7 +53,7 @@ export const Scoreboard = () => {
   };
 
   const tableHeadings = [
-    { label: "No.", class: "w-12" },
+    { label: "Rank", class: "w-12" },
     { label: "Name", sortProp: "name" },
     { label: "Win Rate", sortProp: "win_rate", defaultDirection: "descending" },
     {
@@ -95,6 +95,7 @@ export const Scoreboard = () => {
       name: s.user_name,
       winRate: s.win_rate,
       pointsPerGame: s.average_score,
+      rank: s.rank,
     };
   };
 
@@ -191,7 +192,7 @@ export const Scoreboard = () => {
         >
           <Suspense fallback={<TableRowSkeleton numCols={4} />}>
             <For each={scoreboardData.data?.entries}>
-              {(score, index) => (
+              {(score) => (
                 <TableRow
                   onClick={() => navigate(`player/${score.user_id}`)}
                   class={cn({
@@ -207,7 +208,7 @@ export const Scoreboard = () => {
                           : "text-gray-400",
                       )}
                     >
-                      {index() + 1}
+                      {score.rank}
                       <Change value={score.rank_diff} />
                     </span>
                   </TableCell>

@@ -59,6 +59,8 @@ pub struct ScoreboardEntry {
     pub wins: i64,
     pub win_rate: f64,
 
+    pub rank: i32,
+
     pub rank_diff: i32,
     pub average_score_diff: f64,
     pub win_rate_diff: f64,
@@ -104,6 +106,7 @@ pub struct ScoreboardResponse {
 
 #[derive(Serialize)]
 pub struct ScoreboardEntryResponse {
+    pub rank: i32,
     pub user_id: Uuid,
     pub user_name: String,
     pub user_avatar: Avatar,
@@ -121,6 +124,7 @@ pub struct ScoreboardEntryResponse {
 impl From<ScoreboardEntry> for ScoreboardEntryResponse {
     fn from(entry: ScoreboardEntry) -> Self {
         Self {
+            rank: entry.rank,
             user_id: entry.user_id,
             user_name: entry.user_name,
             user_avatar: entry.user_avatar,

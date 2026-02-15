@@ -104,7 +104,7 @@ struct PlayerStats {
     win_rate: f64,
 }
 
-fn calculate_stats(matches: &Vec<RawMatchStats>) -> PlayerStats {
+fn calculate_stats(matches: &[RawMatchStats]) -> PlayerStats {
     let matches_played = matches.len() as i64;
 
     let sum_score: i32 = matches.iter().map(|m| m.score).sum();
@@ -119,13 +119,13 @@ fn calculate_stats(matches: &Vec<RawMatchStats>) -> PlayerStats {
     let total_wins = matches.iter().filter(|m| m.rank_in_match == 1).count();
     let win_rate = total_wins as f64 / matches_played as f64;
 
-    return PlayerStats {
+    PlayerStats {
         matches_played,
         average_score,
         wins: total_wins as i64,
         best_score,
         win_rate,
-    };
+    }
 }
 
 async fn get_scoreboard_entries(
@@ -171,6 +171,8 @@ async fn get_scoreboard_entries(
             wins: current_stats.wins,
             win_rate: current_stats.win_rate,
 
+            rank: 0,
+
             rank_diff: 0,
             average_score_diff: 0.0,
             win_rate_diff: 0.0,
@@ -193,6 +195,8 @@ async fn get_scoreboard_entries(
             best_score: prev_stats.best_score,
             wins: prev_stats.wins,
             win_rate: prev_stats.win_rate,
+
+            rank: 0,
 
             rank_diff: 0,
             average_score_diff: 0.0,
@@ -222,13 +226,14 @@ async fn get_scoreboard_entries(
         if let Some((prev_rank, prev_average_score, prev_win_rate)) =
             prev_lookup.get(&entry.user_id)
         {
+            entry.rank = current_rank as i32;
             entry.rank_diff = *prev_rank as i32 - current_rank as i32;
             entry.average_score_diff = entry.average_score - prev_average_score;
             entry.win_rate_diff = entry.win_rate - prev_win_rate;
         }
     }
 
-    return Ok(entries);
+    Ok(entries)
 }
 
 pub async fn get_player_history(
@@ -304,7 +309,7 @@ pub async fn get_player_highlights(
 }
 
 fn get_player_distribution(
-    all_matches: &Vec<RawMatchStats>,
+    all_matches: &[RawMatchStats],
     player_id: Uuid,
 ) -> Result<DistributionWithMaxMin, AppError> {
     let player_data: Vec<_> = all_matches

@@ -2,8 +2,8 @@ use uuid::Uuid;
 
 use crate::{
     AppState,
-    errors::{AppError, AuthError, UserError},
-    services::{self, auth},
+    errors::{AppError, UserError},
+    services::{self},
 };
 
 pub async fn update_password(
@@ -22,7 +22,7 @@ pub async fn update_password(
         return Err(UserError::InvalidCurrentPassword.into());
     }
 
-    let hash = services::auth::hash_password(&new_password)?;
+    let hash = services::auth::hash_password(new_password)?;
 
     state
         .user_repo

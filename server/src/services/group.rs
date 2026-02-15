@@ -2,7 +2,7 @@ use crate::AppState;
 use crate::errors::{AppError, GroupError};
 use crate::models::game::GameDb;
 use crate::models::group::{
-    CreateGroupReq, GroupDb, GroupMemberDb, GroupMemberDetailsDb, GroupMemberResponse,
+    CreateGroupReq, GroupDb, GroupMemberDb, GroupMemberResponse,
     GroupMemberRole, GroupWithRole, OrderBy,
 };
 use crate::models::stats::OrderDir;
@@ -129,7 +129,7 @@ pub async fn get_group_members(
     // Convert to response. Email is hidden if user doesn
     let response: Vec<GroupMemberResponse> = group_members
         .into_iter()
-        .map(|m| GroupMemberResponse::from_db(m, member.role).into())
+        .map(|m| GroupMemberResponse::from_db(m, member.role))
         .collect();
 
     Ok(response)

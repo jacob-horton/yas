@@ -13,7 +13,7 @@ use crate::{
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     models::{
         group::{
-            CreateGroupReq, GroupMemberResponse, GroupMembersParams, GroupResponse,
+            CreateGroupReq, GroupMembersParams, GroupResponse,
             GroupWithRoleResponse, OrderBy, SetRoleReq,
         },
         stats::OrderDir,
