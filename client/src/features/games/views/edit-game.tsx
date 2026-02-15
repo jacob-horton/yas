@@ -25,7 +25,7 @@ type Props = {
 const EditGameForm: Component<Props> = (props) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const group = useGroup();
+  const _group = useGroup();
 
   const [name, setName] = createSignal(props.initialData.name ?? "");
   const [numPlayers, setNumPlayers] = createSignal(
@@ -44,11 +44,11 @@ const EditGameForm: Component<Props> = (props) => {
       metric: metric(),
     };
 
-    const res = await gamesApi.game(props.initialData.id).update(updateGame);
+    await gamesApi.game(props.initialData.id).update(updateGame);
     queryClient.invalidateQueries({
       queryKey: [QK_GAME, props.initialData.id],
     });
-    navigate(`/groups/${group.groupId()}/games/${res.id}`);
+    navigate(-1);
   }
 
   return (

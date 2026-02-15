@@ -13,8 +13,8 @@ use crate::{
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     models::{
         group::{
-            CreateGroupReq, GroupMembersParams, GroupResponse,
-            GroupWithRoleResponse, OrderBy, SetRoleReq,
+            CreateGroupReq, GroupMembersParams, GroupResponse, GroupWithRoleResponse, OrderBy,
+            SetRoleReq, UpdateGroupReq,
         },
         stats::OrderDir,
     },
@@ -43,6 +43,17 @@ async fn get_group_details(
 
     let response: GroupWithRoleResponse = group.into();
     Ok((StatusCode::OK, Json(response)))
+}
+
+async fn update_group(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    Path(group_id): Path<Uuid>,
+    ValidatedJson(payload): ValidatedJson<UpdateGroupReq>,
+) -> Result<impl IntoResponse, AppError> {
+    services::group::update_group(&state, user.id, group_id, payload).await?;
+
+    Ok(StatusCode::NO_CONTENT)
 }
 
 async fn delete_group(
@@ -98,6 +109,7 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .route("/groups", post(create_group))
         .route("/groups/:id", get(get_group_details))
+        .route("/groups/:id", put(update_group))
         .route("/groups/:id", delete(delete_group))
         .route("/groups/:id/members", get(get_group_members))
         .route(

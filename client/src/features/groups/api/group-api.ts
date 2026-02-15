@@ -5,7 +5,7 @@ import type {
   InviteSummary,
 } from "@/features/invites/types/invite";
 import { api } from "@/lib/api";
-import type { Group, GroupMember } from "../types";
+import type { Group, GroupMember, UpdateGroupRequest } from "../types";
 import {
   GroupMemberApi,
   type GroupMemberApiContract,
@@ -17,6 +17,7 @@ export interface GroupApiContract {
   games(): Promise<Game[]>;
   invites(): Promise<InviteSummary[]>;
   delete(): Promise<void>;
+  update(payload: UpdateGroupRequest): Promise<void>;
 
   createGame(payload: CreateGameRequest): Promise<Game>;
   createInvite(payload: CreateInviteRequest): Promise<InviteSummary>;
@@ -29,6 +30,12 @@ export class GroupApi implements GroupApiContract {
 
   public async get(): Promise<Group> {
     return api.get(`/groups/${this.groupId}`).then((resp) => resp.data);
+  }
+
+  public async update(payload: UpdateGroupRequest): Promise<void> {
+    return api
+      .put(`/groups/${this.groupId}`, payload)
+      .then((resp) => resp.data);
   }
 
   public async members<T extends string>(

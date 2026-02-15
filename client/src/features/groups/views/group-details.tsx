@@ -8,12 +8,13 @@ import { type Action, Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
 import { useConfirmation } from "@/context/confirmation-context";
 import { useAuth } from "@/features/auth/context/auth-provider";
-import { QK_MY_GROUPS } from "@/features/users/constants";
 import { formatDate } from "@/lib/format-date";
 import { groupsApi } from "../api";
 import { useGroup } from "../context/group-provider";
+import { groupKeys } from "../hooks/query-keys";
 import { useGroupMembers } from "../hooks/use-group-members";
 import { hasPermission } from "../types";
+import { useNavigate } from "@solidjs/router";
 
 // TODO: one full icon map
 const ICON_MAP = {
@@ -42,6 +43,7 @@ const DetailCard: ParentComponent<DetailCardProps> = (props) => {
 };
 
 export const GroupDetails = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const group = useGroup();
   const members = useGroupMembers(group.groupId);
@@ -63,7 +65,7 @@ export const GroupDetails = () => {
 
     if (isConfirmed) {
       await groupsApi.group(group.groupId()).delete();
-      queryClient.invalidateQueries({ queryKey: [QK_MY_GROUPS] });
+      queryClient.invalidateQueries({ queryKey: groupKeys.all });
     }
   };
 
@@ -85,14 +87,14 @@ export const GroupDetails = () => {
         .group(group.groupId())
         .member(auth.user()?.id ?? "")
         .delete();
-      queryClient.invalidateQueries({ queryKey: [QK_MY_GROUPS] });
+      queryClient.invalidateQueries({ queryKey: groupKeys.all });
     }
   };
 
   const actions = createMemo(() => {
     const actions: Action[] = [
       {
-        text: "Leave group",
+        text: "Leave",
         onAction: handleLeave,
         variant: "secondary",
       },
@@ -100,7 +102,15 @@ export const GroupDetails = () => {
 
     if (hasPermission(group.userRole(), "admin")) {
       actions.push({
-        text: "Delete group",
+        text: "Edit",
+        onAction: () => navigate("edit"),
+        variant: "secondary",
+      });
+    }
+
+    if (hasPermission(group.userRole(), "admin")) {
+      actions.push({
+        text: "Delete",
         onAction: handleDelete,
         variant: "secondary",
         danger: true,

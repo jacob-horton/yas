@@ -68,7 +68,7 @@ export const Scoreboard = () => {
 
     if (hasPermission(group.userRole(), "admin")) {
       actions.push({
-        text: "Edit game",
+        text: "Edit",
         variant: "secondary",
         onAction: () => navigate("edit"),
       });

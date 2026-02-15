@@ -70,6 +70,7 @@ impl GroupMemberRole {
             (GroupMemberRole::Admin, GroupAction::CreateMatch) => true,
             (GroupMemberRole::Admin, GroupAction::CreateGame) => true,
             (GroupMemberRole::Admin, GroupAction::UpdateGame) => true,
+            (GroupMemberRole::Admin, GroupAction::UpdateGroup) => true,
             (GroupMemberRole::Admin, GroupAction::RemoveMember(GroupMemberRole::Member)) => true,
             (
                 GroupMemberRole::Admin,
@@ -167,6 +168,12 @@ impl GroupMemberResponse {
 
 #[derive(Debug, Deserialize, Validate)]
 pub struct CreateGroupReq {
+    #[validate(length(min = 3, max = 50, message = "Name must be between 3 and 50 chars"))]
+    pub name: String,
+}
+
+#[derive(Debug, Deserialize, Validate)]
+pub struct UpdateGroupReq {
     #[validate(length(min = 3, max = 50, message = "Name must be between 3 and 50 chars"))]
     pub name: String,
 }

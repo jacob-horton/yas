@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
 import { groupsApi } from "@/features/groups/api";
-import { QK_GROUP_GAMES } from "@/features/groups/constants";
 import { useGroup } from "@/features/groups/context/group-provider";
+import { groupKeys } from "@/features/groups/hooks/query-keys";
 import { SCORING_METRIC_LABELS } from "../constants";
 import {
   type CreateGameRequest,
@@ -34,7 +34,9 @@ export const CreateGame = () => {
     };
 
     const res = await groupsApi.group(group.groupId()).createGame(game);
-    queryClient.invalidateQueries({ queryKey: [QK_GROUP_GAMES] });
+    queryClient.invalidateQueries({
+      queryKey: groupKeys.games(group.groupId()),
+    });
     navigate(`/groups/${group.groupId()}/games/${res.id}`);
   }
 

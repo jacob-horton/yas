@@ -24,6 +24,19 @@ impl GroupRepo {
         .await
     }
 
+    pub async fn update<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        group_id: Uuid,
+        name: &str,
+    ) -> Result<GroupDb, sqlx::Error> {
+        sqlx::query_as::<_, GroupDb>("UPDATE groups SET name = $1 WHERE id = $2 RETURNING *")
+            .bind(name)
+            .bind(group_id)
+            .fetch_one(executor)
+            .await
+    }
+
     pub async fn delete<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,

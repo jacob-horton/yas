@@ -19,10 +19,11 @@ import { AcceptInvite } from "@/features/invites/views/accept-invite";
 import { CreateInvite } from "@/features/invites/views/create-invite";
 import { RecordGame } from "@/features/matches/views/record-match";
 import { PlayerStats } from "@/features/stats/views/player-stats";
+import { EditPassword } from "@/features/users/views/edit-password";
 import { EditUser } from "@/features/users/views/edit-user";
 import { UserSettings } from "@/features/users/views/settings";
 import { HomePage } from "@/pages/home-page";
-import { EditPassword } from "@/features/users/views/edit-password";
+import { EditGroup } from "@/features/groups/views/edit-group";
 
 const queryClient = new QueryClient();
 
@@ -48,7 +49,11 @@ export default function App() {
               <Route path="/" component={ProtectedRoute}>
                 <Route path="/groups/:groupId" component={WithSidebar}>
                   <Route path="/" component={GroupDetails} />
+                  <Route path="/edit" component={EditGroup} />
                   <Route path="/members" component={GroupMembers} />
+
+                  <Route path="/invites" component={Invites} />
+                  <Route path="/invites/create" component={CreateInvite} />
 
                   <Route path="/games/:gameId" component={Scoreboard} />
                   <Route path="/games/:gameId/record" component={RecordGame} />
@@ -59,14 +64,13 @@ export default function App() {
                     path="/games/:gameId/player/:playerId"
                     component={PlayerStats}
                   />
-
-                  <Route path="/invites" component={Invites} />
-                  <Route path="/invites/create" component={CreateInvite} />
                 </Route>
 
                 <Route path="/" component={HomePage} />
-                <Route path="/groups/create" component={CreateGroup} />
                 <Route path="/settings" component={UserSettings} />
+
+                <Route path="/groups/create" component={CreateGroup} />
+
                 <Route path="/me/edit" component={EditUser} />
                 <Route path="/me/password" component={EditPassword} />
 

@@ -45,3 +45,7 @@ export function hasPermission(
 
   return strict ? myLevel > targetLevel : myLevel >= targetLevel;
 }
+
+export type UpdateGroupRequest = {
+  name: string;
+};

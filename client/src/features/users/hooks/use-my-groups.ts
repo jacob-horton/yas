@@ -1,10 +1,10 @@
 import { keepPreviousData, useQuery } from "@tanstack/solid-query";
+import { groupKeys } from "@/features/groups/hooks/query-keys";
 import { usersApi } from "../api";
-import { QK_MY_GROUPS } from "../constants";
 
 export const useMyGroups = () => {
   return useQuery(() => ({
-    queryKey: [QK_MY_GROUPS],
+    queryKey: groupKeys.myGroups(),
     queryFn: () => usersApi.myGroups(),
     placeholderData: keepPreviousData,
   }));

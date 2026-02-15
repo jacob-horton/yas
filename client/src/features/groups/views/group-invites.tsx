@@ -99,7 +99,7 @@ export const Invites = () => {
         hasPermission(group.userRole(), "admin")
           ? [
               {
-                text: "Create Invite",
+                text: "Create",
                 variant: "primary",
                 onAction: () => navigate("create"),
               },

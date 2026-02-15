@@ -4,8 +4,8 @@ import { createSignal } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { QK_MY_GROUPS } from "@/features/users/constants";
 import { groupsApi } from "../api";
+import { groupKeys } from "../hooks/query-keys";
 
 export const CreateGroup = () => {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export const CreateGroup = () => {
 
     // TODO: handle errors
     const res = await groupsApi.create({ name: name() });
-    await queryClient.invalidateQueries({ queryKey: [QK_MY_GROUPS] });
+    await queryClient.invalidateQueries({ queryKey: groupKeys.all });
 
     navigate(`/groups/${res.id}`);
   }
@@ -29,7 +29,7 @@ export const CreateGroup = () => {
         label="Name"
         value={name()}
         onChange={setName}
-        placeholder="e.g. Mario Kart Wii"
+        placeholder="e.g. Family"
       />
       <span class="flex gap-4">
         <Button type="submit">Create</Button>

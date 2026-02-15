@@ -14,6 +14,7 @@ import {
 } from "solid-js";
 import { groupsApi } from "@/features/groups/api";
 import { LS_LAST_GROUP_ID } from "@/pages/home-page";
+import { groupKeys } from "../hooks/query-keys";
 import type { Group, MemberRole } from "../types";
 import type { GroupRouteParams } from "../types/params";
 
@@ -30,7 +31,7 @@ export const GroupProvider: ParentComponent = (props) => {
   const groupId = () => params.groupId;
 
   const groupQuery = useQuery(() => ({
-    queryKey: ["groups", groupId()],
+    queryKey: groupKeys.detail(groupId()),
     queryFn: () => groupsApi.group(groupId()).get(),
     enabled: !!groupId(),
     placeholderData: keepPreviousData,
