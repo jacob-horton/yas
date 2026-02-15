@@ -41,7 +41,7 @@ pub struct CreateMatchScoreReq {
 pub struct MatchResponse {
     pub id: Uuid,
     pub game_id: Uuid,
-    pub played_at: String,
+    pub played_at: DateTime<Utc>,
     pub scores: Vec<MatchScoreResponse>,
 }
 
@@ -56,7 +56,7 @@ impl From<MatchDb> for MatchResponse {
         Self {
             id: game_match.id,
             game_id: game_match.game_id,
-            played_at: game_match.played_at.to_rfc3339(),
+            played_at: game_match.played_at,
             scores: game_match
                 .scores
                 .into_iter()

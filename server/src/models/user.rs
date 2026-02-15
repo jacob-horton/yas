@@ -77,7 +77,7 @@ pub struct UserResponse {
     pub id: Uuid,
     pub email: String,
     pub name: String,
-    pub created_at: String,
+    pub created_at: DateTime<Utc>,
     pub avatar: Avatar,
     pub avatar_colour: AvatarColour,
 }
@@ -88,7 +88,7 @@ impl From<UserDb> for UserResponse {
             id: user.id,
             name: user.name,
             email: user.email,
-            created_at: user.created_at.to_rfc3339(),
+            created_at: user.created_at,
             avatar: user.avatar,
             avatar_colour: user.avatar_colour,
         }

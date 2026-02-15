@@ -19,7 +19,7 @@ pub struct GameResponse {
     pub id: Uuid,
     pub name: String,
     pub group_id: Uuid,
-    pub created_at: String,
+    pub created_at: DateTime<Utc>,
     pub players_per_match: i32,
     pub metric: ScoringMetric,
 }
@@ -30,7 +30,7 @@ impl From<GameDb> for GameResponse {
             id: game.id,
             group_id: game.group_id,
             name: game.name,
-            created_at: game.created_at.to_rfc3339(),
+            created_at: game.created_at,
             players_per_match: game.players_per_match,
             metric: game.metric,
         }

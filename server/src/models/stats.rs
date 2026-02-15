@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 use uuid::Uuid;
@@ -31,7 +32,7 @@ pub struct PlayerMatchDb {
 pub struct PlayerMatchResponse {
     pub match_id: Uuid,
     pub score: i32,
-    pub played_at: String,
+    pub played_at: DateTime<Utc>,
     pub rank_in_match: i64,
 }
 
@@ -40,7 +41,7 @@ impl From<PlayerMatchDb> for PlayerMatchResponse {
         Self {
             match_id: stats.match_id,
             score: stats.score,
-            played_at: stats.played_at.to_rfc3339(),
+            played_at: stats.played_at,
             rank_in_match: stats.rank_in_match,
         }
     }

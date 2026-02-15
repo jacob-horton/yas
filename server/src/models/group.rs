@@ -93,7 +93,7 @@ impl GroupMemberRole {
 pub struct GroupResponse {
     pub id: Uuid,
     pub name: String,
-    pub created_at: String,
+    pub created_at: DateTime<Utc>,
     pub created_by: Uuid,
 }
 
@@ -101,7 +101,7 @@ pub struct GroupResponse {
 pub struct GroupWithRoleResponse {
     pub id: Uuid,
     pub name: String,
-    pub created_at: String,
+    pub created_at: DateTime<Utc>,
     pub created_by: Uuid,
     pub my_role: GroupMemberRole,
 }
@@ -111,7 +111,7 @@ impl From<GroupDb> for GroupResponse {
         Self {
             id: group.id,
             name: group.name,
-            created_at: group.created_at.to_rfc3339(),
+            created_at: group.created_at,
             created_by: group.created_by,
         }
     }
@@ -122,7 +122,7 @@ impl From<GroupWithRole> for GroupWithRoleResponse {
         Self {
             id: group.id,
             name: group.name,
-            created_at: group.created_at.to_rfc3339(),
+            created_at: group.created_at,
             my_role: group.my_role,
             created_by: group.created_by,
         }
@@ -138,9 +138,8 @@ pub struct GroupMemberResponse {
     pub email: Option<String>,
 
     pub name: String,
-    // TODO: can I use datetime<utc> here?
-    pub created_at: String,
-    pub joined_at: String,
+    pub created_at: DateTime<Utc>,
+    pub joined_at: DateTime<Utc>,
     pub role: GroupMemberRole,
     pub avatar: Avatar,
     pub avatar_colour: AvatarColour,
@@ -157,8 +156,8 @@ impl GroupMemberResponse {
             email: if show_email { Some(member.email) } else { None },
 
             name: member.name,
-            created_at: member.created_at.to_rfc3339(),
-            joined_at: member.joined_at.to_rfc3339(),
+            created_at: member.created_at,
+            joined_at: member.joined_at,
             role: member.role,
             avatar: member.avatar,
             avatar_colour: member.avatar_colour,
