@@ -8,7 +8,7 @@ export type Group = {
   my_role: MemberRole;
 };
 
-export const MEMBER_ROLES = ["viewer", "member", "admin", "owner"];
+export const MEMBER_ROLES = ["viewer", "member", "admin", "owner"] as const;
 export type MemberRole = (typeof MEMBER_ROLES)[number];
 
 export type GroupMember = {

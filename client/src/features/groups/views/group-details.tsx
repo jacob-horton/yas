@@ -1,3 +1,4 @@
+import { useNavigate } from "@solidjs/router";
 import { useQueryClient } from "@tanstack/solid-query";
 import CalendarIcon from "lucide-solid/icons/calendar-1";
 import UserStarIcon from "lucide-solid/icons/user-star";
@@ -14,7 +15,6 @@ import { useGroup } from "../context/group-provider";
 import { groupKeys } from "../hooks/query-keys";
 import { useGroupMembers } from "../hooks/use-group-members";
 import { hasPermission } from "../types";
-import { useNavigate } from "@solidjs/router";
 
 // TODO: one full icon map
 const ICON_MAP = {
@@ -50,25 +50,6 @@ export const GroupDetails = () => {
   const auth = useAuth();
 
   const { showConfirm } = useConfirmation();
-  const handleDelete = async () => {
-    const isConfirmed = await showConfirm({
-      title: "Delete Group",
-      description: (
-        <p>
-          Are you sure you would like to delete{" "}
-          <strong>{group.groupQuery.data?.name}</strong>? This cannot be undone.
-        </p>
-      ),
-      confirmText: "Delete",
-      danger: true,
-    });
-
-    if (isConfirmed) {
-      await groupsApi.group(group.groupId()).delete();
-      queryClient.invalidateQueries({ queryKey: groupKeys.all });
-    }
-  };
-
   const handleLeave = async () => {
     const isConfirmed = await showConfirm({
       title: "Leave Group",
@@ -92,13 +73,7 @@ export const GroupDetails = () => {
   };
 
   const actions = createMemo(() => {
-    const actions: Action[] = [
-      {
-        text: "Leave",
-        onAction: handleLeave,
-        variant: "secondary",
-      },
-    ];
+    const actions: Action[] = [];
 
     if (hasPermission(group.userRole(), "admin")) {
       actions.push({
@@ -108,14 +83,12 @@ export const GroupDetails = () => {
       });
     }
 
-    if (hasPermission(group.userRole(), "admin")) {
-      actions.push({
-        text: "Delete",
-        onAction: handleDelete,
-        variant: "secondary",
-        danger: true,
-      });
-    }
+    actions.push({
+      text: "Leave",
+      onAction: handleLeave,
+      variant: "secondary",
+      danger: true,
+    });
 
     return actions;
   });

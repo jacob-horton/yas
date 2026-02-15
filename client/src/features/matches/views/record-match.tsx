@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from "@solidjs/router";
+import { useQueryClient } from "@tanstack/solid-query";
 import { createEffect, createSignal, For, Suspense } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
@@ -9,9 +10,8 @@ import { useLastPlayers } from "@/features/games/hooks/use-last-players";
 import type { GameRouteParams } from "@/features/games/types/game";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { useGroupMembers } from "@/features/groups/hooks/use-group-members";
-import { useGame } from "../hooks/use-game";
-import { useQueryClient } from "@tanstack/solid-query";
 import { statsKeys } from "@/features/stats/hooks/query-keys";
+import { useGame } from "../hooks/use-game";
 
 export const RecordGame = () => {
   const queryClient = useQueryClient();

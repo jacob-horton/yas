@@ -7,17 +7,17 @@ import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
 import { useGroup } from "@/features/groups/context/group-provider";
+import { groupKeys } from "@/features/groups/hooks/query-keys";
 import { useGame } from "@/features/matches/hooks/use-game";
 import { gamesApi } from "../api";
 import { SCORING_METRIC_LABELS } from "../constants";
+import { gameKeys } from "../hooks/query-keys";
 import {
   type Game,
   type ScoringMetric,
   scoringMetrics,
   type UpdateGameRequest,
 } from "../types/game";
-import { gameKeys } from "../hooks/query-keys";
-import { groupKeys } from "@/features/groups/hooks/query-keys";
 
 type Props = {
   initialData: Game;

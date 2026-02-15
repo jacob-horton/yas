@@ -5,6 +5,7 @@ import { createSignal, Show } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useConfirmation } from "@/context/confirmation-context";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { groupsApi } from "../api";
 import { groupKeys } from "../hooks/query-keys";
@@ -33,8 +34,39 @@ const EditGroupForm: Component<Props> = (props) => {
     navigate(-1);
   }
 
+  const { showConfirm } = useConfirmation();
+  const handleDelete = async () => {
+    const isConfirmed = await showConfirm({
+      title: "Delete Group",
+      description: (
+        <p>
+          Are you sure you would like to delete{" "}
+          <strong>{props.initialData.name}</strong>? This cannot be undone.
+        </p>
+      ),
+      confirmText: "Delete",
+      danger: true,
+    });
+
+    if (isConfirmed) {
+      await groupsApi.group(props.initialData.id).delete();
+      queryClient.invalidateQueries({ queryKey: groupKeys.all });
+    }
+  };
+
   return (
-    <FormPage title="Edit Group" onSubmit={handleSubmit}>
+    <FormPage
+      title="Edit Group"
+      onSubmit={handleSubmit}
+      actions={[
+        {
+          text: "Delete",
+          onAction: handleDelete,
+          variant: "secondary",
+          danger: true,
+        },
+      ]}
+    >
       <Input
         label="Name"
         value={name()}

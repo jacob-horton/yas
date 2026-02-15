@@ -12,6 +12,7 @@ import { EditGame } from "@/features/games/views/edit-game";
 import { Scoreboard } from "@/features/games/views/scoreboard";
 import { GroupProvider } from "@/features/groups/context/group-provider";
 import { CreateGroup } from "@/features/groups/views/create-group";
+import { EditGroup } from "@/features/groups/views/edit-group";
 import { GroupDetails } from "@/features/groups/views/group-details";
 import { Invites } from "@/features/groups/views/group-invites";
 import { GroupMembers } from "@/features/groups/views/group-members";
@@ -23,7 +24,6 @@ import { EditPassword } from "@/features/users/views/edit-password";
 import { EditUser } from "@/features/users/views/edit-user";
 import { UserSettings } from "@/features/users/views/settings";
 import { HomePage } from "@/pages/home-page";
-import { EditGroup } from "@/features/groups/views/edit-group";
 
 const queryClient = new QueryClient();
 

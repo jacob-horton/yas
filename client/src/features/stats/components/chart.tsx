@@ -36,6 +36,7 @@ function getBackgroundGradient(baseColor: string) {
 }
 
 type DataPoint = { x: number; y: number };
+type LineChart = Chart<"line", DataPoint[]>;
 type Dataset = {
   label?: string;
   data: DataPoint[];
@@ -58,7 +59,7 @@ export const ChartComponent: Component<ChartProps> = (props) => {
   const [canvas, setCanvas] = createSignal<HTMLCanvasElement | undefined>(
     undefined,
   );
-  const [chart, setChart] = createSignal<Chart | null>(null);
+  const [chart, setChart] = createSignal<LineChart | null>(null);
 
   const datasets = createMemo(() => {
     return props.datasets.map((dataset) => ({
