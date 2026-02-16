@@ -2,32 +2,17 @@
   "name": "yas",
   "version": "0.0.0",
   "description": "",
+  "license": "MIT",
   "type": "module",
   "scripts": {
-    "start": "vite",
-    "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview",
+    "dev": "vite",
+    "format": "biome format --write",
     "lint": "biome lint",
     "lint:fix": "biome check --write --unsafe",
-    "format": "biome format --write",
+    "serve": "vite preview",
+    "start": "vite",
     "type-check": "tsc --noEmit"
-  },
-  "license": "MIT",
-  "devDependencies": {
-    "@biomejs/biome": "2.2.6",
-    "@eslint/js": "^9.36.0",
-    "@tailwindcss/vite": "^4.1.13",
-    "@types/node": "^25.0.10",
-    "eslint": "^9.36.0",
-    "eslint-plugin-solid": "^0.14.5",
-    "solid-devtools": "^0.34.3",
-    "tailwindcss": "^4.1.13",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.45.0",
-    "vite": "^6.3.0",
-    "vite-plugin-solid": "^2.11.8",
-    "vite-plugin-solid-svg": "^0.8.1"
   },
   "dependencies": {
     "@ark-ui/solid": "^5.31.0",
@@ -40,5 +25,16 @@
     "lucide-solid": "^0.544.0",
     "solid-js": "^1.9.9",
     "tailwind-merge": "^3.4.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.2.6",
+    "@tailwindcss/vite": "^4.1.13",
+    "@types/node": "^25.0.10",
+    "solid-devtools": "^0.34.3",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.9.2",
+    "vite": "^6.3.0",
+    "vite-plugin-solid": "^2.11.8",
+    "vite-plugin-solid-svg": "^0.8.1"
   }
 }

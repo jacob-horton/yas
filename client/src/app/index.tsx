@@ -25,6 +25,7 @@ import { EditPassword } from "@/features/users/views/edit-password";
 import { EditUser } from "@/features/users/views/edit-user";
 import { UserSettings } from "@/features/users/views/settings";
 import { HomePage } from "@/pages/home-page";
+import { VerifyEmail } from "@/features/auth/views/verify-email";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +89,8 @@ export default function App() {
                   component={AcceptInvite}
                 />
               </Route>
+
+              <Route path="/verify-email/:token" component={VerifyEmail} />
 
               <Route path="/login" component={Login} />
               <Route path="/register" component={Register} />

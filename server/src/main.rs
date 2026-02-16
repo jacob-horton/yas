@@ -14,6 +14,7 @@ use axum::{
         header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
     },
 };
+use resend_rs::Resend;
 use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::{env, net::SocketAddr, sync::Arc};
 use tower_http::cors::CorsLayer;
@@ -21,14 +22,15 @@ use tower_sessions::{Expiry, SessionManagerLayer, cookie::time::Duration};
 use tower_sessions_sqlx_store::PostgresStore;
 
 use crate::repositories::{
-    game_repo::GameRepo, group_repo::GroupRepo, invite_repo::InviteRepo, match_repo::MatchRepo,
-    stats_repo::StatsRepo, user_repo::UserRepo,
+    email_repo::EmailRepo, game_repo::GameRepo, group_repo::GroupRepo, invite_repo::InviteRepo,
+    match_repo::MatchRepo, stats_repo::StatsRepo, user_repo::UserRepo,
 };
 
 #[derive(Clone)]
 pub struct AppState {
     pub pool: PgPool,
 
+    pub email_repo: EmailRepo,
     pub user_repo: Arc<UserRepo>,
     pub group_repo: Arc<GroupRepo>,
     pub invite_repo: Arc<InviteRepo>,
@@ -41,6 +43,8 @@ pub struct AppState {
 async fn main() {
     dotenvy::dotenv().ok();
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+
+    let resend_client = Resend::new(&env::var("RESEND_KEY").expect("RESEND_KEY must be set"));
 
     let pool = PgPoolOptions::new()
         .max_connections(5)
@@ -86,9 +90,12 @@ async fn main() {
     let match_repo = Arc::new(MatchRepo {});
     let stats_repo = Arc::new(StatsRepo {});
 
+    let email_repo = EmailRepo { resend_client };
+
     let app_state = AppState {
         pool: pool.clone(),
 
+        email_repo,
         user_repo,
         group_repo,
         invite_repo,

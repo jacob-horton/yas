@@ -3,7 +3,10 @@ use crate::{
     constants::SESSION_USER_KEY,
     errors::{AppError, AuthError},
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
-    models::{auth::CreateSessionReq, user::UserResponse},
+    models::{
+        auth::{CreateSessionReq, VerifyEmailReq},
+        user::UserResponse,
+    },
     services,
 };
 use axum::{
@@ -52,9 +55,20 @@ async fn get_session(AuthUser(user): AuthUser) -> Result<impl IntoResponse, AppE
     Ok(Json(serde_json::json!({ "user_id": user.id.to_string() })))
 }
 
+// Verify email address
+async fn verify_email(
+    State(state): State<AppState>,
+    Json(payload): Json<VerifyEmailReq>,
+) -> Result<impl IntoResponse, AppError> {
+    services::auth::verify_email(&state, payload.token).await?;
+
+    Ok(StatusCode::NO_CONTENT)
+}
+
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/sessions", post(create_session))
         .route("/sessions", delete(delete_session))
         .route("/sessions", get(get_session))
+        .route("/verify-email", post(verify_email))
 }

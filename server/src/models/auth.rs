@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use uuid::Uuid;
 use validator::Validate;
 
 #[derive(Debug, Deserialize, Validate)]
@@ -11,4 +12,9 @@ pub struct CreateSessionReq {
         message = "Password must be between 8 and 1023 chars"
     ))]
     pub password: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct VerifyEmailReq {
+    pub token: Uuid,
 }

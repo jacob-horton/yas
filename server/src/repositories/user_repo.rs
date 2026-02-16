@@ -78,4 +78,17 @@ impl UserRepo {
             .fetch_optional(executor)
             .await
     }
+
+    pub async fn mark_verified<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        email: &str,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query("UPDATE users SET email_verified = true WHERE email = $1")
+            .bind(email)
+            .execute(executor)
+            .await?;
+
+        Ok(())
+    }
 }

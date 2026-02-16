@@ -2,8 +2,12 @@ use argon2::{
     Argon2,
     password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString, rand_core::OsRng},
 };
+use uuid::Uuid;
 
-use crate::errors::AppError;
+use crate::{
+    AppState,
+    errors::{AppError, AuthError},
+};
 
 pub fn hash_password(password: &str) -> Result<String, AppError> {
     let salt = SaltString::generate(&mut OsRng);
@@ -24,4 +28,20 @@ pub fn verify_password(hash: &str, password: &str) -> bool {
     Argon2::default()
         .verify_password(password.as_bytes(), &parsed_hash)
         .is_ok()
+}
+
+pub async fn verify_email(state: &AppState, token: Uuid) -> Result<(), AppError> {
+    let mut tx = state.pool.begin().await.map_err(AppError::Database)?;
+
+    let email = state
+        .email_repo
+        .delete_token_and_get_email(&mut *tx, token)
+        .await?
+        .ok_or(AuthError::InvalidOrExpiredToken)?;
+
+    state.user_repo.mark_verified(&mut *tx, &email).await?;
+
+    tx.commit().await.map_err(AppError::Database)?;
+
+    Ok(())
 }

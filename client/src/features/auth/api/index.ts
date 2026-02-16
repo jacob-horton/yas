@@ -4,6 +4,7 @@ import { api } from "@/lib/api";
 export interface AuthApiContract {
   login(email: string, password: string): Promise<User>;
   logout(): Promise<void>;
+  verifyEmail(token: string): Promise<void>;
 }
 
 class AuthApi implements AuthApiContract {
@@ -13,6 +14,10 @@ class AuthApi implements AuthApiContract {
 
   public logout(): Promise<void> {
     return api.delete("/sessions");
+  }
+
+  public verifyEmail(token: string): Promise<void> {
+    return api.post("/verify-email", { token });
   }
 }
 

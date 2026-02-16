@@ -1,3 +1,4 @@
+pub mod email_repo;
 pub mod game_repo;
 pub mod group_repo;
 pub mod invite_repo;

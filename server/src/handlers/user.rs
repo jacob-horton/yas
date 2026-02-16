@@ -29,13 +29,7 @@ async fn create_user(
     State(state): State<AppState>,
     ValidatedJson(payload): ValidatedJson<CreateUserReq>,
 ) -> Result<impl IntoResponse, AppError> {
-    let hash = services::auth::hash_password(&payload.password)?;
-
-    let user = state
-        .user_repo
-        .create(&state.pool, &payload.name, &payload.email, &hash)
-        .await
-        .map_err(|_| UserError::UserAlreadyExists)?;
+    let user = services::user::create_user(&state, payload).await?;
 
     // Create session (sets the cookie automatically)
     session
