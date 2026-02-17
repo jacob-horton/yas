@@ -18,7 +18,10 @@ use resend_rs::Resend;
 use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::{env, net::SocketAddr, sync::Arc};
 use tower_http::cors::CorsLayer;
-use tower_sessions::{Expiry, SessionManagerLayer, cookie::time::Duration};
+use tower_sessions::{
+    Expiry, SessionManagerLayer,
+    cookie::{SameSite, time::Duration},
+};
 use tower_sessions_sqlx_store::PostgresStore;
 
 use crate::repositories::{
@@ -68,6 +71,8 @@ async fn main() {
     let use_secure_cookies = env::var("SECURE_COOKIES").expect("SECURE_COOKIES must be set");
     let session_layer = SessionManagerLayer::new(session_store)
         .with_secure(use_secure_cookies == "true")
+        .with_http_only(true)
+        .with_same_site(SameSite::Lax)
         .with_expiry(Expiry::OnInactivity(Duration::days(30)));
 
     let cors_layer = CorsLayer::new()

@@ -71,6 +71,7 @@ pub struct UserDb {
     pub avatar: Avatar,
     pub avatar_colour: AvatarColour,
     pub email_verified: bool,
+    pub session_version: i32,
 }
 
 #[derive(Debug, Serialize)]

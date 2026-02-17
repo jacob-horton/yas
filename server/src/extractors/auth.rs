@@ -1,6 +1,6 @@
 use crate::{
     AppState,
-    constants::SESSION_USER_KEY,
+    constants::{SESSION_USER_KEY, SESSION_VERSION_KEY},
     errors::{AppError, AuthError},
     models::user::UserDb,
 };
@@ -38,6 +38,16 @@ impl FromRequestParts<AppState> for AuthUser {
             .find_by_id(&state.pool, &user_id)
             .await?
             .ok_or(AuthError::InvalidSession)?;
+
+        let session_ver = session
+            .get::<i32>(SESSION_VERSION_KEY)
+            .await
+            .map_err(|e| AppError::InternalServerError(e.to_string()))?
+            .ok_or(AuthError::InvalidSession)?;
+
+        if session_ver != user.session_version {
+            return Err(AuthError::InvalidSession.into());
+        }
 
         // 4. Return the user
         Ok(AuthUser(user))

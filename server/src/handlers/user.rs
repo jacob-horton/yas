@@ -10,7 +10,7 @@ use uuid::Uuid;
 
 use crate::{
     AppState,
-    constants::SESSION_USER_KEY,
+    constants::{SESSION_USER_KEY, SESSION_VERSION_KEY},
     errors::{AppError, GroupError, UserError},
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     models::{
@@ -120,17 +120,24 @@ async fn update_current_user(
 }
 
 async fn update_password(
+    session: Session,
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
     ValidatedJson(payload): ValidatedJson<UpdatePasswordReq>,
 ) -> Result<impl IntoResponse, AppError> {
-    services::user::update_password(
+    let updated_user = services::user::update_password(
         &state,
         &user.id,
         &payload.current_password,
         &payload.new_password,
     )
     .await?;
+
+    // Session version updated in database - update session cookie so user stays logged in
+    session
+        .insert(SESSION_VERSION_KEY, updated_user.session_version)
+        .await
+        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
 
     Ok(StatusCode::NO_CONTENT)
 }

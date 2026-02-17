@@ -50,7 +50,7 @@ impl UserRepo {
         id: &Uuid,
         password_hash: &str,
     ) -> Result<UserDb, sqlx::Error> {
-        sqlx::query_as::<_, UserDb>("UPDATE users SET password_hash = $1 WHERE id = $2 RETURNING *")
+        sqlx::query_as::<_, UserDb>("UPDATE users SET password_hash = $1, session_version = session_version + 1 WHERE id = $2 RETURNING *")
             .bind(password_hash)
             .bind(id)
             .fetch_one(executor)

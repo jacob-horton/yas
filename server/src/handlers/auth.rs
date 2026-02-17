@@ -1,6 +1,6 @@
 use crate::{
     AppState,
-    constants::SESSION_USER_KEY,
+    constants::{SESSION_USER_KEY, SESSION_VERSION_KEY},
     errors::{AppError, AuthError},
     extractors::{auth::AuthUser, validated_json::ValidatedJson},
     models::{
@@ -34,9 +34,21 @@ async fn create_session(
         return Err(AuthError::InvalidCredentials.into());
     }
 
+    // Cycle ID to prevent Session Fixation attacks
+    session
+        .cycle_id()
+        .await
+        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
+
     // Create session (sets the cookie automatically)
     session
         .insert(SESSION_USER_KEY, user.id.to_string())
+        .await
+        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
+
+    // Save session version
+    session
+        .insert(SESSION_VERSION_KEY, user.session_version)
         .await
         .map_err(|e| AppError::InternalServerError(e.to_string()))?;
 
