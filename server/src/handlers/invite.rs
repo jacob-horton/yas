@@ -10,7 +10,7 @@ use uuid::Uuid;
 use crate::{
     AppState,
     errors::{AppError, GroupError},
-    extractors::{auth::AuthUser, validated_json::ValidatedJson},
+    extractors::{auth::AuthUser, validated_json::ValidatedJson, verified_user::VerifiedUser},
     models::invite::{
         CreateInviteReq, InviteBasicResponse, InviteDetailResponse, InviteSummaryResponse,
     },
@@ -21,7 +21,7 @@ use crate::{
 pub async fn create_invite(
     Path(group_id): Path<Uuid>,
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    VerifiedUser(user): VerifiedUser,
     ValidatedJson(payload): ValidatedJson<CreateInviteReq>,
 ) -> Result<impl IntoResponse, AppError> {
     let invite = services::invite::create_link(&state, group_id, user.id, payload).await?;
@@ -95,7 +95,7 @@ async fn delete_invite(
 async fn accept_invite(
     Path(code): Path<Uuid>,
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    VerifiedUser(user): VerifiedUser,
 ) -> Result<impl IntoResponse, AppError> {
     services::invite::accept_invite(&state, user.id, code).await?;
 

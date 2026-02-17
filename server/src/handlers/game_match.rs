@@ -10,7 +10,7 @@ use uuid::Uuid;
 use crate::{
     AppState,
     errors::AppError,
-    extractors::{auth::AuthUser, validated_json::ValidatedJson},
+    extractors::{validated_json::ValidatedJson, verified_user::VerifiedUser},
     models::game_match::{CreateMatchReq, MatchResponse},
     services,
 };
@@ -18,7 +18,7 @@ use crate::{
 pub async fn create_match(
     State(state): State<AppState>,
     Path(game_id): Path<Uuid>,
-    AuthUser(user): AuthUser,
+    VerifiedUser(user): VerifiedUser,
     ValidatedJson(payload): ValidatedJson<CreateMatchReq>,
 ) -> Result<impl IntoResponse, AppError> {
     let game_match = services::game_match::create_match(&state, game_id, user.id, payload).await?;

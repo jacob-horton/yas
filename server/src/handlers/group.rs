@@ -10,7 +10,7 @@ use uuid::Uuid;
 use crate::{
     AppState,
     errors::AppError,
-    extractors::{auth::AuthUser, validated_json::ValidatedJson},
+    extractors::{auth::AuthUser, validated_json::ValidatedJson, verified_user::VerifiedUser},
     models::{
         group::{
             CreateGroupReq, GroupMembersParams, GroupResponse, GroupWithRoleResponse, OrderBy,
@@ -23,7 +23,7 @@ use crate::{
 
 async fn create_group(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    VerifiedUser(user): VerifiedUser,
     ValidatedJson(payload): ValidatedJson<CreateGroupReq>,
 ) -> Result<impl IntoResponse, AppError> {
     // TODO: check user email is validated before they can start creating groups
@@ -47,7 +47,7 @@ async fn get_group_details(
 
 async fn update_group(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    VerifiedUser(user): VerifiedUser,
     Path(group_id): Path<Uuid>,
     ValidatedJson(payload): ValidatedJson<UpdateGroupReq>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -58,7 +58,7 @@ async fn update_group(
 
 async fn delete_group(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    VerifiedUser(user): VerifiedUser,
     Path(group_id): Path<Uuid>,
 ) -> Result<impl IntoResponse, AppError> {
     services::group::delete_group(&state, user.id, group_id).await?;
@@ -86,7 +86,7 @@ async fn get_group_members(
 
 async fn remove_group_member(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    VerifiedUser(user): VerifiedUser,
     Path((group_id, member_id)): Path<(Uuid, Uuid)>,
 ) -> Result<impl IntoResponse, AppError> {
     services::group::remove_group_member(&state, user.id, group_id, member_id).await?;
@@ -96,7 +96,7 @@ async fn remove_group_member(
 
 async fn set_member_role(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    VerifiedUser(user): VerifiedUser,
     Path((group_id, member_id)): Path<(Uuid, Uuid)>,
     Json(payload): Json<SetRoleReq>,
 ) -> Result<impl IntoResponse, AppError> {

@@ -15,6 +15,9 @@ pub enum AuthError {
 
     #[error("Invalid or expired token")]
     InvalidOrExpiredToken,
+
+    #[error("Email verification required")]
+    UnverifiedEmail,
 }
 
 #[derive(Debug, Error)]
@@ -140,6 +143,7 @@ impl IntoResponse for AppError {
                 AuthError::InvalidCredentials => (StatusCode::UNAUTHORIZED, err.to_string()),
                 AuthError::InvalidSession => (StatusCode::UNAUTHORIZED, err.to_string()),
                 AuthError::InvalidOrExpiredToken => (StatusCode::GONE, err.to_string()),
+                AuthError::UnverifiedEmail => (StatusCode::FORBIDDEN, err.to_string()),
             },
 
             AppError::User(err) => match err {

@@ -10,7 +10,7 @@ use uuid::Uuid;
 use crate::{
     AppState,
     errors::AppError,
-    extractors::{auth::AuthUser, validated_json::ValidatedJson},
+    extractors::{auth::AuthUser, validated_json::ValidatedJson, verified_user::VerifiedUser},
     models::{
         game::{CreateGameReq, GameResponse, UpdateGameReq},
         stats::{ScoreboardResponse, StatsParams},
@@ -21,7 +21,7 @@ use crate::{
 pub async fn create_game(
     State(state): State<AppState>,
     Path(group_id): Path<Uuid>,
-    AuthUser(user): AuthUser,
+    VerifiedUser(user): VerifiedUser,
     ValidatedJson(payload): ValidatedJson<CreateGameReq>,
 ) -> Result<impl IntoResponse, AppError> {
     let game = services::game::create_game(&state, user.id, group_id, payload).await?;
@@ -33,7 +33,7 @@ pub async fn create_game(
 pub async fn update_game(
     State(state): State<AppState>,
     Path(game_id): Path<Uuid>,
-    AuthUser(user): AuthUser,
+    VerifiedUser(user): VerifiedUser,
     ValidatedJson(payload): ValidatedJson<UpdateGameReq>,
 ) -> Result<impl IntoResponse, AppError> {
     let game = services::game::update_game(&state, user.id, game_id, payload).await?;

@@ -70,6 +70,7 @@ pub struct UserDb {
     pub created_at: DateTime<Utc>,
     pub avatar: Avatar,
     pub avatar_colour: AvatarColour,
+    pub email_verified: bool,
 }
 
 #[derive(Debug, Serialize)]
@@ -80,6 +81,7 @@ pub struct UserResponse {
     pub created_at: DateTime<Utc>,
     pub avatar: Avatar,
     pub avatar_colour: AvatarColour,
+    pub email_verified: bool,
 }
 
 impl From<UserDb> for UserResponse {
@@ -91,6 +93,7 @@ impl From<UserDb> for UserResponse {
             created_at: user.created_at,
             avatar: user.avatar,
             avatar_colour: user.avatar_colour,
+            email_verified: user.email_verified,
         }
     }
 }
