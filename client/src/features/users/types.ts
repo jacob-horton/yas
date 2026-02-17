@@ -13,4 +13,5 @@ export type User = {
   email: string;
   avatar: AvatarIcon;
   avatar_colour: AvatarColour;
+  email_verified: boolean;
 };

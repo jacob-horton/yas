@@ -66,7 +66,7 @@ export const Scoreboard = () => {
   const actions = createMemo(() => {
     const actions: Action[] = [];
 
-    if (hasPermission(group.userRole(), "admin")) {
+    if (hasPermission(group.userRole(), "admin", auth.user()?.email_verified)) {
       actions.push({
         text: "Edit",
         variant: "secondary",
@@ -74,7 +74,9 @@ export const Scoreboard = () => {
       });
     }
 
-    if (hasPermission(group.userRole(), "member")) {
+    if (
+      hasPermission(group.userRole(), "member", auth.user()?.email_verified)
+    ) {
       actions.push({
         text: "Record Match",
         variant: "primary",

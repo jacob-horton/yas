@@ -36,14 +36,15 @@ export const ROLE_HIERARCHY: Record<MemberRole, number> = {
 export function hasPermission(
   myRole: MemberRole | undefined,
   targetRole: MemberRole,
+  verified: boolean | undefined,
   strict = false,
 ) {
-  if (!myRole) return false;
+  if (!myRole || !verified) return false;
 
   const myLevel = ROLE_HIERARCHY[myRole];
   const targetLevel = ROLE_HIERARCHY[targetRole];
 
-  return strict ? myLevel > targetLevel : myLevel >= targetLevel;
+  return verified && (strict ? myLevel > targetLevel : myLevel >= targetLevel);
 }
 
 export type UpdateGroupRequest = {

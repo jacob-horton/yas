@@ -75,7 +75,7 @@ export const GroupDetails = () => {
   const actions = createMemo(() => {
     const actions: Action[] = [];
 
-    if (hasPermission(group.userRole(), "admin")) {
+    if (hasPermission(group.userRole(), "admin", auth.user()?.email_verified)) {
       actions.push({
         text: "Edit",
         onAction: () => navigate("edit"),

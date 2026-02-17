@@ -76,12 +76,14 @@ export const GroupMembers = () => {
   // Allow promoting people up to (and including) your role
   const selectableRoles = createMemo(() =>
     MEMBER_ROLES.filter(
-      (role) => role !== "owner" && hasPermission(group.userRole(), role),
+      (role) =>
+        role !== "owner" &&
+        hasPermission(group.userRole(), role, auth.user()?.email_verified),
     ),
   );
 
   const tableHeadings = createMemo(() => {
-    if (hasPermission(group.userRole(), "admin")) {
+    if (hasPermission(group.userRole(), "admin", auth.user()?.email_verified)) {
       return TABLE_HEADINGS;
     }
 
@@ -126,9 +128,18 @@ export const GroupMembers = () => {
                       // Only allow changing people below your role, and you must be admin or above
                       disabled={
                         // Can change people below your role
-                        !hasPermission(group.userRole(), member.role, true) ||
+                        !hasPermission(
+                          group.userRole(),
+                          member.role,
+                          auth.user()?.email_verified,
+                          true,
+                        ) ||
                         // Can only change if admin or above
-                        !hasPermission(group.userRole(), "admin") ||
+                        !hasPermission(
+                          group.userRole(),
+                          "admin",
+                          auth.user()?.email_verified,
+                        ) ||
                         // Cannot change owner role (owner can demote themselves otherwise)
                         member.role === "owner"
                       }

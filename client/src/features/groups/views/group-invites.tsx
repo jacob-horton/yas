@@ -20,6 +20,7 @@ import { formatDate, formatDateTime } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupInvites } from "../hooks/use-group-invites";
 import { hasPermission } from "../types";
+import { useAuth } from "@/features/auth/context/auth-provider";
 
 function isExpired(expiry: string) {
   const expiryDate = new Date(expiry);
@@ -67,6 +68,7 @@ const TABLE_HEADINGS = [
 ] as const satisfies Heading<string>[];
 
 export const Invites = () => {
+  const auth = useAuth();
   const group = useGroup();
   const invites = useGroupInvites(group.groupId);
 
@@ -96,7 +98,7 @@ export const Invites = () => {
     <Page
       title="Invites"
       actions={
-        hasPermission(group.userRole(), "admin")
+        hasPermission(group.userRole(), "admin", auth.user()?.email_verified)
           ? [
               {
                 text: "Create",
