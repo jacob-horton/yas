@@ -1,22 +1,16 @@
 use crate::AppState;
 use crate::errors::{AppError, GameError, GroupError};
 use crate::models::game::{CreateGameReq, GameDb, UpdateGameReq};
+use crate::models::group::GroupMemberDb;
 use crate::policies::GroupAction;
 
 use uuid::Uuid;
 
 pub async fn create_game(
     state: &AppState,
-    user_id: Uuid,
-    group_id: Uuid,
+    member: GroupMemberDb,
     payload: CreateGameReq,
 ) -> Result<GameDb, AppError> {
-    let member = state
-        .group_repo
-        .get_member(&state.pool, group_id, user_id)
-        .await?
-        .ok_or(GroupError::MemberNotFound)?;
-
     if !member.role.can_perform(GroupAction::CreateGame) {
         return Err(GroupError::Forbidden.into());
     }
@@ -25,7 +19,7 @@ pub async fn create_game(
         .game_repo
         .create(
             &state.pool,
-            group_id,
+            member.group_id,
             &payload.name,
             payload.players_per_match,
             payload.metric,
@@ -42,19 +36,7 @@ pub async fn update_game(
     game_id: Uuid,
     payload: UpdateGameReq,
 ) -> Result<GameDb, AppError> {
-    let game = state
-        .game_repo
-        .get(&state.pool, game_id)
-        .await?
-        .ok_or(GameError::NotFound)?;
-
-    // Check permissions of user
-    let member = state
-        .group_repo
-        .get_member(&state.pool, game.group_id, user_id)
-        .await?
-        .ok_or(GroupError::MemberNotFound)?;
-
+    let (game, member) = fetch_game_guarded(state, game_id, user_id).await?;
     if !member.role.can_perform(GroupAction::UpdateGame) {
         return Err(GroupError::Forbidden.into());
     }
@@ -63,7 +45,7 @@ pub async fn update_game(
         .game_repo
         .update(
             &state.pool,
-            game_id,
+            game.id,
             &payload.name,
             payload.players_per_match,
             payload.metric,
@@ -75,20 +57,7 @@ pub async fn update_game(
 }
 
 pub async fn get(state: &AppState, user_id: Uuid, game_id: Uuid) -> Result<GameDb, AppError> {
-    let game = state
-        .game_repo
-        .get(&state.pool, game_id)
-        .await
-        .map_err(GameError::Database)?
-        .ok_or(GameError::NotFound)?;
-
-    // Check user is in group
-    state
-        .group_repo
-        .get_member(&state.pool, game.group_id, user_id)
-        .await?
-        .ok_or(GroupError::MemberNotFound)?;
-
+    let (game, _) = fetch_game_guarded(state, game_id, user_id).await?;
     Ok(game)
 }
 
@@ -97,24 +66,33 @@ pub async fn get_last_players(
     user_id: Uuid,
     game_id: Uuid,
 ) -> Result<Vec<Uuid>, AppError> {
+    let (game, _) = fetch_game_guarded(state, game_id, user_id).await?;
+
+    let last_players = state
+        .group_repo
+        .get_last_players(&state.pool, game.id)
+        .await?;
+
+    Ok(last_players)
+}
+
+pub async fn fetch_game_guarded(
+    state: &AppState,
+    game_id: Uuid,
+    user_id: Uuid,
+) -> Result<(GameDb, GroupMemberDb), AppError> {
     let game = state
         .game_repo
         .get(&state.pool, game_id)
-        .await
-        .map_err(GameError::Database)?
+        .await?
         .ok_or(GameError::NotFound)?;
 
-    // Check user is in group
-    state
+    // Check user is member of group
+    let member = state
         .group_repo
         .get_member(&state.pool, game.group_id, user_id)
         .await?
         .ok_or(GroupError::MemberNotFound)?;
 
-    let last_players = state
-        .group_repo
-        .get_last_players(&state.pool, game_id)
-        .await?;
-
-    Ok(last_players)
+    Ok((game, member))
 }

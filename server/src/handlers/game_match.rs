@@ -28,5 +28,5 @@ pub async fn create_match(
 }
 
 pub fn router() -> Router<AppState> {
-    Router::new().route("/games/:id/matches", post(create_match))
+    Router::new().route("/games/:game_id/matches", post(create_match))
 }

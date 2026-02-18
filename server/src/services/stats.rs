@@ -9,6 +9,7 @@ use crate::{
             StatsLifetime,
         },
     },
+    services::game::fetch_game_guarded,
 };
 use std::{cmp::Ordering, collections::HashMap};
 use uuid::Uuid;
@@ -47,22 +48,7 @@ pub async fn get_scoreboard_and_stats(
     order_by: Option<OrderBy>,
     order_dir: Option<OrderDir>,
 ) -> Result<Scoreboard, AppError> {
-    let game = state
-        .game_repo
-        .get(&state.pool, game_id)
-        .await?
-        .ok_or(GameError::NotFound)?;
-
-    // Check user is in group
-    let is_member = state
-        .group_repo
-        .are_members(&state.pool, game.group_id, &[user_id])
-        .await?;
-
-    if !is_member {
-        return Err(GroupError::MemberNotFound.into());
-    }
-
+    let (game, _) = fetch_game_guarded(state, game_id, user_id).await?;
     let mut entries = get_scoreboard_entries(state, &game).await?;
 
     // Already sorted by game metric
@@ -242,25 +228,11 @@ pub async fn get_player_history(
     game_id: Uuid,
     player_id: Uuid,
 ) -> Result<Vec<PlayerMatchDb>, AppError> {
-    let game = state
-        .game_repo
-        .get(&state.pool, game_id)
-        .await?
-        .ok_or(GameError::NotFound)?;
-
-    // Check user is in group
-    let is_member = state
-        .group_repo
-        .are_members(&state.pool, game.group_id, &[user_id])
-        .await?;
-
-    if !is_member {
-        return Err(GroupError::MemberNotFound.into());
-    }
+    let (game, _) = fetch_game_guarded(state, game_id, user_id).await?;
 
     let player_history = state
         .stats_repo
-        .get_player_history(&state.pool, game_id, player_id)
+        .get_player_history(&state.pool, game.id, player_id)
         .await?;
 
     Ok(player_history)
@@ -272,21 +244,7 @@ pub async fn get_player_highlights(
     game_id: Uuid,
     player_id: Uuid,
 ) -> Result<PlayerHighlightStats, AppError> {
-    let game = state
-        .game_repo
-        .get(&state.pool, game_id)
-        .await?
-        .ok_or(GameError::NotFound)?;
-
-    // Check user is in group
-    let is_member = state
-        .group_repo
-        .are_members(&state.pool, game.group_id, &[user_id])
-        .await?;
-
-    if !is_member {
-        return Err(GroupError::MemberNotFound.into());
-    }
+    let (game, _) = fetch_game_guarded(&state, game_id, user_id).await?;
 
     let scoreboard = get_scoreboard_entries(state, &game).await?;
     let (rank_index, entry) = scoreboard
@@ -355,21 +313,7 @@ pub async fn get_distributions(
     user_id: Uuid,
     game_id: Uuid,
 ) -> Result<HashMap<Uuid, DistributionWithMaxMin>, AppError> {
-    let game = state
-        .game_repo
-        .get(&state.pool, game_id)
-        .await?
-        .ok_or(GameError::NotFound)?;
-
-    // Check user is in group
-    let is_member = state
-        .group_repo
-        .are_members(&state.pool, game.group_id, &[user_id])
-        .await?;
-
-    if !is_member {
-        return Err(GroupError::MemberNotFound.into());
-    }
+    let (game, _) = fetch_game_guarded(&state, game_id, user_id).await?;
 
     let raw_data = state
         .stats_repo

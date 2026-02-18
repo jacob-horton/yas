@@ -10,7 +10,10 @@ use uuid::Uuid;
 use crate::{
     AppState,
     errors::{AppError, GroupError},
-    extractors::{auth::AuthUser, validated_json::ValidatedJson, verified_user::VerifiedUser},
+    extractors::{
+        auth::AuthUser, auth_member::AuthMember, validated_json::ValidatedJson,
+        verified_member::VerifiedMember, verified_user::VerifiedUser,
+    },
     models::invite::{
         CreateInviteReq, InviteBasicResponse, InviteDetailResponse, InviteSummaryResponse,
     },
@@ -19,23 +22,21 @@ use crate::{
 };
 
 pub async fn create_invite(
-    Path(group_id): Path<Uuid>,
+    VerifiedMember(member): VerifiedMember,
     State(state): State<AppState>,
-    VerifiedUser(user): VerifiedUser,
     ValidatedJson(payload): ValidatedJson<CreateInviteReq>,
 ) -> Result<impl IntoResponse, AppError> {
-    let invite = services::invite::create_link(&state, group_id, user.id, payload).await?;
+    let invite = services::invite::create_link(&state, member, payload).await?;
 
     let response: InviteBasicResponse = invite.into();
     Ok((StatusCode::CREATED, Json(response)))
 }
 
 pub async fn get_group_invites(
-    Path(group_id): Path<Uuid>,
+    AuthMember(member): AuthMember,
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let invites = services::invite::get_group_invites(&state, user.id, group_id).await?;
+    let invites = services::invite::get_group_invites(&state, member).await?;
 
     let response: Vec<InviteSummaryResponse> =
         invites.into_iter().map(|invite| invite.into()).collect();
@@ -48,12 +49,13 @@ async fn get_invite(
     AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
     let invite = services::invite::get_invite(&state, code).await?;
-    let group = services::group::get_group_without_auth_check(&state, invite.group_id).await?;
+    let group = services::group::get_group_raw(&state, invite.group_id).await?;
 
     let in_group = state
         .group_repo
-        .are_members(&state.pool, invite.group_id, &[user.id])
-        .await?;
+        .get_member(&state.pool, invite.group_id, user.id)
+        .await?
+        .is_some();
 
     let response = InviteDetailResponse {
         id: invite.id,
@@ -72,14 +74,13 @@ async fn get_invite(
 async fn delete_invite(
     Path(code): Path<Uuid>,
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    VerifiedUser(user): VerifiedUser,
 ) -> Result<impl IntoResponse, AppError> {
     let invite = services::invite::get_invite(&state, code).await?;
-    let group = services::group::get_group_without_auth_check(&state, invite.group_id).await?;
 
     let member = state
         .group_repo
-        .get_member(&state.pool, group.id, user.id)
+        .get_member(&state.pool, invite.group_id, user.id)
         .await?
         .ok_or(GroupError::MemberNotFound)?;
 
@@ -104,9 +105,9 @@ async fn accept_invite(
 
 pub fn router() -> Router<AppState> {
     Router::new()
-        .route("/groups/:id/invites", post(create_invite))
-        .route("/groups/:id/invites", get(get_group_invites))
-        .route("/invites/:code/accept", post(accept_invite))
-        .route("/invites/:code", get(get_invite))
-        .route("/invites/:code", delete(delete_invite))
+        .route("/groups/:group_id/invites", post(create_invite))
+        .route("/groups/:group_id/invites", get(get_group_invites))
+        .route("/invites/:invite_code/accept", post(accept_invite))
+        .route("/invites/:invite_code", get(get_invite))
+        .route("/invites/:invite_code", delete(delete_invite))
 }

@@ -10,7 +10,10 @@ use uuid::Uuid;
 use crate::{
     AppState,
     errors::AppError,
-    extractors::{auth::AuthUser, validated_json::ValidatedJson, verified_user::VerifiedUser},
+    extractors::{
+        auth::AuthUser, auth_member::AuthMember, validated_json::ValidatedJson,
+        verified_member::VerifiedMember, verified_user::VerifiedUser,
+    },
     models::{
         group::{
             CreateGroupReq, GroupMembersParams, GroupResponse, GroupWithRoleResponse, OrderBy,
@@ -26,8 +29,6 @@ async fn create_group(
     VerifiedUser(user): VerifiedUser,
     ValidatedJson(payload): ValidatedJson<CreateGroupReq>,
 ) -> Result<impl IntoResponse, AppError> {
-    // TODO: check user email is validated before they can start creating groups
-
     let group = services::group::create_group(&state, user.id, payload).await?;
 
     let response: GroupResponse = group.into();
@@ -35,42 +36,38 @@ async fn create_group(
 }
 
 async fn get_group_details(
+    AuthMember(member): AuthMember,
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
-    Path(group_id): Path<Uuid>,
 ) -> Result<impl IntoResponse, AppError> {
-    let group = services::group::get_group(&state, user.id, group_id).await?;
+    let group = services::group::get_group(&state, member).await?;
 
     let response: GroupWithRoleResponse = group.into();
     Ok((StatusCode::OK, Json(response)))
 }
 
 async fn update_group(
+    VerifiedMember(member): VerifiedMember,
     State(state): State<AppState>,
-    VerifiedUser(user): VerifiedUser,
-    Path(group_id): Path<Uuid>,
     ValidatedJson(payload): ValidatedJson<UpdateGroupReq>,
 ) -> Result<impl IntoResponse, AppError> {
-    services::group::update_group(&state, user.id, group_id, payload).await?;
+    services::group::update_group(&state, member, payload).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }
 
 async fn delete_group(
+    VerifiedMember(member): VerifiedMember,
     State(state): State<AppState>,
-    VerifiedUser(user): VerifiedUser,
-    Path(group_id): Path<Uuid>,
 ) -> Result<impl IntoResponse, AppError> {
-    services::group::delete_group(&state, user.id, group_id).await?;
+    services::group::delete_group(&state, member).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }
 
 async fn get_group_members(
+    AuthMember(member): AuthMember,
     State(state): State<AppState>,
     Query(query): Query<GroupMembersParams>,
-    AuthUser(user): AuthUser,
-    Path(group_id): Path<Uuid>,
 ) -> Result<impl IntoResponse, AppError> {
     let order_by = query.order_by.unwrap_or(OrderBy::Name);
     let order_dir = query.order_dir.unwrap_or(match order_by {
@@ -78,29 +75,28 @@ async fn get_group_members(
         OrderBy::Role => OrderDir::Descending,
     });
 
-    let response =
-        services::group::get_group_members(&state, user.id, group_id, order_by, order_dir).await?;
+    let response = services::group::get_group_members(&state, member, order_by, order_dir).await?;
 
     Ok((StatusCode::OK, Json(response)))
 }
 
 async fn remove_group_member(
+    VerifiedMember(member): VerifiedMember,
     State(state): State<AppState>,
-    VerifiedUser(user): VerifiedUser,
-    Path((group_id, member_id)): Path<(Uuid, Uuid)>,
+    Path((_, member_id)): Path<(Uuid, Uuid)>,
 ) -> Result<impl IntoResponse, AppError> {
-    services::group::remove_group_member(&state, user.id, group_id, member_id).await?;
+    services::group::remove_group_member(&state, member, member_id).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }
 
 async fn set_member_role(
+    VerifiedMember(member): VerifiedMember,
     State(state): State<AppState>,
-    VerifiedUser(user): VerifiedUser,
-    Path((group_id, member_id)): Path<(Uuid, Uuid)>,
+    Path((_, member_id)): Path<(Uuid, Uuid)>,
     Json(payload): Json<SetRoleReq>,
 ) -> Result<impl IntoResponse, AppError> {
-    services::group::set_member_role(&state, user.id, group_id, member_id, payload.role).await?;
+    services::group::set_member_role(&state, member, member_id, payload.role).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }
@@ -108,16 +104,16 @@ async fn set_member_role(
 pub fn router() -> Router<AppState> {
     Router::new()
         .route("/groups", post(create_group))
-        .route("/groups/:id", get(get_group_details))
-        .route("/groups/:id", put(update_group))
-        .route("/groups/:id", delete(delete_group))
-        .route("/groups/:id/members", get(get_group_members))
+        .route("/groups/:group_id", get(get_group_details))
+        .route("/groups/:group_id", put(update_group))
+        .route("/groups/:group_id", delete(delete_group))
+        .route("/groups/:group_id/members", get(get_group_members))
         .route(
-            "/groups/:groupId/member/:memberId",
+            "/groups/:group_id/member/:member_id",
             delete(remove_group_member),
         )
         .route(
-            "/groups/:groupId/member/:memberId/role",
+            "/groups/:group_id/member/:member_id/role",
             put(set_member_role),
         )
 }

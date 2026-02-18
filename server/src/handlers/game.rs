@@ -10,7 +10,10 @@ use uuid::Uuid;
 use crate::{
     AppState,
     errors::AppError,
-    extractors::{auth::AuthUser, validated_json::ValidatedJson, verified_user::VerifiedUser},
+    extractors::{
+        auth::AuthUser, auth_member::AuthMember, validated_json::ValidatedJson,
+        verified_member::VerifiedMember, verified_user::VerifiedUser,
+    },
     models::{
         game::{CreateGameReq, GameResponse, UpdateGameReq},
         stats::{ScoreboardResponse, StatsParams},
@@ -19,12 +22,11 @@ use crate::{
 };
 
 pub async fn create_game(
+    VerifiedMember(member): VerifiedMember,
     State(state): State<AppState>,
-    Path(group_id): Path<Uuid>,
-    VerifiedUser(user): VerifiedUser,
     ValidatedJson(payload): ValidatedJson<CreateGameReq>,
 ) -> Result<impl IntoResponse, AppError> {
-    let game = services::game::create_game(&state, user.id, group_id, payload).await?;
+    let game = services::game::create_game(&state, member, payload).await?;
 
     let response: GameResponse = game.into();
     Ok((StatusCode::CREATED, Json(response)))
@@ -43,11 +45,10 @@ pub async fn update_game(
 }
 
 pub async fn get_games_in_group(
+    AuthMember(member): AuthMember,
     State(state): State<AppState>,
-    Path(group_id): Path<Uuid>,
-    AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let games = services::group::get_games_in_group(&state, user.id, group_id).await?;
+    let games = services::group::get_games_in_group(&state, member.group_id).await?;
 
     let response: Vec<GameResponse> = games.into_iter().map(|g| g.into()).collect();
     Ok((StatusCode::CREATED, Json(response)))
@@ -96,10 +97,10 @@ pub async fn get_last_players(
 
 pub fn router() -> Router<AppState> {
     Router::new()
-        .route("/groups/:id/games", post(create_game))
-        .route("/groups/:id/games", get(get_games_in_group))
-        .route("/games/:id", get(get_game_details))
-        .route("/games/:id", put(update_game))
-        .route("/games/:id/scoreboard", get(get_scoreboard))
-        .route("/games/:id/last-players", get(get_last_players))
+        .route("/groups/:group_id/games", post(create_game))
+        .route("/groups/:group_id/games", get(get_games_in_group))
+        .route("/games/:game_id", get(get_game_details))
+        .route("/games/:game_id", put(update_game))
+        .route("/games/:game_id/scoreboard", get(get_scoreboard))
+        .route("/games/:game_id/last-players", get(get_last_players))
 }

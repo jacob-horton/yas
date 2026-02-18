@@ -5,7 +5,7 @@ use crate::{
     AppState,
     errors::{AppError, GroupError, InviteError},
     models::{
-        group::GroupMemberRole,
+        group::{GroupMemberDb, GroupMemberRole},
         invite::{CreateInviteReq, InviteDb, InviteWithCreatedByNameDb},
     },
     policies::GroupAction,
@@ -13,17 +13,10 @@ use crate::{
 
 pub async fn create_link(
     state: &AppState,
-    group_id: Uuid,
-    creator_id: Uuid,
+    creator: GroupMemberDb,
     payload: CreateInviteReq,
 ) -> Result<InviteDb, AppError> {
-    let member = state
-        .group_repo
-        .get_member(&state.pool, group_id, creator_id)
-        .await?
-        .ok_or(GroupError::MemberNotFound)?;
-
-    if !member.role.can_perform(GroupAction::CreateInvite) {
+    if !creator.role.can_perform(GroupAction::CreateInvite) {
         return Err(GroupError::Forbidden.into());
     }
 
@@ -42,8 +35,8 @@ pub async fn create_link(
         .invite_repo
         .create(
             &state.pool,
-            group_id,
-            creator_id,
+            creator.group_id,
+            creator.user_id,
             payload.name,
             payload.max_uses,
             Some(expires_at),
@@ -136,19 +129,11 @@ pub fn validate_invite(invite: &InviteWithCreatedByNameDb) -> Result<(), AppErro
 
 pub async fn get_group_invites(
     state: &AppState,
-    user_id: Uuid,
-    group_id: Uuid,
+    member: GroupMemberDb,
 ) -> Result<Vec<InviteWithCreatedByNameDb>, AppError> {
-    // Check user is a member
-    state
-        .group_repo
-        .get_member(&state.pool, group_id, user_id)
-        .await?
-        .ok_or(GroupError::MemberNotFound)?;
-
     let group = state
         .invite_repo
-        .get_invites_for_group(&state.pool, group_id)
+        .get_invites_for_group(&state.pool, member.group_id)
         .await
         .map_err(GroupError::Database)?;
 

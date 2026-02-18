@@ -1,7 +1,8 @@
 use crate::AppState;
-use crate::errors::{AppError, GameError, GroupError, MatchError};
+use crate::errors::{AppError, GroupError, MatchError};
 use crate::models::game_match::{CreateMatchReq, MatchDb, MatchScoreDb};
 use crate::policies::GroupAction;
+use crate::services::game::fetch_game_guarded;
 
 use uuid::Uuid;
 
@@ -11,21 +12,8 @@ pub async fn create_match(
     user_id: Uuid,
     payload: CreateMatchReq,
 ) -> Result<MatchDb, AppError> {
-    let mut tx = state.pool.begin().await?;
-
-    // Check user has permissions ot create the match within the group
-    let game = state
-        .game_repo
-        .get(&mut *tx, game_id)
-        .await?
-        .ok_or(GameError::NotFound)?;
-
-    let member = state
-        .group_repo
-        .get_member(&mut *tx, game.group_id, user_id)
-        .await?
-        .ok_or(GroupError::MemberNotFound)?;
-
+    // Check user has permissions to create the match within the group
+    let (game, member) = fetch_game_guarded(&state, game_id, user_id).await?;
     if !member.role.can_perform(GroupAction::CreateMatch) {
         return Err(GroupError::Forbidden.into());
     }
@@ -50,6 +38,8 @@ pub async fn create_match(
             score: s.score,
         })
     }
+
+    let mut tx = state.pool.begin().await?;
 
     // Verify all users are members of the group
     let all_members = state
