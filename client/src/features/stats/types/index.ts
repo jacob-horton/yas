@@ -1,3 +1,6 @@
+import type { Icon } from "@/lib/icons";
+import type { Colour } from "../constants";
+
 export type MatchStats = {
   match_id: string;
   score: number;
@@ -35,3 +38,10 @@ type PlayerStatsEntry = {
 };
 
 export type DistributionData = Record<string, PlayerStatsEntry>;
+
+export type StatData = {
+  icon: Icon;
+  colour: Colour;
+  label: string;
+  getValue: (data: PlayerHighlightStats) => string;
+};

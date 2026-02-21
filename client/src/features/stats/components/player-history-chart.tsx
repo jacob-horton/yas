@@ -1,8 +1,7 @@
 import { type Component, createMemo } from "solid-js";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
+import { CHART_LINE_COLOUR } from "../constants";
 import { ChartComponent } from "./chart";
-
-const LINE_COLOUR = "oklch(54.1% 0.281 293.009)";
 
 type Props = {
   data: {
@@ -22,7 +21,7 @@ export const PlayerHistoryChart: Component<Props> = (props) => {
 
   return (
     <ChartComponent
-      datasets={[{ data: data(), colour: LINE_COLOUR }]}
+      datasets={[{ data: data(), colour: CHART_LINE_COLOUR }]}
       formatTooltipTitle={(items) => {
         const point = items[0].raw as { rank: number };
         return ordinalSuffix(point.rank);

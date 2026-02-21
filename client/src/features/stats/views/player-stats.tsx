@@ -15,56 +15,17 @@ import { formatDate } from "@/lib/format-date";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_TEXT_COLOURS } from "@/lib/rank-colours";
 import { PlayerHistoryChart } from "../components/player-history-chart";
-import { type Colour, type Icon, StatCard } from "../components/stat-card";
+import { StatCard } from "../components/stat-card";
+import { LIFETIME_STATS } from "../constants";
 import { usePlayerHighlights } from "../hooks/use-player-highlights";
 import { usePlayerHistory } from "../hooks/use-player-history";
-import type { PlayerHighlightStats, PlayerStatsRouteParams } from "../types";
+import type { PlayerStatsRouteParams } from "../types";
 
 const TABLE_HEADINGS = [
   { label: "Date" },
   { label: "Rank" },
   { label: "Score" },
 ] as const satisfies Heading<string>[];
-
-type StatData = {
-  icon: Icon;
-  colour: Colour;
-  label: string;
-  getValue: (data: PlayerHighlightStats) => string;
-};
-
-const LIFETIME_STATS: StatData[] = [
-  {
-    icon: "trophy",
-    colour: "orange",
-    label: "Win Rate",
-    getValue: (d) => `${(d.lifetime.win_rate * 100).toFixed(0)}%`,
-  },
-  {
-    icon: "chart",
-    colour: "green",
-    label: "Average Score",
-    getValue: (d) => d.lifetime.average_score.toFixed(2),
-  },
-  {
-    icon: "star",
-    colour: "purple",
-    label: "Best Score",
-    getValue: (d) => d.lifetime.best_score.toFixed(0),
-  },
-  {
-    icon: "stack",
-    colour: "blue",
-    label: "Total Games",
-    getValue: (d) => d.lifetime.total_games.toFixed(0),
-  },
-  {
-    icon: "hash",
-    colour: "yellow",
-    label: "Current Rank",
-    getValue: (d) => ordinalSuffix(d.lifetime.rank),
-  },
-];
 
 export const PlayerStats = () => {
   const params = useParams<PlayerStatsRouteParams>();

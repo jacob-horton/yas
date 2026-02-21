@@ -13,21 +13,15 @@ import {
 import { TableRowSkeleton } from "@/components/ui/table.skeleton";
 import { useConfirmation } from "@/context/confirmation-context";
 import { Authorised } from "@/features/auth/components/authorised";
+import { useAuth } from "@/features/auth/context/auth-provider";
 import { invitesApi } from "@/features/invites/api";
 import type { InviteSummary } from "@/features/invites/types/invite";
 import { cn } from "@/lib/classname";
+import { isExpired } from "@/lib/expiry";
 import { formatDate, formatDateTime } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupInvites } from "../hooks/use-group-invites";
 import { hasPermission } from "../types";
-import { useAuth } from "@/features/auth/context/auth-provider";
-
-function isExpired(expiry: string) {
-  const expiryDate = new Date(expiry);
-  const now = new Date();
-
-  return now > expiryDate;
-}
 
 type ExpiryCellProps = { expiresAt: string };
 

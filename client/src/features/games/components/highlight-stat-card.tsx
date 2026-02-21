@@ -1,53 +1,12 @@
-import CrownIcon from "lucide-solid/icons/crown";
-import InfinityIcon from "lucide-solid/icons/infinity";
-import MountainIcon from "lucide-solid/icons/mountain-snow";
-import WheatIcon from "lucide-solid/icons/wheat";
 import type { Component } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { TextSkeleton } from "@/components/ui/text.skeleton";
 import { cn } from "@/lib/classname";
-
-// TODO: reduce duplication with other stat card
-export const COLOUR_MAP = {
-  orange: {
-    text: "text-amber-500",
-    textSubtle: "text-amber-400",
-    bg: "bg-amber-50/50 dark:bg-amber-500/10",
-    bgDark: "bg-amber-100/75 dark:bg-amber-200/10",
-    border: "border-amber-200 dark:border-amber-500/30",
-  },
-  green: {
-    text: "text-emerald-500",
-    textSubtle: "text-emerald-400",
-    bg: "bg-emerald-50/50 dark:bg-emerald-500/10",
-    bgDark: "bg-emerald-100/75 dark:bg-emerald-200/10",
-    border: "border-emerald-200 dark:border-emerald-500/30",
-  },
-  purple: {
-    text: "text-violet-500",
-    textSubtle: "text-violet-400",
-    bg: "bg-violet-50/50 dark:bg-violet-500/10",
-    bgDark: "bg-violet-100/75 dark:bg-violet-200/10",
-    border: "border-violet-200 dark:border-violet-500/30",
-  },
-  blue: {
-    text: "text-blue-500",
-    textSubtle: "text-blue-400",
-    bg: "bg-blue-50/50 dark:bg-blue-500/10",
-    bgDark: "bg-blue-100/75 dark:bg-blue-200/10",
-    border: "border-blue-200 dark:border-blue-500/30",
-  },
-} as const;
-
-export const ICON_MAP = {
-  crown: CrownIcon,
-  wheat: WheatIcon,
-  mountain: MountainIcon,
-  infinity: InfinityIcon,
-} as const;
+import { ICON_MAP, type Icon } from "@/lib/icons";
+import { COLOUR_MAP } from "../constants";
 
 type Props = {
-  icon: keyof typeof ICON_MAP;
+  icon: Icon;
   colour: keyof typeof COLOUR_MAP;
   label: string;
   subtext: string;

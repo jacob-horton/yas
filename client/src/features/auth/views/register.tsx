@@ -3,14 +3,8 @@ import { type Component, createEffect } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ERROR_MESSAGES } from "../constants";
 import { useAuth } from "../context/auth-provider";
-
-const ERROR_MESSAGES = {
-  length: "Invalid length",
-  email: "Must be a valid email",
-  common: "Password is too common",
-  duplicate: "Already in use",
-};
 
 export const Register: Component = () => {
   const [data, setData] = createStore({

@@ -9,12 +9,7 @@ import { TextSkeleton } from "@/components/ui/text.skeleton";
 import { cn } from "@/lib/classname";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_BG_GRADIENTS } from "@/lib/rank-colours";
-
-const RANK_SIZES: Record<number, string> = {
-  1: "h-80 text-4xl",
-  2: "h-72 text-3xl",
-  3: "h-68 text-2xl",
-};
+import { RANK_PODIUM_SIZES } from "../constants";
 
 type PodiumStats = {
   avatar: AvatarIcon;
@@ -32,7 +27,7 @@ export const PodiumCard: Component<{
     <div
       class={cn(
         "flex w-68 flex-col justify-between overflow-clip rounded-md border bg-white pb-8 dark:bg-gray-800",
-        RANK_SIZES[props.position],
+        RANK_PODIUM_SIZES[props.position],
       )}
     >
       <div

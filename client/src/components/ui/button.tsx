@@ -1,13 +1,9 @@
-import ChevronLeftIcon from "lucide-solid/icons/chevron-left";
-import ClipboardIcon from "lucide-solid/icons/clipboard";
-import PlusIcon from "lucide-solid/icons/plus";
-import TrashIcon from "lucide-solid/icons/trash-2";
-import type { Component, ParentComponent } from "solid-js";
+import type { ParentComponent } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { cn } from "@/lib/classname";
+import { ICON_MAP, type Icon } from "@/lib/icons";
 
 export type Variant = "primary" | "secondary" | "ghost";
-export type Icon = "copy" | "chevronLeft" | "plus" | "delete";
 
 const COLOUR_MAP: Record<Variant, string> = {
   primary:
@@ -15,13 +11,6 @@ const COLOUR_MAP: Record<Variant, string> = {
   secondary: "border hover:bg-gray-100 dark:hover:bg-gray-100/10 transition",
   ghost: "hover:bg-gray-100 dark:hover:bg-gray-100/10 transition",
 } as const;
-
-export const ICON_MAP: Record<Icon, Component> = {
-  copy: ClipboardIcon,
-  chevronLeft: ChevronLeftIcon,
-  plus: PlusIcon,
-  delete: TrashIcon,
-};
 
 export const Button: ParentComponent<{
   variant?: Variant;

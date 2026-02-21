@@ -1,8 +1,5 @@
 import { useNavigate } from "@solidjs/router";
 import { useQueryClient } from "@tanstack/solid-query";
-import CalendarIcon from "lucide-solid/icons/calendar-1";
-import UserStarIcon from "lucide-solid/icons/user-star";
-import UsersIcon from "lucide-solid/icons/users";
 import { createMemo, type ParentComponent, Show, Suspense } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { type Action, Page } from "@/components/layout/page";
@@ -10,20 +7,12 @@ import { Avatar } from "@/components/ui/avatar";
 import { useConfirmation } from "@/context/confirmation-context";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { formatDate } from "@/lib/format-date";
+import { ICON_MAP, type Icon } from "@/lib/icons";
 import { groupsApi } from "../api";
 import { useGroup } from "../context/group-provider";
 import { groupKeys } from "../hooks/query-keys";
 import { useGroupMembers } from "../hooks/use-group-members";
 import { hasPermission } from "../types";
-
-// TODO: one full icon map
-const ICON_MAP = {
-  calendar: CalendarIcon,
-  users: UsersIcon,
-  user: UserStarIcon,
-} as const;
-
-type Icon = keyof typeof ICON_MAP;
 
 type DetailCardProps = {
   title: string;
@@ -115,7 +104,7 @@ export const GroupDetails = () => {
               {formatDate(group.groupQuery.data?.created_at ?? "")}
             </Suspense>
           </DetailCard>
-          <DetailCard icon="user" title="Created By">
+          <DetailCard icon="userStar" title="Created By">
             <Suspense>
               <Show when={createdBy()}>
                 {(createdBy) => {

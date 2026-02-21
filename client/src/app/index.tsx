@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/features/auth/components/protected-route";
 import { AuthProvider } from "@/features/auth/context/auth-provider";
 import { Login } from "@/features/auth/views/login";
 import { Register } from "@/features/auth/views/register";
+import { VerifyEmail } from "@/features/auth/views/verify-email";
 import { CreateGame } from "@/features/games/views/create-game";
 import { EditGame } from "@/features/games/views/edit-game";
 import { Scoreboard } from "@/features/games/views/scoreboard";
@@ -25,7 +26,6 @@ import { EditPassword } from "@/features/users/views/edit-password";
 import { EditUser } from "@/features/users/views/edit-user";
 import { UserSettings } from "@/features/users/views/settings";
 import { HomePage } from "@/pages/home-page";
-import { VerifyEmail } from "@/features/auth/views/verify-email";
 
 const queryClient = new QueryClient();
 

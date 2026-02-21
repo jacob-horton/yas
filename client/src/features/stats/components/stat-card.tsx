@@ -1,61 +1,9 @@
-import ChartColumnIcon from "lucide-solid/icons/chart-column";
-import HashIcon from "lucide-solid/icons/hash";
-import Layers2Icon from "lucide-solid/icons/layers-2";
-import StarIcon from "lucide-solid/icons/star";
-import TrophyIcon from "lucide-solid/icons/trophy";
 import type { Component } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { TextSkeleton } from "@/components/ui/text.skeleton";
 import { cn } from "@/lib/classname";
-
-const COLOUR_MAP = {
-  orange: {
-    text: "text-amber-500",
-    textSubtle: "text-amber-400",
-    bg: "bg-amber-50/50 dark:bg-amber-500/10",
-    bgDark: "bg-amber-100/75 dark:bg-amber-200/10",
-    border: "border-amber-200 dark:border-amber-500/30",
-  },
-  green: {
-    text: "text-emerald-500",
-    textSubtle: "text-emerald-400",
-    bg: "bg-emerald-50/50 dark:bg-emerald-500/10",
-    bgDark: "bg-emerald-100/75 dark:bg-emerald-200/10",
-    border: "border-emerald-200 dark:border-emerald-500/30",
-  },
-  purple: {
-    text: "text-violet-500",
-    textSubtle: "text-violet-400",
-    bg: "bg-violet-50/50 dark:bg-violet-500/10",
-    bgDark: "bg-violet-100/75 dark:bg-violet-200/10",
-    border: "border-violet-200 dark:border-violet-500/30",
-  },
-  blue: {
-    text: "text-blue-500",
-    textSubtle: "text-blue-400",
-    bg: "bg-blue-50/50 dark:bg-blue-500/10",
-    bgDark: "bg-blue-100/75 dark:bg-blue-200/10",
-    border: "border-blue-200 dark:border-blue-500/30",
-  },
-  yellow: {
-    text: "text-fuchsia-500",
-    textSubtle: "text-fuchsia-400",
-    bg: "bg-fuchsia-50/50 dark:bg-fuchsia-500/10",
-    bgDark: "bg-fuchsia-100/75 dark:bg-fuchsia-200/10",
-    border: "border-fuchsia-200 dark:border-fuchsia-500/30",
-  },
-} as const;
-
-const ICON_MAP = {
-  trophy: TrophyIcon,
-  star: StarIcon,
-  chart: ChartColumnIcon,
-  stack: Layers2Icon,
-  hash: HashIcon,
-} as const;
-
-export type Icon = keyof typeof ICON_MAP;
-export type Colour = keyof typeof COLOUR_MAP;
+import { ICON_MAP, type Icon } from "@/lib/icons";
+import { COLOUR_MAP, type Colour } from "../constants";
 
 type Props = {
   icon: Icon;
