@@ -1,12 +1,12 @@
-use std::sync::Arc;
-
 use axum::{
-    Json, Router,
+    Extension, Json, Router,
     extract::{Path, State},
     http::StatusCode,
+    middleware,
     response::IntoResponse,
     routing::{delete, get, post},
 };
+use tower::ServiceBuilder;
 use uuid::Uuid;
 
 use crate::{
@@ -15,7 +15,10 @@ use crate::{
     extractors::{
         auth::AuthUser,
         auth_member::AuthMember,
-        rate_limiting::ip::{IpLimitConfig, IpLimiter, RequireIpLimit},
+        rate_limiting::{
+            ip::{create_ip_limiter, ip_limit_mw},
+            user_id::{create_user_limiter, user_limit_mw},
+        },
         validated_json::ValidatedJson,
         verified_member::VerifiedMember,
         verified_user::VerifiedUser,
@@ -27,15 +30,7 @@ use crate::{
     services,
 };
 
-struct InviteRoute;
-impl IpLimitConfig for InviteRoute {
-    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
-        &state.rate_limiters.invite_ip_limiter
-    }
-}
-
 async fn create_invite(
-    _ip_limiter: RequireIpLimit<InviteRoute>,
     VerifiedMember(member): VerifiedMember,
     State(state): State<AppState>,
     ValidatedJson(payload): ValidatedJson<CreateInviteReq>,
@@ -119,9 +114,39 @@ async fn accept_invite(
 
 pub fn router() -> Router<AppState> {
     Router::new()
-        .route("/groups/:group_id/invites", post(create_invite))
-        .route("/groups/:group_id/invites", get(get_group_invites))
-        .route("/invites/:invite_code/accept", post(accept_invite))
-        .route("/invites/:invite_code", get(get_invite))
+        .route(
+            "/groups/:group_id/invites",
+            post(create_invite).layer(
+                ServiceBuilder::new()
+                    .layer(Extension(create_ip_limiter(10, 60 * 60)))
+                    .layer(middleware::from_fn(ip_limit_mw))
+                    .layer(Extension(create_user_limiter(20, 60 * 60 * 24)))
+                    .layer(middleware::from_fn(user_limit_mw)),
+            ),
+        )
+        .route(
+            "/groups/:group_id/invites",
+            get(get_group_invites).layer(
+                ServiceBuilder::new()
+                    .layer(Extension(create_ip_limiter(20, 60)))
+                    .layer(middleware::from_fn(ip_limit_mw)),
+            ),
+        )
+        .route(
+            "/invites/:invite_code/accept",
+            post(accept_invite).layer(
+                ServiceBuilder::new()
+                    .layer(Extension(create_ip_limiter(20, 60)))
+                    .layer(middleware::from_fn(ip_limit_mw)),
+            ),
+        )
+        .route(
+            "/invites/:invite_code",
+            get(get_invite).layer(
+                ServiceBuilder::new()
+                    .layer(Extension(create_ip_limiter(20, 60)))
+                    .layer(middleware::from_fn(ip_limit_mw)),
+            ),
+        )
         .route("/invites/:invite_code", delete(delete_invite))
 }

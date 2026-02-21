@@ -1,9 +1,10 @@
-use crate::extractors::rate_limiting::email::EmailLimitConfig;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, prelude::Type};
 use uuid::Uuid;
 use validator::Validate;
+
+use crate::extractors::rate_limiting::payload::RateLimitKeyExtractor;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type, PartialEq, Eq)]
 #[sqlx(type_name = "TEXT", rename_all = "snake_case")]
@@ -129,15 +130,9 @@ pub struct CreateUserReq {
     pub password: String,
 }
 
-impl EmailLimitConfig for CreateUserReq {
-    fn email(&self) -> &str {
-        &self.email
-    }
-
-    fn email_limiter(
-        state: &crate::AppState,
-    ) -> &std::sync::Arc<crate::extractors::rate_limiting::email::EmailLimiter> {
-        &state.rate_limiters.register_email_limiter
+impl RateLimitKeyExtractor for CreateUserReq {
+    fn limit_key(&self) -> String {
+        self.email.clone()
     }
 }
 

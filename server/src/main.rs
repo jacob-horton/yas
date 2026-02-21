@@ -14,126 +14,21 @@ use axum::{
         header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
     },
 };
-use governor::{Quota, RateLimiter};
 use resend_rs::Resend;
 use sqlx::{PgPool, postgres::PgPoolOptions};
-use std::{env, net::SocketAddr, num::NonZeroU32, sync::Arc, time::Duration};
+use std::{env, net::SocketAddr, sync::Arc};
 use tower_http::cors::CorsLayer;
 use tower_sessions::{Expiry, SessionManagerLayer, cookie::SameSite};
 use tower_sessions_sqlx_store::PostgresStore;
 
-use crate::{
-    extractors::rate_limiting::{email::EmailLimiter, ip::IpLimiter, user_id::UserIdLimiter},
-    repositories::{
-        email_repo::EmailRepo, game_repo::GameRepo, group_repo::GroupRepo, invite_repo::InviteRepo,
-        match_repo::MatchRepo, stats_repo::StatsRepo, user_repo::UserRepo,
-    },
+use crate::repositories::{
+    email_repo::EmailRepo, game_repo::GameRepo, group_repo::GroupRepo, invite_repo::InviteRepo,
+    match_repo::MatchRepo, stats_repo::StatsRepo, user_repo::UserRepo,
 };
-
-#[derive(Clone)]
-pub struct RateLimiters {
-    pub login_ip_limiter: Arc<IpLimiter>,
-    pub login_email_limiter: Arc<EmailLimiter>,
-
-    pub register_ip_limiter: Arc<IpLimiter>,
-    pub register_email_limiter: Arc<EmailLimiter>,
-
-    pub change_password_ip_limiter: Arc<IpLimiter>,
-    pub change_password_user_id_limiter: Arc<UserIdLimiter>,
-
-    pub invite_ip_limiter: Arc<IpLimiter>,
-
-    pub verify_email_ip_limiter: Arc<IpLimiter>,
-
-    pub create_group_ip_limiter: Arc<IpLimiter>,
-    pub create_game_ip_limiter: Arc<IpLimiter>,
-    pub create_match_ip_limiter: Arc<IpLimiter>,
-}
-
-impl RateLimiters {
-    fn new() -> Self {
-        Self {
-            // Login: 10 IP requests per minute (1 token per 6s)
-            // 5 Email requests per 15 mins (1 token per 180s)
-            login_ip_limiter: Arc::new(RateLimiter::keyed(
-                Quota::with_period(Duration::from_secs(6))
-                    .unwrap()
-                    .allow_burst(NonZeroU32::new(10).unwrap()),
-            )),
-            login_email_limiter: Arc::new(RateLimiter::keyed(
-                Quota::with_period(Duration::from_secs(180))
-                    .unwrap()
-                    .allow_burst(NonZeroU32::new(5).unwrap()),
-            )),
-
-            // Register: 5 IP requests per hour (1 token per 720s)
-            // 3 Email requests per hour (1 token per 1200s)
-            register_ip_limiter: Arc::new(RateLimiter::keyed(
-                Quota::with_period(Duration::from_secs(720))
-                    .unwrap()
-                    .allow_burst(NonZeroU32::new(5).unwrap()),
-            )),
-            register_email_limiter: Arc::new(RateLimiter::keyed(
-                Quota::with_period(Duration::from_secs(1200))
-                    .unwrap()
-                    .allow_burst(NonZeroU32::new(3).unwrap()),
-            )),
-
-            // Change password: 5 IP requests per hour (1 token per 720s)
-            // 3 User/Email requests per hour (1 token per 1200s)
-            change_password_ip_limiter: Arc::new(RateLimiter::keyed(
-                Quota::with_period(Duration::from_secs(720))
-                    .unwrap()
-                    .allow_burst(NonZeroU32::new(5).unwrap()),
-            )),
-            change_password_user_id_limiter: Arc::new(RateLimiter::keyed(
-                Quota::with_period(Duration::from_secs(1200))
-                    .unwrap()
-                    .allow_burst(NonZeroU32::new(3).unwrap()),
-            )),
-
-            // Invites (view and accept): 20 per minute (1 token per 3s)
-            invite_ip_limiter: Arc::new(RateLimiter::keyed(
-                Quota::with_period(Duration::from_secs(3))
-                    .unwrap()
-                    .allow_burst(NonZeroU32::new(20).unwrap()),
-            )),
-
-            // Verify Email: 10 IP requests per hour (1 token per 360s)
-            verify_email_ip_limiter: Arc::new(RateLimiter::keyed(
-                Quota::with_period(Duration::from_secs(360))
-                    .unwrap()
-                    .allow_burst(NonZeroU32::new(10).unwrap()),
-            )),
-
-            // Create group: 5 per hour (1 token per 720s)
-            create_group_ip_limiter: Arc::new(RateLimiter::keyed(
-                Quota::with_period(Duration::from_secs(720))
-                    .unwrap()
-                    .allow_burst(NonZeroU32::new(5).unwrap()),
-            )),
-
-            // Create game: 5 per hour (1 token per 720s)
-            create_game_ip_limiter: Arc::new(RateLimiter::keyed(
-                Quota::with_period(Duration::from_secs(720))
-                    .unwrap()
-                    .allow_burst(NonZeroU32::new(5).unwrap()),
-            )),
-
-            // Create Match: 10 per minute (1 token per 6s)
-            create_match_ip_limiter: Arc::new(RateLimiter::keyed(
-                Quota::with_period(Duration::from_secs(6))
-                    .unwrap()
-                    .allow_burst(NonZeroU32::new(10).unwrap()),
-            )),
-        }
-    }
-}
 
 #[derive(Clone)]
 pub struct AppState {
     pub pool: PgPool,
-    pub rate_limiters: RateLimiters,
 
     pub email_repo: EmailRepo,
     pub user_repo: Arc<UserRepo>,
@@ -156,11 +51,8 @@ impl AppState {
         let resend_client = Resend::new(&env::var("RESEND_KEY").expect("RESEND_KEY must be set"));
         let email_repo = EmailRepo { resend_client };
 
-        let rate_limiters = RateLimiters::new();
-
         Self {
             pool: pool.clone(),
-            rate_limiters,
 
             email_repo,
             user_repo,

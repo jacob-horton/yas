@@ -1,12 +1,12 @@
-use std::sync::Arc;
-
 use axum::{
-    Json, Router,
+    Extension, Json, Router,
     extract::{Path, Query, State},
     http::StatusCode,
+    middleware,
     response::IntoResponse,
     routing::{get, post, put},
 };
+use tower::ServiceBuilder;
 use uuid::Uuid;
 
 use crate::{
@@ -15,7 +15,7 @@ use crate::{
     extractors::{
         auth::AuthUser,
         auth_member::AuthMember,
-        rate_limiting::ip::{IpLimitConfig, IpLimiter, RequireIpLimit},
+        rate_limiting::ip::{create_ip_limiter, ip_limit_mw},
         validated_json::ValidatedJson,
         verified_member::VerifiedMember,
         verified_user::VerifiedUser,
@@ -27,15 +27,7 @@ use crate::{
     services,
 };
 
-struct CreateGameRoute;
-impl IpLimitConfig for CreateGameRoute {
-    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
-        &state.rate_limiters.create_game_ip_limiter
-    }
-}
-
 async fn create_game(
-    _ip_limiter: RequireIpLimit<CreateGameRoute>,
     VerifiedMember(member): VerifiedMember,
     State(state): State<AppState>,
     ValidatedJson(payload): ValidatedJson<CreateGameReq>,
@@ -111,7 +103,14 @@ async fn get_last_players(
 
 pub fn router() -> Router<AppState> {
     Router::new()
-        .route("/groups/:group_id/games", post(create_game))
+        .route(
+            "/groups/:group_id/games",
+            post(create_game).layer(
+                ServiceBuilder::new()
+                    .layer(Extension(create_ip_limiter(5, 60 * 60)))
+                    .layer(middleware::from_fn(ip_limit_mw)),
+            ),
+        )
         .route("/groups/:group_id/games", get(get_games_in_group))
         .route("/games/:game_id", get(get_game_details))
         .route("/games/:game_id", put(update_game))

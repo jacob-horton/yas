@@ -1,60 +1,46 @@
-use crate::{
-    AppState,
-    constants::SESSION_USER_KEY,
-    errors::{AppError, AuthError},
+use crate::constants::SESSION_USER_KEY;
+use axum::{
+    Extension, Json,
+    extract::Request,
+    http::StatusCode,
+    middleware::Next,
+    response::{IntoResponse, Response},
 };
-use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
-use governor::{RateLimiter, clock::DefaultClock, state::keyed::DefaultKeyedStateStore};
-use std::{marker::PhantomData, ops::Deref, sync::Arc};
+use governor::{Quota, RateLimiter, clock::DefaultClock, state::keyed::DefaultKeyedStateStore};
+use std::sync::Arc;
+use std::{num::NonZeroU32, time::Duration};
 use tower_sessions::Session;
 use uuid::Uuid;
 
-pub type UserIdLimiter = RateLimiter<Uuid, DefaultKeyedStateStore<Uuid>, DefaultClock>;
+pub type UserLimiter = RateLimiter<Uuid, DefaultKeyedStateStore<Uuid>, DefaultClock>;
 
-pub trait UserLimitConfig {
-    fn limiter(state: &AppState) -> &Arc<UserIdLimiter>;
+pub fn create_user_limiter(requests: u32, per_seconds: u64) -> Arc<UserLimiter> {
+    let period = Duration::from_secs(per_seconds) / requests;
+    Arc::new(RateLimiter::keyed(
+        Quota::with_period(period)
+            .unwrap()
+            .allow_burst(NonZeroU32::new(requests).unwrap()),
+    ))
 }
 
-pub struct RateLimitedUser<R, E>(pub E, pub PhantomData<R>);
+pub async fn user_limit_mw(
+    Extension(limiter): Extension<Arc<UserLimiter>>,
+    session: Session,
+    req: Request,
+    next: Next,
+) -> Response {
+    let Ok(Some(user_id_str)) = session.get::<String>(SESSION_USER_KEY).await else {
+        return (StatusCode::UNAUTHORIZED, "Unauthorized").into_response();
+    };
 
-impl<R, E> Deref for RateLimitedUser<R, E> {
-    type Target = E;
-    fn deref(&self) -> &Self::Target {
-        &self.0
+    let Ok(user_id) = user_id_str.parse::<Uuid>() else {
+        return (StatusCode::UNAUTHORIZED, "Unauthorized").into_response();
+    };
+
+    if limiter.check_key(&user_id).is_err() {
+        let err = serde_json::json!({ "error": "User limit exceeded" });
+        return (StatusCode::TOO_MANY_REQUESTS, Json(err)).into_response();
     }
-}
 
-#[async_trait]
-impl<R, E> FromRequestParts<AppState> for RateLimitedUser<R, E>
-where
-    R: UserLimitConfig + Send + Sync + 'static,
-    E: FromRequestParts<AppState, Rejection = AppError> + Send + Sync + 'static,
-{
-    type Rejection = AppError;
-
-    async fn from_request_parts(
-        parts: &mut Parts,
-        state: &AppState,
-    ) -> Result<Self, Self::Rejection> {
-        let session = Session::from_request_parts(parts, state)
-            .await
-            .map_err(|_| AppError::InternalServerError("Failed to load session".into()))?;
-
-        let user_id: Uuid = session
-            .get::<String>(SESSION_USER_KEY)
-            .await
-            .map_err(|e| AppError::InternalServerError(e.to_string()))?
-            .ok_or(AuthError::InvalidSession)?
-            .parse()
-            .map_err(|_| AuthError::InvalidSession)?;
-
-        let limiter = R::limiter(state);
-
-        if limiter.check_key(&user_id).is_err() {
-            return Err(AppError::InternalServerError("Too many requests".into()));
-        }
-        let inner_extractor = E::from_request_parts(parts, state).await?;
-
-        Ok(RateLimitedUser(inner_extractor, PhantomData))
-    }
+    next.run(req).await
 }

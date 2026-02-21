@@ -1,12 +1,12 @@
-use std::sync::Arc;
-
 use axum::{
-    Json, Router,
+    Extension, Json, Router,
     extract::{Path, Query, State},
     http::StatusCode,
+    middleware,
     response::IntoResponse,
     routing::{delete, get, post, put},
 };
+use tower::ServiceBuilder;
 use uuid::Uuid;
 
 use crate::{
@@ -14,7 +14,7 @@ use crate::{
     errors::AppError,
     extractors::{
         auth_member::AuthMember,
-        rate_limiting::ip::{IpLimitConfig, IpLimiter, RequireIpLimit},
+        rate_limiting::ip::{create_ip_limiter, ip_limit_mw},
         validated_json::ValidatedJson,
         verified_member::VerifiedMember,
         verified_user::VerifiedUser,
@@ -29,17 +29,9 @@ use crate::{
     services,
 };
 
-struct CreateGroupRoute;
-impl IpLimitConfig for CreateGroupRoute {
-    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
-        &state.rate_limiters.create_group_ip_limiter
-    }
-}
-
 async fn create_group(
-    _ip_limiter: RequireIpLimit<CreateGroupRoute>,
-    State(state): State<AppState>,
     user: VerifiedUser,
+    State(state): State<AppState>,
     ValidatedJson(payload): ValidatedJson<CreateGroupReq>,
 ) -> Result<impl IntoResponse, AppError> {
     let group = services::group::create_group(&state, user.id, payload).await?;
@@ -116,7 +108,14 @@ async fn set_member_role(
 
 pub fn router() -> Router<AppState> {
     Router::new()
-        .route("/groups", post(create_group))
+        .route(
+            "/groups",
+            post(create_group).layer(
+                ServiceBuilder::new()
+                    .layer(Extension(create_ip_limiter(5, 60 * 60)))
+                    .layer(middleware::from_fn(ip_limit_mw)),
+            ),
+        )
         .route("/groups/:group_id", get(get_group_details))
         .route("/groups/:group_id", put(update_group))
         .route("/groups/:group_id", delete(delete_group))

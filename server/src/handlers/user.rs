@@ -1,9 +1,8 @@
-use std::sync::Arc;
-
 use axum::{
-    Json, Router,
+    Extension, Json, Router,
     extract::{Path, State},
     http::StatusCode,
+    middleware,
     response::IntoResponse,
     routing::{get, patch, post, put},
 };
@@ -17,9 +16,9 @@ use crate::{
     extractors::{
         auth::AuthUser,
         rate_limiting::{
-            email::EmailLimited,
-            ip::{IpLimitConfig, IpLimiter, RequireIpLimit},
-            user_id::{RateLimitedUser, UserIdLimiter, UserLimitConfig},
+            ip::{create_ip_limiter, ip_limit_mw},
+            payload::{RateLimitedPayload, create_payload_limiter},
+            user_id::{create_user_limiter, user_limit_mw},
         },
         validated_json::ValidatedJson,
     },
@@ -33,32 +32,11 @@ use crate::{
     services,
 };
 
-struct RegisterRoute;
-impl IpLimitConfig for RegisterRoute {
-    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
-        &state.rate_limiters.register_ip_limiter
-    }
-}
-
-struct ChangePasswordRoute;
-impl IpLimitConfig for ChangePasswordRoute {
-    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
-        &state.rate_limiters.change_password_ip_limiter
-    }
-}
-
-impl UserLimitConfig for ChangePasswordRoute {
-    fn limiter(state: &AppState) -> &Arc<UserIdLimiter> {
-        &state.rate_limiters.change_password_user_id_limiter
-    }
-}
-
 // Sign up
 async fn create_user(
     session: Session,
-    _ip_limiter: RequireIpLimit<RegisterRoute>,
     State(state): State<AppState>,
-    EmailLimited(ValidatedJson(payload)): EmailLimited<ValidatedJson<CreateUserReq>>,
+    RateLimitedPayload(ValidatedJson(payload)): RateLimitedPayload<ValidatedJson<CreateUserReq>>,
 ) -> Result<impl IntoResponse, AppError> {
     let user = services::user::create_user(&state, payload).await?;
 
@@ -152,8 +130,7 @@ async fn update_current_user(
 
 async fn update_password(
     session: Session,
-    _ip_limiter: RequireIpLimit<ChangePasswordRoute>,
-    user: RateLimitedUser<ChangePasswordRoute, AuthUser>,
+    user: AuthUser,
     State(state): State<AppState>,
     ValidatedJson(payload): ValidatedJson<UpdatePasswordReq>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -176,10 +153,23 @@ async fn update_password(
 
 pub fn router() -> Router<AppState> {
     Router::new()
-        .route("/users", post(create_user))
+        .route(
+            "/users",
+            post(create_user)
+                .route_layer(Extension(create_payload_limiter(3, 60 * 60)))
+                .route_layer(Extension(create_ip_limiter(5, 60 * 60)))
+                .route_layer(middleware::from_fn(ip_limit_mw)),
+        )
         .route("/users/me", get(get_current_user))
         .route("/users/me", patch(update_current_user))
-        .route("/users/me/password", put(update_password))
+        .route(
+            "/users/me/password",
+            put(update_password)
+                .route_layer(Extension(create_ip_limiter(5, 60 * 60)))
+                .route_layer(middleware::from_fn(ip_limit_mw))
+                .route_layer(Extension(create_user_limiter(3, 60 * 60)))
+                .route_layer(middleware::from_fn(user_limit_mw)),
+        )
         .route("/users/me/groups", get(get_current_user_groups))
         .route("/users/:id", get(get_user))
 }

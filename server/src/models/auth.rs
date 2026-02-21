@@ -2,7 +2,7 @@ use serde::Deserialize;
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::extractors::rate_limiting::email::EmailLimitConfig;
+use crate::extractors::rate_limiting::payload::RateLimitKeyExtractor;
 
 #[derive(Debug, Deserialize, Validate)]
 pub struct CreateSessionReq {
@@ -21,14 +21,8 @@ pub struct VerifyEmailReq {
     pub token: Uuid,
 }
 
-impl EmailLimitConfig for CreateSessionReq {
-    fn email(&self) -> &str {
-        &self.email
-    }
-
-    fn email_limiter(
-        state: &crate::AppState,
-    ) -> &std::sync::Arc<crate::extractors::rate_limiting::email::EmailLimiter> {
-        &state.rate_limiters.login_email_limiter
+impl RateLimitKeyExtractor for CreateSessionReq {
+    fn limit_key(&self) -> String {
+        self.email.clone()
     }
 }

@@ -1,19 +1,19 @@
-use std::sync::Arc;
-
 use axum::{
-    Json, Router,
+    Extension, Json, Router,
     extract::{Path, State},
     http::StatusCode,
+    middleware,
     response::IntoResponse,
     routing::post,
 };
+use tower::ServiceBuilder;
 use uuid::Uuid;
 
 use crate::{
     AppState,
     errors::AppError,
     extractors::{
-        rate_limiting::ip::{IpLimitConfig, IpLimiter, RequireIpLimit},
+        rate_limiting::ip::{create_ip_limiter, ip_limit_mw},
         validated_json::ValidatedJson,
         verified_user::VerifiedUser,
     },
@@ -21,15 +21,7 @@ use crate::{
     services,
 };
 
-struct CreateMatchRoute;
-impl IpLimitConfig for CreateMatchRoute {
-    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
-        &state.rate_limiters.create_match_ip_limiter
-    }
-}
-
 async fn create_match(
-    _ip_limiter: RequireIpLimit<CreateMatchRoute>,
     State(state): State<AppState>,
     Path(game_id): Path<Uuid>,
     user: VerifiedUser,
@@ -42,5 +34,12 @@ async fn create_match(
 }
 
 pub fn router() -> Router<AppState> {
-    Router::new().route("/games/:game_id/matches", post(create_match))
+    Router::new().route(
+        "/games/:game_id/matches",
+        post(create_match).layer(
+            ServiceBuilder::new()
+                .layer(Extension(create_ip_limiter(10, 60)))
+                .layer(middleware::from_fn(ip_limit_mw)),
+        ),
+    )
 }

@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::{
     AppState,
     constants::{SESSION_USER_KEY, SESSION_VERSION_KEY},
@@ -7,8 +5,8 @@ use crate::{
     extractors::{
         auth::AuthUser,
         rate_limiting::{
-            email::EmailLimited,
-            ip::{IpLimitConfig, IpLimiter, RequireIpLimit},
+            ip::{create_ip_limiter, ip_limit_mw},
+            payload::{RateLimitedPayload, create_payload_limiter},
         },
         validated_json::ValidatedJson,
     },
@@ -19,34 +17,21 @@ use crate::{
     services,
 };
 use axum::{
-    Json, Router,
+    Extension, Json, Router,
     extract::State,
     http::StatusCode,
+    middleware,
     response::IntoResponse,
     routing::{delete, get, post},
 };
+use tower::ServiceBuilder;
 use tower_sessions::Session;
-
-struct LoginRoute;
-impl IpLimitConfig for LoginRoute {
-    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
-        &state.rate_limiters.login_ip_limiter
-    }
-}
-
-struct VerifyEmailRoute;
-impl IpLimitConfig for VerifyEmailRoute {
-    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
-        &state.rate_limiters.verify_email_ip_limiter
-    }
-}
 
 // Login
 async fn create_session(
     State(state): State<AppState>,
-    _ip_limiter: RequireIpLimit<LoginRoute>,
     session: Session,
-    EmailLimited(ValidatedJson(payload)): EmailLimited<ValidatedJson<CreateSessionReq>>,
+    payload: RateLimitedPayload<ValidatedJson<CreateSessionReq>>,
 ) -> Result<impl IntoResponse, AppError> {
     let user = state
         .user_repo
@@ -93,7 +78,6 @@ async fn get_session(user: AuthUser) -> Result<impl IntoResponse, AppError> {
 
 // Verify email address
 async fn verify_email(
-    _ip_limiter: RequireIpLimit<VerifyEmailRoute>,
     State(state): State<AppState>,
     Json(payload): Json<VerifyEmailReq>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -104,8 +88,23 @@ async fn verify_email(
 
 pub fn router() -> Router<AppState> {
     Router::new()
-        .route("/sessions", post(create_session))
+        .route(
+            "/sessions",
+            post(create_session).layer(
+                ServiceBuilder::new()
+                    .layer(Extension(create_payload_limiter(5, 60 * 15)))
+                    .layer(Extension(create_ip_limiter(10, 60)))
+                    .layer(middleware::from_fn(ip_limit_mw)),
+            ),
+        )
         .route("/sessions", delete(delete_session))
         .route("/sessions", get(get_session))
-        .route("/verify-email", post(verify_email))
+        .route(
+            "/verify-email",
+            post(verify_email).layer(
+                ServiceBuilder::new()
+                    .layer(Extension(create_ip_limiter(10, 60 * 60)))
+                    .layer(middleware::from_fn(ip_limit_mw)),
+            ),
+        )
 }
