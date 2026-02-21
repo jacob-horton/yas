@@ -21,16 +21,21 @@ use tower_http::cors::CorsLayer;
 use tower_sessions::{Expiry, SessionManagerLayer, cookie::SameSite};
 use tower_sessions_sqlx_store::PostgresStore;
 
-use crate::repositories::{
-    email_repo::EmailRepo, game_repo::GameRepo, group_repo::GroupRepo, invite_repo::InviteRepo,
-    match_repo::MatchRepo, stats_repo::StatsRepo, user_repo::UserRepo,
+use crate::{
+    repositories::{
+        game_repo::GameRepo, group_repo::GroupRepo, invite_repo::InviteRepo, match_repo::MatchRepo,
+        stats_repo::StatsRepo, user_repo::UserRepo, verification_repo::VerificationRepo,
+    },
+    services::email::EmailService,
 };
 
 #[derive(Clone)]
 pub struct AppState {
     pub pool: PgPool,
 
-    pub email_repo: EmailRepo,
+    pub email_service: Arc<EmailService>,
+
+    pub verification_repo: Arc<VerificationRepo>,
     pub user_repo: Arc<UserRepo>,
     pub group_repo: Arc<GroupRepo>,
     pub invite_repo: Arc<InviteRepo>,
@@ -47,14 +52,17 @@ impl AppState {
         let game_repo = Arc::new(GameRepo {});
         let match_repo = Arc::new(MatchRepo {});
         let stats_repo = Arc::new(StatsRepo {});
+        let verification_repo = Arc::new(VerificationRepo {});
 
         let resend_client = Resend::new(&env::var("RESEND_KEY").expect("RESEND_KEY must be set"));
-        let email_repo = EmailRepo { resend_client };
+        let email_service = Arc::new(EmailService { resend_client });
 
         Self {
             pool: pool.clone(),
 
-            email_repo,
+            email_service,
+
+            verification_repo,
             user_repo,
             group_repo,
             invite_repo,

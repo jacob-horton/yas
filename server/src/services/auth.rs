@@ -34,7 +34,7 @@ pub async fn verify_email(state: &AppState, token: Uuid) -> Result<(), AppError>
     let mut tx = state.pool.begin().await?;
 
     let email = state
-        .email_repo
+        .verification_repo
         .delete_token_and_get_email(&mut *tx, token)
         .await?
         .ok_or(AuthError::InvalidOrExpiredToken)?;

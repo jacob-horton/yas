@@ -6,7 +6,6 @@ use axum::{
     response::IntoResponse,
     routing::{delete, get, post, put},
 };
-use tower::ServiceBuilder;
 use uuid::Uuid;
 
 use crate::{

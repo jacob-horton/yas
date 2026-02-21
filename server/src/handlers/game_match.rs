@@ -6,7 +6,6 @@ use axum::{
     response::IntoResponse,
     routing::post,
 };
-use tower::ServiceBuilder;
 use uuid::Uuid;
 
 use crate::{

@@ -3,7 +3,7 @@ use uuid::Uuid;
 use crate::{
     AppState,
     errors::{AppError, UserError},
-    models::user::{CreateUserReq, UpdateEmailReq, UserDb},
+    models::user::{CreateUserReq, UserDb},
     services::{self},
 };
 
@@ -45,7 +45,7 @@ pub async fn create_user(state: &AppState, payload: CreateUserReq) -> Result<Use
         .map_err(|_| UserError::UserAlreadyExists)?;
 
     let token = state
-        .email_repo
+        .verification_repo
         .create_verification_record(&mut *tx, &user.email)
         .await
         .map_err(AppError::Database)?;
@@ -53,7 +53,7 @@ pub async fn create_user(state: &AppState, payload: CreateUserReq) -> Result<Use
     tx.commit().await?;
 
     state
-        .email_repo
+        .email_service
         .send_verification_email(&user.email, &user.name, token)
         .await?;
 
@@ -69,7 +69,7 @@ pub async fn update_email(
 
     // Clear out existing verification tokens
     state
-        .email_repo
+        .verification_repo
         .delete_all_tokens_for_email(&mut *tx, &user.email)
         .await
         .map_err(AppError::Database)?;
@@ -83,7 +83,7 @@ pub async fn update_email(
 
     // Create a new verification token
     let token = state
-        .email_repo
+        .verification_repo
         .create_verification_record(&mut *tx, new_email)
         .await?;
 
@@ -91,7 +91,7 @@ pub async fn update_email(
 
     // Send the email
     state
-        .email_repo
+        .email_service
         .send_verification_email(new_email, &user.name, token)
         .await?;
 
