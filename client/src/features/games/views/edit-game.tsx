@@ -6,6 +6,7 @@ import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
+import { useConfirmation } from "@/context/confirmation-context";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { groupKeys } from "@/features/groups/hooks/query-keys";
 import { useGame } from "@/features/matches/hooks/use-game";
@@ -47,17 +48,49 @@ const EditGameForm: Component<Props> = (props) => {
     };
 
     await gamesApi.game(props.initialData.id).update(updateGame);
-    queryClient.invalidateQueries({
+    await queryClient.invalidateQueries({
       queryKey: gameKeys.game(props.initialData.id),
     });
-    queryClient.invalidateQueries({
+    await queryClient.invalidateQueries({
       queryKey: groupKeys.games(group.groupId()),
     });
     navigate(-1);
   }
 
+  const { showConfirm } = useConfirmation();
+  const handleDelete = async () => {
+    const isConfirmed = await showConfirm({
+      title: "Delete Group",
+      description: (
+        <p>
+          Are you sure you would like to delete{" "}
+          <strong>{props.initialData.name}</strong>? This cannot be undone.
+        </p>
+      ),
+      confirmText: "Delete",
+      danger: true,
+    });
+
+    if (isConfirmed) {
+      await gamesApi.game(props.initialData.id).delete();
+      await queryClient.invalidateQueries({ queryKey: groupKeys.all });
+      navigate("/");
+    }
+  };
+
   return (
-    <FormPage title="Edit Game" onSubmit={handleSubmit}>
+    <FormPage
+      title="Edit Game"
+      onSubmit={handleSubmit}
+      actions={[
+        {
+          text: "Delete",
+          onAction: handleDelete,
+          variant: "secondary",
+          danger: true,
+        },
+      ]}
+    >
       <Input
         label="Name"
         value={name()}

@@ -34,7 +34,7 @@ export const CreateGame = () => {
     };
 
     const res = await groupsApi.group(group.groupId()).createGame(game);
-    queryClient.invalidateQueries({
+    await queryClient.invalidateQueries({
       queryKey: groupKeys.games(group.groupId()),
     });
     navigate(`/groups/${group.groupId()}/games/${res.id}`);

@@ -1,4 +1,5 @@
 import { useNavigate } from "@solidjs/router";
+import { useQueryClient } from "@tanstack/solid-query";
 import { createSignal, For } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import {
@@ -13,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { cn } from "@/lib/classname";
 import { usersApi } from "../api";
-import { useQueryClient } from "@tanstack/solid-query";
 import { userKeys } from "../hooks/query-keys";
 
 const COLOURS = Object.keys(COLOUR_MAP) as AvatarColour[];
@@ -34,7 +34,7 @@ export const EditUser = () => {
     e.preventDefault();
 
     await usersApi.updateMe(name(), avatar(), colour());
-    queryClient.invalidateQueries({ queryKey: userKeys.me() });
+    await queryClient.invalidateQueries({ queryKey: userKeys.me() });
     navigate("/");
   };
 

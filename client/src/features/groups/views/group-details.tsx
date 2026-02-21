@@ -57,7 +57,7 @@ export const GroupDetails = () => {
         .group(group.groupId())
         .member(auth.user()?.id ?? "")
         .delete();
-      queryClient.invalidateQueries({ queryKey: groupKeys.all });
+      await queryClient.invalidateQueries({ queryKey: groupKeys.all });
     }
   };
 

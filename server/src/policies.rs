@@ -5,6 +5,7 @@ pub enum GroupAction {
     DeleteInvite,
     CreateGame,
     UpdateGame,
+    DeleteGame,
     UpdateGroup,
     CreateMatch,
     RemoveMember(GroupMemberRole),

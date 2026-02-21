@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
     middleware,
     response::IntoResponse,
-    routing::{get, post, put},
+    routing::{delete, get, post, put},
 };
 use uuid::Uuid;
 
@@ -47,6 +47,16 @@ async fn update_game(
 
     let response: GameResponse = game.into();
     Ok((StatusCode::CREATED, Json(response)))
+}
+
+async fn delete_game(
+    State(state): State<AppState>,
+    Path(game_id): Path<Uuid>,
+    user: VerifiedUser,
+) -> Result<impl IntoResponse, AppError> {
+    services::game::delete_game(&state, user.id, game_id).await?;
+
+    Ok(StatusCode::NO_CONTENT)
 }
 
 async fn get_games_in_group(
@@ -111,6 +121,7 @@ pub fn router() -> Router<AppState> {
         .route("/groups/:group_id/games", get(get_games_in_group))
         .route("/games/:game_id", get(get_game_details))
         .route("/games/:game_id", put(update_game))
+        .route("/games/:game_id", delete(delete_game))
         .route("/games/:game_id/scoreboard", get(get_scoreboard))
         .route("/games/:game_id/last-players", get(get_last_players))
 }

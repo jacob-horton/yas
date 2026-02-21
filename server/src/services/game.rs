@@ -56,6 +56,21 @@ pub async fn update_game(
     Ok(game)
 }
 
+pub async fn delete_game(state: &AppState, user_id: Uuid, game_id: Uuid) -> Result<(), AppError> {
+    let (game, member) = fetch_game_guarded(state, game_id, user_id).await?;
+    if !member.role.can_perform(GroupAction::DeleteGame) {
+        return Err(GroupError::Forbidden.into());
+    }
+
+    state
+        .game_repo
+        .delete(&state.pool, game.id)
+        .await
+        .map_err(GameError::Database)?;
+
+    Ok(())
+}
+
 pub async fn get(state: &AppState, user_id: Uuid, game_id: Uuid) -> Result<GameDb, AppError> {
     let (game, _) = fetch_game_guarded(state, game_id, user_id).await?;
     Ok(game)

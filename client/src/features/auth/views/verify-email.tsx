@@ -16,7 +16,7 @@ export const VerifyEmail: Component = () => {
   onMount(async () => {
     try {
       await authApi.verifyEmail(params.token);
-      queryClient.invalidateQueries({ queryKey: userKeys.all });
+      await queryClient.invalidateQueries({ queryKey: userKeys.all });
 
       setLoading(false);
 

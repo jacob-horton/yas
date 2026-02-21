@@ -21,7 +21,7 @@ const EditEmailForm: Component<Props> = (props) => {
     e.preventDefault();
 
     await usersApi.updateMyEmail(email());
-    queryClient.invalidateQueries({ queryKey: userKeys.me() });
+    await queryClient.invalidateQueries({ queryKey: userKeys.me() });
 
     navigate(-1);
   };

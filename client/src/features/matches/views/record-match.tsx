@@ -65,7 +65,7 @@ export const RecordGame = () => {
 
     // TODO: try/catch
     await gamesApi.game(g.id).createMatch({ scores });
-    queryClient.invalidateQueries({ queryKey: statsKeys.game(g.id) });
+    await queryClient.invalidateQueries({ queryKey: statsKeys.game(g.id) });
     navigate(-1);
   };
 

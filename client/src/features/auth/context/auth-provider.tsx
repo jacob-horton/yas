@@ -13,6 +13,7 @@ import { userKeys } from "@/features/users/hooks/query-keys";
 import type { User } from "@/features/users/types";
 import { setupAxiosInterceptors } from "@/lib/api";
 import { LS_LAST_GROUP_ID } from "@/pages/home-page";
+
 type ErrorDetail = {
   property: string;
   codes: string;
@@ -47,7 +48,7 @@ export const AuthProvider: ParentComponent = (props) => {
     queryFn: async () => {
       try {
         return await usersApi.me();
-      } catch (err) {
+      } catch (_err) {
         return null;
       }
     },

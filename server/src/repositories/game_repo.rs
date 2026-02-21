@@ -55,6 +55,19 @@ impl GameRepo {
             .await
     }
 
+    pub async fn delete<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        game_id: Uuid,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query_as::<_, GameDb>("DELETE FROM games WHERE id = $1")
+            .bind(game_id)
+            .fetch_optional(executor)
+            .await?;
+
+        Ok(())
+    }
+
     pub async fn get_games_in_group<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,

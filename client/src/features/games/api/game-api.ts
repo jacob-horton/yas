@@ -5,6 +5,7 @@ import type { Game, UpdateGameRequest } from "../types/game";
 
 export interface GameApiContract {
   get(): Promise<Game>;
+  delete(): Promise<void>;
   createMatch(match: CreateMatchRequest): Promise<Match>;
   lastPlayers(): Promise<string[]>;
 
@@ -18,6 +19,10 @@ export class GameApi implements GameApiContract {
 
   public async get(): Promise<Game> {
     return api.get(`/games/${this.gameId}`).then((resp) => resp.data);
+  }
+
+  public async delete(): Promise<void> {
+    return api.delete(`/games/${this.gameId}`);
   }
 
   public async update(payload: UpdateGameRequest): Promise<Game> {

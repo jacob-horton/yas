@@ -30,7 +30,7 @@ const EditGroupForm: Component<Props> = (props) => {
     };
 
     await groupsApi.group(props.initialData.id).update(updateGroup);
-    queryClient.invalidateQueries({ queryKey: groupKeys.all });
+    await queryClient.invalidateQueries({ queryKey: groupKeys.all });
     navigate(-1);
   }
 
@@ -50,7 +50,7 @@ const EditGroupForm: Component<Props> = (props) => {
 
     if (isConfirmed) {
       await groupsApi.group(props.initialData.id).delete();
-      queryClient.invalidateQueries({ queryKey: groupKeys.all });
+      await queryClient.invalidateQueries({ queryKey: groupKeys.all });
     }
   };
 
