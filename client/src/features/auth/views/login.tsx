@@ -19,7 +19,8 @@ export const Login: Component = () => {
 
   const login = async (e: SubmitEvent) => {
     e.preventDefault();
-    auth.login(email(), password());
+    await auth.login(email(), password());
+    navigate("/", { replace: true });
   };
 
   return (

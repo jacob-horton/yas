@@ -7,13 +7,9 @@ export interface UsersApiContract {
   create(payload: CreateUserRequest): Promise<User>;
   me(): Promise<User>;
   myGroups(): Promise<Group[]>;
-  updateMe(
-    name: string,
-    email: string,
-    avatar: string,
-    avatarColour: string,
-  ): Promise<User>;
+  updateMe(name: string, avatar: string, avatarColour: string): Promise<User>;
   updateMyPassword(currentPassword: string, newPassword: string): Promise<void>;
+  updateMyEmail(email: string): Promise<User>;
 
   user(id: string): UserApiContract;
 }
@@ -30,12 +26,11 @@ class UsersApi implements UsersApiContract {
 
   public async updateMe(
     name: string,
-    email: string,
     avatar: string,
     avatar_colour: string,
   ): Promise<User> {
     return api
-      .patch("/users/me", { name, email, avatar, avatar_colour })
+      .patch("/users/me", { name, avatar, avatar_colour })
       .then((resp) => resp.data);
   }
 
@@ -47,6 +42,10 @@ class UsersApi implements UsersApiContract {
       current_password: currentPassword,
       new_password: newPassword,
     });
+  }
+
+  public async updateMyEmail(email: string): Promise<User> {
+    return api.put(`/users/me/email`, { email });
   }
 
   public async myGroups(): Promise<Group[]> {

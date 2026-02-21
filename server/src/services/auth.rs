@@ -31,7 +31,7 @@ pub fn verify_password(hash: &str, password: &str) -> bool {
 }
 
 pub async fn verify_email(state: &AppState, token: Uuid) -> Result<(), AppError> {
-    let mut tx = state.pool.begin().await.map_err(AppError::Database)?;
+    let mut tx = state.pool.begin().await?;
 
     let email = state
         .email_repo

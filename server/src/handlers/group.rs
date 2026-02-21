@@ -110,11 +110,9 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .route(
             "/groups",
-            post(create_group).layer(
-                ServiceBuilder::new()
-                    .layer(Extension(create_ip_limiter(5, 60 * 60)))
-                    .layer(middleware::from_fn(ip_limit_mw)),
-            ),
+            post(create_group)
+                .route_layer(middleware::from_fn(ip_limit_mw))
+                .route_layer(Extension(create_ip_limiter(5, 60 * 60))),
         )
         .route("/groups/:group_id", get(get_group_details))
         .route("/groups/:group_id", put(update_group))

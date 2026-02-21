@@ -28,17 +28,30 @@ impl UserRepo {
         executor: impl PgExecutor<'e, Database = Postgres>,
         id: Uuid,
         name: &str,
-        email: &str,
         avatar: Avatar,
         avatar_colour: AvatarColour,
     ) -> Result<UserDb, sqlx::Error> {
         sqlx::query_as::<_, UserDb>(
-            "UPDATE users SET name = $1, email = $2, avatar = $3, avatar_colour = $4 WHERE id = $5 RETURNING *",
+            "UPDATE users SET name = $1, avatar = $2, avatar_colour = $3 WHERE id = $4 RETURNING *",
         )
         .bind(name)
-        .bind(email.to_lowercase())
         .bind(avatar)
         .bind(avatar_colour)
+        .bind(id)
+        .fetch_one(executor)
+        .await
+    }
+
+    pub async fn update_email<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        id: Uuid,
+        email: &str,
+    ) -> Result<UserDb, sqlx::Error> {
+        sqlx::query_as::<_, UserDb>(
+            "UPDATE users SET email = $1, email_verified = false WHERE id = $2 RETURNING *",
+        )
+        .bind(email)
         .bind(id)
         .fetch_one(executor)
         .await

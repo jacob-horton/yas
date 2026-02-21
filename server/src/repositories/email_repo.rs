@@ -1,4 +1,4 @@
-use chrono::{DateTime, Duration, Utc};
+use chrono::{Duration, Utc};
 use resend_rs::{Resend, types::CreateEmailBaseOptions};
 use sqlx::{PgExecutor, Postgres};
 use uuid::Uuid;
@@ -11,51 +11,14 @@ pub struct EmailRepo {
 }
 
 impl EmailRepo {
-    pub async fn send_invite<'e>(
-        &self,
-        executor: impl PgExecutor<'e, Database = Postgres>,
-        address: &str,
-        name: &str,
-    ) -> Result<(), AppError> {
-        let token = Uuid::new_v4();
-        let expiration = Utc::now() + Duration::hours(24);
-        let verification_link = get_verification_link(&token);
-
-        self.save_verification(executor, address, token, expiration)
-            .await?;
-
-        let from = "onboarding@resend.dev";
-        // TODO: switch to using `address` here for prod
-        // Maybe use env to determine what email to use?
-        let to = &format!(
-            "delivered+{}@resend.dev",
-            address.split_once("@").unwrap().0
-        );
-        let subject = "Welcome!";
-
-        let template = include_str!("../email_templates/invite.html");
-        let html_body = template
-            .replace("{{name}}", name)
-            .replace("{{verification_link}}", &verification_link);
-
-        let email = CreateEmailBaseOptions::new(from, [to], subject).with_html(&html_body);
-
-        let send_result = self.resend_client.emails.send(email).await;
-        if let Err(e) = send_result {
-            // Log but ignore error - don't want to return 500
-            eprintln!("Failed to send verification email to {}: {:?}", to, e);
-        }
-
-        Ok(())
-    }
-
-    async fn save_verification<'e>(
+    pub async fn create_verification_record<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,
         email: &str,
-        token: Uuid,
-        expiration: DateTime<Utc>,
-    ) -> Result<(), sqlx::Error> {
+    ) -> Result<Uuid, sqlx::Error> {
+        let token = Uuid::new_v4();
+        let expiration = Utc::now() + Duration::hours(24);
+
         sqlx::query(
             "INSERT INTO email_verifications (email, token, expiration) VALUES ($1, $2, $3)",
         )
@@ -64,6 +27,39 @@ impl EmailRepo {
         .bind(expiration)
         .execute(executor)
         .await?;
+
+        Ok(token)
+    }
+
+    pub async fn send_verification_email(
+        &self,
+        address: &str,
+        name: &str,
+        token: Uuid,
+    ) -> Result<(), AppError> {
+        let verification_link = get_verification_link(&token);
+
+        // TODO: switch to using `address` here for prod
+        // Maybe use env to determine what email to use?
+        let to = &format!(
+            "delivered+{}@resend.dev",
+            address.split_once("@").unwrap().0
+        );
+
+        let from = "onboarding@resend.dev";
+        let subject = "Verify your email";
+        let template = include_str!("../email_templates/invite.html");
+
+        let html_body = template
+            .replace("{{name}}", name)
+            .replace("{{verification_link}}", &verification_link);
+
+        let email = CreateEmailBaseOptions::new(from, [to], subject).with_html(&html_body);
+
+        // Fire and forget (with logging)
+        if let Err(e) = self.resend_client.emails.send(email).await {
+            eprintln!("Resend failure for {}: {:?}", to, e);
+        }
 
         Ok(())
     }
@@ -79,6 +75,21 @@ impl EmailRepo {
         .bind(token)
         .fetch_optional(executor)
         .await
+    }
+
+    pub async fn delete_all_tokens_for_email<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        email: &str,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query!(
+            "DELETE FROM email_verifications WHERE email = $1",
+            email.to_lowercase()
+        )
+        .execute(executor)
+        .await?;
+
+        Ok(())
     }
 }
 

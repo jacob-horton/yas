@@ -17,6 +17,12 @@ export const UserSettings = () => {
           Edit Details
         </A>
         <A
+          href="/me/email"
+          class="h-8 w-fit rounded-md bg-violet-500 px-6 py-1 font-semibold text-white dark:bg-violet-700"
+        >
+          Change Email
+        </A>
+        <A
           href="/me/password"
           class="h-8 w-fit rounded-md bg-violet-500 px-6 py-1 font-semibold text-white dark:bg-violet-700"
         >

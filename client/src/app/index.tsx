@@ -22,6 +22,7 @@ import { AcceptInvite } from "@/features/invites/views/accept-invite";
 import { CreateInvite } from "@/features/invites/views/create-invite";
 import { RecordGame } from "@/features/matches/views/record-match";
 import { PlayerStats } from "@/features/stats/views/player-stats";
+import { EditEmail } from "@/features/users/views/edit-email";
 import { EditPassword } from "@/features/users/views/edit-password";
 import { EditUser } from "@/features/users/views/edit-user";
 import { UserSettings } from "@/features/users/views/settings";
@@ -42,8 +43,8 @@ const WithSidebar: ParentComponent = (props) => {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
         <ConfirmationProvider>
           <div class="flex h-screen max-h-screen min-h-screen w-full flex-col overflow-hidden bg-white dark:bg-gray-900">
             <Router>
@@ -83,6 +84,7 @@ export default function App() {
 
                 <Route path="/me/edit" component={EditUser} />
                 <Route path="/me/password" component={EditPassword} />
+                <Route path="/me/email" component={EditEmail} />
 
                 <Route
                   path="/invites/:inviteId/accept"
@@ -97,7 +99,7 @@ export default function App() {
             </Router>
           </div>
         </ConfirmationProvider>
-      </QueryClientProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }

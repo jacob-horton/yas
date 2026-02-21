@@ -90,21 +90,17 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .route(
             "/sessions",
-            post(create_session).layer(
-                ServiceBuilder::new()
-                    .layer(Extension(create_payload_limiter(5, 60 * 15)))
-                    .layer(Extension(create_ip_limiter(10, 60)))
-                    .layer(middleware::from_fn(ip_limit_mw)),
-            ),
+            post(create_session)
+                .route_layer(middleware::from_fn(ip_limit_mw))
+                .route_layer(Extension(create_ip_limiter(10, 60)))
+                .route_layer(Extension(create_payload_limiter(5, 60 * 15))),
         )
         .route("/sessions", delete(delete_session))
         .route("/sessions", get(get_session))
         .route(
             "/verify-email",
-            post(verify_email).layer(
-                ServiceBuilder::new()
-                    .layer(Extension(create_ip_limiter(10, 60 * 60)))
-                    .layer(middleware::from_fn(ip_limit_mw)),
-            ),
+            post(verify_email)
+                .route_layer(middleware::from_fn(ip_limit_mw))
+                .route_layer(Extension(create_ip_limiter(10, 60 * 60))),
         )
 }

@@ -1,9 +1,12 @@
 import { useNavigate, useParams } from "@solidjs/router";
+import { useQueryClient } from "@tanstack/solid-query";
 import { type Component, createSignal, onMount, Show } from "solid-js";
 import { Button } from "@/components/ui/button";
+import { userKeys } from "@/features/users/hooks/query-keys";
 import { authApi } from "../api";
 
 export const VerifyEmail: Component = () => {
+  const queryClient = useQueryClient();
   const params = useParams();
   const navigate = useNavigate();
 
@@ -13,6 +16,7 @@ export const VerifyEmail: Component = () => {
   onMount(async () => {
     try {
       await authApi.verifyEmail(params.token);
+      queryClient.invalidateQueries({ queryKey: userKeys.all });
 
       setLoading(false);
 

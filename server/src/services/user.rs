@@ -3,7 +3,7 @@ use uuid::Uuid;
 use crate::{
     AppState,
     errors::{AppError, UserError},
-    models::user::{CreateUserReq, UserDb},
+    models::user::{CreateUserReq, UpdateEmailReq, UserDb},
     services::{self},
 };
 
@@ -36,16 +36,63 @@ pub async fn update_password(
 
 pub async fn create_user(state: &AppState, payload: CreateUserReq) -> Result<UserDb, AppError> {
     let hash = services::auth::hash_password(&payload.password)?;
+    let mut tx = state.pool.begin().await?;
 
     let user = state
         .user_repo
-        .create(&state.pool, &payload.name, &payload.email, &hash)
+        .create(&mut *tx, &payload.name, &payload.email, &hash)
         .await
         .map_err(|_| UserError::UserAlreadyExists)?;
 
+    let token = state
+        .email_repo
+        .create_verification_record(&mut *tx, &user.email)
+        .await
+        .map_err(AppError::Database)?;
+
+    tx.commit().await?;
+
     state
         .email_repo
-        .send_invite(&state.pool, &user.email, &user.name)
+        .send_verification_email(&user.email, &user.name, token)
+        .await?;
+
+    Ok(user)
+}
+
+pub async fn update_email(
+    state: &AppState,
+    user: UserDb,
+    new_email: &str,
+) -> Result<UserDb, AppError> {
+    let mut tx = state.pool.begin().await?;
+
+    // Clear out existing verification tokens
+    state
+        .email_repo
+        .delete_all_tokens_for_email(&mut *tx, &user.email)
+        .await
+        .map_err(AppError::Database)?;
+
+    // Update email and reset "email_verified" to false
+    let user = state
+        .user_repo
+        .update_email(&mut *tx, user.id, new_email)
+        .await
+        .map_err(UserError::Database)?;
+
+    // Create a new verification token
+    let token = state
+        .email_repo
+        .create_verification_record(&mut *tx, new_email)
+        .await?;
+
+    tx.commit().await?;
+
+    // Send the email
+    state
+        .email_repo
+        .send_verification_email(new_email, &user.name, token)
         .await?;
 
     Ok(user)

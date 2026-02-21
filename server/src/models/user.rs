@@ -138,12 +138,16 @@ impl RateLimitKeyExtractor for CreateUserReq {
 
 #[derive(Debug, Deserialize, Validate)]
 pub struct UpdateUserReq {
-    #[validate(email(message = "Email must be valid"))]
-    pub email: String,
     #[validate(length(min = 1, max = 512, message = "Name must be between 1 and 512 chars"))]
     pub name: String,
     pub avatar: Avatar,
     pub avatar_colour: AvatarColour,
+}
+
+#[derive(Debug, Deserialize, Validate)]
+pub struct UpdateEmailReq {
+    #[validate(email(message = "Email must be valid"))]
+    pub email: String,
 }
 
 #[derive(Debug, Deserialize, Validate)]

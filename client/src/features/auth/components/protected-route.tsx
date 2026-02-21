@@ -4,14 +4,14 @@ import { useAuth } from "../context/auth-provider";
 
 export const ProtectedRoute: ParentComponent = (props) => {
   const navigate = useNavigate();
-  const { loading, user } = useAuth();
+  const auth = useAuth();
 
   createEffect(() => {
-    if (!loading() && !user()) {
+    if (!auth.loading() && !auth.user()) {
       navigate("/login", { replace: true });
     }
   });
 
   // TODO: fallback?
-  return <Show when={!!user()}>{props.children}</Show>;
+  return <Show when={auth.user()}>{props.children}</Show>;
 };

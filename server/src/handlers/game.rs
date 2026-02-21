@@ -105,11 +105,9 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .route(
             "/groups/:group_id/games",
-            post(create_game).layer(
-                ServiceBuilder::new()
-                    .layer(Extension(create_ip_limiter(5, 60 * 60)))
-                    .layer(middleware::from_fn(ip_limit_mw)),
-            ),
+            post(create_game)
+                .route_layer(middleware::from_fn(ip_limit_mw))
+                .route_layer(Extension(create_ip_limiter(5, 60 * 60))),
         )
         .route("/groups/:group_id/games", get(get_games_in_group))
         .route("/games/:game_id", get(get_game_details))

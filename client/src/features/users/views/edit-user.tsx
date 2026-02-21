@@ -13,11 +13,14 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { cn } from "@/lib/classname";
 import { usersApi } from "../api";
+import { useQueryClient } from "@tanstack/solid-query";
+import { userKeys } from "../hooks/query-keys";
 
 const COLOURS = Object.keys(COLOUR_MAP) as AvatarColour[];
 const AVATARS = Object.keys(AVATAR_SVGS) as AvatarIcon[];
 
 export const EditUser = () => {
+  const queryClient = useQueryClient();
   const auth = useAuth();
   const navigate = useNavigate();
 
@@ -26,13 +29,12 @@ export const EditUser = () => {
   );
   const [avatar, setAvatar] = createSignal(auth.user()?.avatar ?? AVATARS[0]);
   const [name, setName] = createSignal(auth.user()?.name ?? "");
-  const [email, setEmail] = createSignal(auth.user()?.email ?? "");
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
 
-    await usersApi.updateMe(name(), email(), avatar(), colour());
-    await auth.revalidate();
+    await usersApi.updateMe(name(), avatar(), colour());
+    queryClient.invalidateQueries({ queryKey: userKeys.me() });
     navigate("/");
   };
 
@@ -43,12 +45,6 @@ export const EditUser = () => {
         value={name()}
         onChange={setName}
         placeholder="User"
-      />
-      <Input
-        label="Email"
-        value={email()}
-        onChange={setEmail}
-        placeholder="user@email.com"
       />
 
       <div class="flex flex-wrap gap-2">

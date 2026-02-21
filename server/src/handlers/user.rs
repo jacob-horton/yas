@@ -25,8 +25,8 @@ use crate::{
     models::{
         group::GroupResponse,
         user::{
-            CreateUserReq, PublicUserDetailsResponse, UpdatePasswordReq, UpdateUserReq,
-            UserResponse,
+            CreateUserReq, PublicUserDetailsResponse, UpdateEmailReq, UpdatePasswordReq,
+            UpdateUserReq, UserResponse,
         },
     },
     services,
@@ -117,12 +117,22 @@ async fn update_current_user(
             &state.pool,
             user.id,
             &payload.name,
-            &payload.email,
             payload.avatar,
             payload.avatar_colour,
         )
         .await
         .map_err(UserError::Database)?;
+
+    let response: UserResponse = user.into();
+    Ok((StatusCode::OK, Json(response)))
+}
+
+async fn update_email(
+    AuthUser(user): AuthUser,
+    State(state): State<AppState>,
+    ValidatedJson(payload): ValidatedJson<UpdateEmailReq>,
+) -> Result<impl IntoResponse, AppError> {
+    let user = services::user::update_email(&state, user, &payload.email).await?;
 
     let response: UserResponse = user.into();
     Ok((StatusCode::OK, Json(response)))
@@ -156,19 +166,27 @@ pub fn router() -> Router<AppState> {
         .route(
             "/users",
             post(create_user)
+                .route_layer(middleware::from_fn(ip_limit_mw))
                 .route_layer(Extension(create_payload_limiter(3, 60 * 60)))
-                .route_layer(Extension(create_ip_limiter(5, 60 * 60)))
-                .route_layer(middleware::from_fn(ip_limit_mw)),
+                .route_layer(Extension(create_ip_limiter(5, 60 * 60))),
         )
         .route("/users/me", get(get_current_user))
         .route("/users/me", patch(update_current_user))
         .route(
             "/users/me/password",
             put(update_password)
-                .route_layer(Extension(create_ip_limiter(5, 60 * 60)))
                 .route_layer(middleware::from_fn(ip_limit_mw))
-                .route_layer(Extension(create_user_limiter(3, 60 * 60)))
-                .route_layer(middleware::from_fn(user_limit_mw)),
+                .route_layer(middleware::from_fn(user_limit_mw))
+                .route_layer(Extension(create_ip_limiter(5, 60 * 60)))
+                .route_layer(Extension(create_user_limiter(3, 60 * 60))),
+        )
+        .route(
+            "/users/me/email",
+            put(update_email)
+                .route_layer(middleware::from_fn(user_limit_mw))
+                .route_layer(middleware::from_fn(ip_limit_mw))
+                .route_layer(Extension(create_user_limiter(3, 3600)))
+                .route_layer(Extension(create_ip_limiter(5, 3600))),
         )
         .route("/users/me/groups", get(get_current_user_groups))
         .route("/users/:id", get(get_user))
