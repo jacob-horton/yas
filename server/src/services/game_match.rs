@@ -13,7 +13,7 @@ pub async fn create_match(
     payload: CreateMatchReq,
 ) -> Result<MatchDb, AppError> {
     // Check user has permissions to create the match within the group
-    let (game, member) = fetch_game_guarded(&state, game_id, user_id).await?;
+    let (game, member) = fetch_game_guarded(state, game_id, user_id).await?;
     if !member.role.can_perform(GroupAction::CreateMatch) {
         return Err(GroupError::Forbidden.into());
     }

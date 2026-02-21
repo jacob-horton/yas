@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
     Json, Router,
     extract::{Path, Query, State},
@@ -11,8 +13,12 @@ use crate::{
     AppState,
     errors::AppError,
     extractors::{
-        auth::AuthUser, auth_member::AuthMember, validated_json::ValidatedJson,
-        verified_member::VerifiedMember, verified_user::VerifiedUser,
+        auth::AuthUser,
+        auth_member::AuthMember,
+        rate_limiting::ip::{IpLimitConfig, IpLimiter, RequireIpLimit},
+        validated_json::ValidatedJson,
+        verified_member::VerifiedMember,
+        verified_user::VerifiedUser,
     },
     models::{
         game::{CreateGameReq, GameResponse, UpdateGameReq},
@@ -21,7 +27,15 @@ use crate::{
     services,
 };
 
-pub async fn create_game(
+struct CreateGameRoute;
+impl IpLimitConfig for CreateGameRoute {
+    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
+        &state.rate_limiters.create_game_ip_limiter
+    }
+}
+
+async fn create_game(
+    _ip_limiter: RequireIpLimit<CreateGameRoute>,
     VerifiedMember(member): VerifiedMember,
     State(state): State<AppState>,
     ValidatedJson(payload): ValidatedJson<CreateGameReq>,
@@ -32,10 +46,10 @@ pub async fn create_game(
     Ok((StatusCode::CREATED, Json(response)))
 }
 
-pub async fn update_game(
+async fn update_game(
     State(state): State<AppState>,
     Path(game_id): Path<Uuid>,
-    VerifiedUser(user): VerifiedUser,
+    user: VerifiedUser,
     ValidatedJson(payload): ValidatedJson<UpdateGameReq>,
 ) -> Result<impl IntoResponse, AppError> {
     let game = services::game::update_game(&state, user.id, game_id, payload).await?;
@@ -44,8 +58,8 @@ pub async fn update_game(
     Ok((StatusCode::CREATED, Json(response)))
 }
 
-pub async fn get_games_in_group(
-    AuthMember(member): AuthMember,
+async fn get_games_in_group(
+    member: AuthMember,
     State(state): State<AppState>,
 ) -> Result<impl IntoResponse, AppError> {
     let games = services::group::get_games_in_group(&state, member.group_id).await?;
@@ -54,11 +68,11 @@ pub async fn get_games_in_group(
     Ok((StatusCode::CREATED, Json(response)))
 }
 
-pub async fn get_scoreboard(
+async fn get_scoreboard(
     State(state): State<AppState>,
     Path(game_id): Path<Uuid>,
     Query(query): Query<StatsParams>,
-    AuthUser(user): AuthUser,
+    user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
     let scoreboard = services::stats::get_scoreboard_and_stats(
         &state,
@@ -74,10 +88,10 @@ pub async fn get_scoreboard(
     Ok((StatusCode::OK, Json(response)))
 }
 
-pub async fn get_game_details(
+async fn get_game_details(
     State(state): State<AppState>,
     Path(game_id): Path<Uuid>,
-    AuthUser(user): AuthUser,
+    user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
     let game = services::game::get(&state, user.id, game_id).await?;
     let response: GameResponse = game.into();
@@ -85,10 +99,10 @@ pub async fn get_game_details(
     Ok((StatusCode::OK, Json(response)))
 }
 
-pub async fn get_last_players(
+async fn get_last_players(
     State(state): State<AppState>,
     Path(game_id): Path<Uuid>,
-    AuthUser(user): AuthUser,
+    user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
     let players = services::game::get_last_players(&state, user.id, game_id).await?;
 

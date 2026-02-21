@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
     Json, Router,
     extract::{Path, State},
@@ -11,8 +13,12 @@ use crate::{
     AppState,
     errors::{AppError, GroupError},
     extractors::{
-        auth::AuthUser, auth_member::AuthMember, validated_json::ValidatedJson,
-        verified_member::VerifiedMember, verified_user::VerifiedUser,
+        auth::AuthUser,
+        auth_member::AuthMember,
+        rate_limiting::ip::{IpLimitConfig, IpLimiter, RequireIpLimit},
+        validated_json::ValidatedJson,
+        verified_member::VerifiedMember,
+        verified_user::VerifiedUser,
     },
     models::invite::{
         CreateInviteReq, InviteBasicResponse, InviteDetailResponse, InviteSummaryResponse,
@@ -21,7 +27,15 @@ use crate::{
     services,
 };
 
-pub async fn create_invite(
+struct InviteRoute;
+impl IpLimitConfig for InviteRoute {
+    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
+        &state.rate_limiters.invite_ip_limiter
+    }
+}
+
+async fn create_invite(
+    _ip_limiter: RequireIpLimit<InviteRoute>,
     VerifiedMember(member): VerifiedMember,
     State(state): State<AppState>,
     ValidatedJson(payload): ValidatedJson<CreateInviteReq>,
@@ -32,7 +46,7 @@ pub async fn create_invite(
     Ok((StatusCode::CREATED, Json(response)))
 }
 
-pub async fn get_group_invites(
+async fn get_group_invites(
     AuthMember(member): AuthMember,
     State(state): State<AppState>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -46,7 +60,7 @@ pub async fn get_group_invites(
 async fn get_invite(
     Path(code): Path<Uuid>,
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
     let invite = services::invite::get_invite(&state, code).await?;
     let group = services::group::get_group_raw(&state, invite.group_id).await?;
@@ -74,7 +88,7 @@ async fn get_invite(
 async fn delete_invite(
     Path(code): Path<Uuid>,
     State(state): State<AppState>,
-    VerifiedUser(user): VerifiedUser,
+    user: VerifiedUser,
 ) -> Result<impl IntoResponse, AppError> {
     let invite = services::invite::get_invite(&state, code).await?;
 
@@ -96,7 +110,7 @@ async fn delete_invite(
 async fn accept_invite(
     Path(code): Path<Uuid>,
     State(state): State<AppState>,
-    VerifiedUser(user): VerifiedUser,
+    user: VerifiedUser,
 ) -> Result<impl IntoResponse, AppError> {
     services::invite::accept_invite(&state, user.id, code).await?;
 

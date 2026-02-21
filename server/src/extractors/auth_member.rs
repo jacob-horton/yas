@@ -3,7 +3,7 @@ use axum::{
     extract::{FromRequestParts, Path},
     http::request::Parts,
 };
-use std::collections::HashMap;
+use std::{collections::HashMap, ops::Deref};
 use uuid::Uuid;
 
 use crate::{
@@ -14,6 +14,13 @@ use crate::{
 };
 
 pub struct AuthMember(pub GroupMemberDb);
+
+impl Deref for AuthMember {
+    type Target = GroupMemberDb;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 #[async_trait]
 impl FromRequestParts<AppState> for AuthMember {

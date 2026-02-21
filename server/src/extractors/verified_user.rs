@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
 
 use crate::{
@@ -8,6 +10,13 @@ use crate::{
 };
 
 pub struct VerifiedUser(pub UserDb);
+
+impl Deref for VerifiedUser {
+    type Target = UserDb;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 #[async_trait]
 impl FromRequestParts<AppState> for VerifiedUser {

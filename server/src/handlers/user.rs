@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
     Json, Router,
     extract::{Path, State},
@@ -12,7 +14,15 @@ use crate::{
     AppState,
     constants::{SESSION_USER_KEY, SESSION_VERSION_KEY},
     errors::{AppError, GroupError, UserError},
-    extractors::{auth::AuthUser, validated_json::ValidatedJson},
+    extractors::{
+        auth::AuthUser,
+        rate_limiting::{
+            email::EmailLimited,
+            ip::{IpLimitConfig, IpLimiter, RequireIpLimit},
+            user_id::{RateLimitedUser, UserIdLimiter, UserLimitConfig},
+        },
+        validated_json::ValidatedJson,
+    },
     models::{
         group::GroupResponse,
         user::{
@@ -23,11 +33,32 @@ use crate::{
     services,
 };
 
+struct RegisterRoute;
+impl IpLimitConfig for RegisterRoute {
+    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
+        &state.rate_limiters.register_ip_limiter
+    }
+}
+
+struct ChangePasswordRoute;
+impl IpLimitConfig for ChangePasswordRoute {
+    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
+        &state.rate_limiters.change_password_ip_limiter
+    }
+}
+
+impl UserLimitConfig for ChangePasswordRoute {
+    fn limiter(state: &AppState) -> &Arc<UserIdLimiter> {
+        &state.rate_limiters.change_password_user_id_limiter
+    }
+}
+
 // Sign up
 async fn create_user(
     session: Session,
+    _ip_limiter: RequireIpLimit<RegisterRoute>,
     State(state): State<AppState>,
-    ValidatedJson(payload): ValidatedJson<CreateUserReq>,
+    EmailLimited(ValidatedJson(payload)): EmailLimited<ValidatedJson<CreateUserReq>>,
 ) -> Result<impl IntoResponse, AppError> {
     let user = services::user::create_user(&state, payload).await?;
 
@@ -43,7 +74,7 @@ async fn create_user(
 
 async fn get_current_user(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
     let user = state
         .user_repo
@@ -59,7 +90,7 @@ async fn get_current_user(
 // Gets public info about a user
 async fn get_user(
     State(state): State<AppState>,
-    AuthUser(logged_in_user): AuthUser,
+    logged_in_user: AuthUser,
     Path(user_id): Path<Uuid>,
 ) -> Result<impl IntoResponse, AppError> {
     // Check if logged in user shares a group with lookup user for privacy
@@ -85,7 +116,7 @@ async fn get_user(
 
 async fn get_current_user_groups(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
     let groups = state
         .group_repo
@@ -99,7 +130,7 @@ async fn get_current_user_groups(
 
 async fn update_current_user(
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
+    user: AuthUser,
     ValidatedJson(payload): ValidatedJson<UpdateUserReq>,
 ) -> Result<impl IntoResponse, AppError> {
     let user = state
@@ -121,8 +152,9 @@ async fn update_current_user(
 
 async fn update_password(
     session: Session,
+    _ip_limiter: RequireIpLimit<ChangePasswordRoute>,
+    user: RateLimitedUser<ChangePasswordRoute, AuthUser>,
     State(state): State<AppState>,
-    AuthUser(user): AuthUser,
     ValidatedJson(payload): ValidatedJson<UpdatePasswordReq>,
 ) -> Result<impl IntoResponse, AppError> {
     let updated_user = services::user::update_password(

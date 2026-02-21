@@ -84,5 +84,5 @@ impl EmailRepo {
 
 fn get_verification_link(token: &Uuid) -> String {
     // TODO: get from env
-    format!("http://localhost:3000/verify-email/{}", token.to_string())
+    format!("http://localhost:3000/verify-email/{}", token)
 }

@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use crate::{
     AppState,
     constants::{SESSION_USER_KEY, SESSION_VERSION_KEY},
@@ -9,6 +11,13 @@ use tower_sessions::Session;
 use uuid::Uuid;
 
 pub struct AuthUser(pub UserDb);
+
+impl Deref for AuthUser {
+    type Target = UserDb;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 // Checks user is authenticated from session cookie
 #[async_trait]

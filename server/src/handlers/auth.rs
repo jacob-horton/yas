@@ -1,8 +1,17 @@
+use std::sync::Arc;
+
 use crate::{
     AppState,
     constants::{SESSION_USER_KEY, SESSION_VERSION_KEY},
     errors::{AppError, AuthError},
-    extractors::{auth::AuthUser, validated_json::ValidatedJson},
+    extractors::{
+        auth::AuthUser,
+        rate_limiting::{
+            email::EmailLimited,
+            ip::{IpLimitConfig, IpLimiter, RequireIpLimit},
+        },
+        validated_json::ValidatedJson,
+    },
     models::{
         auth::{CreateSessionReq, VerifyEmailReq},
         user::UserResponse,
@@ -18,11 +27,26 @@ use axum::{
 };
 use tower_sessions::Session;
 
+struct LoginRoute;
+impl IpLimitConfig for LoginRoute {
+    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
+        &state.rate_limiters.login_ip_limiter
+    }
+}
+
+struct VerifyEmailRoute;
+impl IpLimitConfig for VerifyEmailRoute {
+    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
+        &state.rate_limiters.verify_email_ip_limiter
+    }
+}
+
 // Login
 async fn create_session(
     State(state): State<AppState>,
+    _ip_limiter: RequireIpLimit<LoginRoute>,
     session: Session,
-    ValidatedJson(payload): ValidatedJson<CreateSessionReq>,
+    EmailLimited(ValidatedJson(payload)): EmailLimited<ValidatedJson<CreateSessionReq>>,
 ) -> Result<impl IntoResponse, AppError> {
     let user = state
         .user_repo
@@ -63,12 +87,13 @@ async fn delete_session(session: Session) -> impl IntoResponse {
 }
 
 // Get current user
-async fn get_session(AuthUser(user): AuthUser) -> Result<impl IntoResponse, AppError> {
+async fn get_session(user: AuthUser) -> Result<impl IntoResponse, AppError> {
     Ok(Json(serde_json::json!({ "user_id": user.id.to_string() })))
 }
 
 // Verify email address
 async fn verify_email(
+    _ip_limiter: RequireIpLimit<VerifyEmailRoute>,
     State(state): State<AppState>,
     Json(payload): Json<VerifyEmailReq>,
 ) -> Result<impl IntoResponse, AppError> {

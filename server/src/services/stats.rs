@@ -1,6 +1,6 @@
 use crate::{
     AppState,
-    errors::{AppError, GameError, GroupError, StatsError},
+    errors::{AppError, GroupError, StatsError},
     models::{
         game::{GameDb, OrderBy},
         stats::{
@@ -244,7 +244,7 @@ pub async fn get_player_highlights(
     game_id: Uuid,
     player_id: Uuid,
 ) -> Result<PlayerHighlightStats, AppError> {
-    let (game, _) = fetch_game_guarded(&state, game_id, user_id).await?;
+    let (game, _) = fetch_game_guarded(state, game_id, user_id).await?;
 
     let scoreboard = get_scoreboard_entries(state, &game).await?;
     let (rank_index, entry) = scoreboard
@@ -313,7 +313,7 @@ pub async fn get_distributions(
     user_id: Uuid,
     game_id: Uuid,
 ) -> Result<HashMap<Uuid, DistributionWithMaxMin>, AppError> {
-    let (game, _) = fetch_game_guarded(&state, game_id, user_id).await?;
+    let (game, _) = fetch_game_guarded(state, game_id, user_id).await?;
 
     let raw_data = state
         .stats_repo

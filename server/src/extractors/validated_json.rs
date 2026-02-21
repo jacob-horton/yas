@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use axum::{
     Json, async_trait,
     extract::{FromRequest, Request},
@@ -27,5 +29,12 @@ where
             .map_err(|e| AppError::BadRequest(e.to_string()))?;
 
         Ok(ValidatedJson(data))
+    }
+}
+
+impl<T> Deref for ValidatedJson<T> {
+    type Target = T;
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }

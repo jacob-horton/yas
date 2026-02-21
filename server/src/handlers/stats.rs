@@ -18,7 +18,7 @@ use crate::{
 pub async fn get_user_history(
     State(state): State<AppState>,
     Path((game_id, player_id)): Path<(Uuid, Uuid)>,
-    AuthUser(user): AuthUser,
+    user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
     let stats = services::stats::get_player_history(&state, user.id, game_id, player_id).await?;
 
@@ -30,7 +30,7 @@ pub async fn get_user_history(
 pub async fn get_player_highlights(
     State(state): State<AppState>,
     Path((game_id, player_id)): Path<(Uuid, Uuid)>,
-    AuthUser(user): AuthUser,
+    user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
     let stats = services::stats::get_player_highlights(&state, user.id, game_id, player_id).await?;
 
@@ -42,7 +42,7 @@ pub async fn get_player_highlights(
 pub async fn get_distributions(
     State(state): State<AppState>,
     Path(game_id): Path<Uuid>,
-    AuthUser(user): AuthUser,
+    user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
     let distribution = services::stats::get_distributions(&state, user.id, game_id).await?;
 

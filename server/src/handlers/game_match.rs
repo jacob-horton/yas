@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
     Json, Router,
     extract::{Path, State},
@@ -10,15 +12,27 @@ use uuid::Uuid;
 use crate::{
     AppState,
     errors::AppError,
-    extractors::{validated_json::ValidatedJson, verified_user::VerifiedUser},
+    extractors::{
+        rate_limiting::ip::{IpLimitConfig, IpLimiter, RequireIpLimit},
+        validated_json::ValidatedJson,
+        verified_user::VerifiedUser,
+    },
     models::game_match::{CreateMatchReq, MatchResponse},
     services,
 };
 
-pub async fn create_match(
+struct CreateMatchRoute;
+impl IpLimitConfig for CreateMatchRoute {
+    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
+        &state.rate_limiters.create_match_ip_limiter
+    }
+}
+
+async fn create_match(
+    _ip_limiter: RequireIpLimit<CreateMatchRoute>,
     State(state): State<AppState>,
     Path(game_id): Path<Uuid>,
-    VerifiedUser(user): VerifiedUser,
+    user: VerifiedUser,
     ValidatedJson(payload): ValidatedJson<CreateMatchReq>,
 ) -> Result<impl IntoResponse, AppError> {
     let game_match = services::game_match::create_match(&state, game_id, user.id, payload).await?;

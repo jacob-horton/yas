@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
     Json, Router,
     extract::{Path, Query, State},
@@ -11,8 +13,11 @@ use crate::{
     AppState,
     errors::AppError,
     extractors::{
-        auth::AuthUser, auth_member::AuthMember, validated_json::ValidatedJson,
-        verified_member::VerifiedMember, verified_user::VerifiedUser,
+        auth_member::AuthMember,
+        rate_limiting::ip::{IpLimitConfig, IpLimiter, RequireIpLimit},
+        validated_json::ValidatedJson,
+        verified_member::VerifiedMember,
+        verified_user::VerifiedUser,
     },
     models::{
         group::{
@@ -24,9 +29,17 @@ use crate::{
     services,
 };
 
+struct CreateGroupRoute;
+impl IpLimitConfig for CreateGroupRoute {
+    fn limiter(state: &AppState) -> &Arc<IpLimiter> {
+        &state.rate_limiters.create_group_ip_limiter
+    }
+}
+
 async fn create_group(
+    _ip_limiter: RequireIpLimit<CreateGroupRoute>,
     State(state): State<AppState>,
-    VerifiedUser(user): VerifiedUser,
+    user: VerifiedUser,
     ValidatedJson(payload): ValidatedJson<CreateGroupReq>,
 ) -> Result<impl IntoResponse, AppError> {
     let group = services::group::create_group(&state, user.id, payload).await?;
