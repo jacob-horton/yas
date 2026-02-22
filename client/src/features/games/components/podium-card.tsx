@@ -26,7 +26,7 @@ export const PodiumCard: Component<{
   return (
     <div
       class={cn(
-        "flex w-68 flex-col justify-between overflow-clip rounded-md border bg-white pb-8 dark:bg-gray-800",
+        "flex w-76 flex-col justify-between overflow-clip rounded-md border bg-white pb-8 dark:bg-gray-800",
         RANK_PODIUM_SIZES[props.position],
       )}
     >

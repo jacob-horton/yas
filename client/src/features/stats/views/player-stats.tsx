@@ -21,6 +21,8 @@ import { usePlayerHighlights } from "../hooks/use-player-highlights";
 import { usePlayerHistory } from "../hooks/use-player-history";
 import type { PlayerStatsRouteParams } from "../types";
 import { ErrorMessage } from "@/components/ui/error-message";
+import { EmptyState } from "@/components/ui/empty-state";
+import VisualiseDataSvg from "@/assets/empty-states/visualise-data.svg";
 
 const TABLE_HEADINGS = [
   { label: "Date" },
@@ -79,43 +81,53 @@ export const PlayerStats = () => {
           <ErrorMessage title="Error" details="Couldn't player history" />
         }
       >
-        <Container class="flex flex-col gap-8">
-          <PlayerHistoryChart
-            data={
-              history.data
-                ?.map((s) => ({ score: s.score, rank: s.rank_in_match }))
-                .toReversed() ?? []
-            }
-          />
+        <Show
+          when={(history.data?.length ?? 0) > 2}
+          fallback={
+            <EmptyState title="Not enough data" img={VisualiseDataSvg}>
+              Record more matches to see your match history
+            </EmptyState>
+          }
+        >
+          <Container class="flex flex-col gap-8">
+            <PlayerHistoryChart
+              data={
+                history.data
+                  ?.map((s) => ({ score: s.score, rank: s.rank_in_match }))
+                  .toReversed() ?? []
+              }
+            />
 
-          <Table headings={TABLE_HEADINGS} caption="Match history">
-            <Suspense fallback={<TableRowSkeleton numCols={3} />}>
-              <Show when={history.data}>
-                {(data) =>
-                  data().map((s) => (
-                    <TableRow>
-                      <TableCell>{formatDate(s.played_at)}</TableCell>
-                      <TableCell>
-                        <span
-                          class={cn(
-                            {
-                              "font-bold": !!RANK_TEXT_COLOURS[s.rank_in_match],
-                            },
-                            RANK_TEXT_COLOURS[s.rank_in_match] ??
-                              "text-gray-400",
-                          )}
-                        >
-                          {ordinalSuffix(s.rank_in_match)}
-                        </span>
-                      </TableCell>
-                      <TableCell>{s.score}</TableCell>
-                    </TableRow>
-                  ))
-                }
-              </Show>
-            </Suspense>
-          </Table>
-        </Container>
+            <Table headings={TABLE_HEADINGS} caption="Match history">
+              <Suspense fallback={<TableRowSkeleton numCols={3} />}>
+                <Show when={history.data}>
+                  {(data) =>
+                    data().map((s) => (
+                      <TableRow>
+                        <TableCell>{formatDate(s.played_at)}</TableCell>
+                        <TableCell>
+                          <span
+                            class={cn(
+                              {
+                                "font-bold":
+                                  !!RANK_TEXT_COLOURS[s.rank_in_match],
+                              },
+                              RANK_TEXT_COLOURS[s.rank_in_match] ??
+                                "text-gray-400",
+                            )}
+                          >
+                            {ordinalSuffix(s.rank_in_match)}
+                          </span>
+                        </TableCell>
+                        <TableCell>{s.score}</TableCell>
+                      </TableRow>
+                    ))
+                  }
+                </Show>
+              </Suspense>
+            </Table>
+          </Container>
+        </Show>
       </Show>
     </Page>
   );
