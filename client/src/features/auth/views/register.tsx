@@ -7,12 +7,15 @@ import { useZodForm } from "@/lib/zod/use-zod-form";
 import { useAuth } from "../context/auth-provider";
 
 export const Register: Component = () => {
-  const { values, errors, setField, validate } = useZodForm(createUserSchema, {
-    name: "",
-    email: "",
-    password: "",
-    confirm_password: "",
-  });
+  const { values, errors, setField, setError, validate } = useZodForm(
+    createUserSchema,
+    {
+      name: "",
+      email: "",
+      password: "",
+      confirm_password: "",
+    },
+  );
 
   const navigate = useNavigate();
   const auth = useAuth();
@@ -29,8 +32,14 @@ export const Register: Component = () => {
     const validData = validate();
     if (!validData) return;
 
-    // TODO: check type of error here
-    await auth.register(values.name, values.email, values.password);
+    const error = await auth.register(
+      values.name,
+      values.email,
+      values.password,
+    );
+    if (error === "email-taken") {
+      setError("email", "Email already taken");
+    }
   };
 
   return (
@@ -74,7 +83,7 @@ export const Register: Component = () => {
           </Button>
 
           <div class="text-center text-sm">
-            <span class="text-gray-500">Already have an account?</span>
+            <span class="text-gray-500">Already have an account? </span>
             <A
               href="/login"
               class="font-semibold text-violet-600 hover:underline"

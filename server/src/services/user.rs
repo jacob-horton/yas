@@ -42,7 +42,15 @@ pub async fn create_user(state: &AppState, payload: CreateUserReq) -> Result<Use
         .user_repo
         .create(&mut *tx, &payload.name, &payload.email, &hash)
         .await
-        .map_err(|_| UserError::UserAlreadyExists)?;
+        .map_err(|e| match e.as_database_error() {
+            Some(db_err)
+                if db_err.code() == Some("23505".into())
+                    && db_err.message().contains("users_email_unique") =>
+            {
+                UserError::UserAlreadyExists
+            }
+            _ => UserError::Database(e),
+        })?;
 
     let token = state
         .verification_repo
@@ -79,7 +87,15 @@ pub async fn update_email(
         .user_repo
         .update_email(&mut *tx, user.id, new_email)
         .await
-        .map_err(UserError::Database)?;
+        .map_err(|e| match e.as_database_error() {
+            Some(db_err)
+                if db_err.code() == Some("23505".into())
+                    && db_err.message().contains("users_email_unique") =>
+            {
+                UserError::UserAlreadyExists
+            }
+            _ => UserError::Database(e),
+        })?;
 
     // Create a new verification token
     let token = state

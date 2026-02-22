@@ -23,6 +23,10 @@ export function useZodForm<T extends z.ZodType>(
     {},
   );
 
+  const setError = (path: FormPath, message: string | undefined) => {
+    setErrors({ [path]: message } as any);
+  };
+
   const setField: SetStoreFunction<FormInput> = (...args: any[]) => {
     (setValues as any)(...args);
 
@@ -58,5 +62,5 @@ export function useZodForm<T extends z.ZodType>(
     return result.data;
   };
 
-  return { values, errors, setField, validate };
+  return { values, errors, setField, setError, validate };
 }

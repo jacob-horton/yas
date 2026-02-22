@@ -2,8 +2,8 @@ import { createListCollection, Select } from "@ark-ui/solid";
 import ChevronDownIcon from "lucide-solid/icons/chevron-down";
 import CircleAlertIcon from "lucide-solid/icons/circle-alert";
 import { type Component, createMemo, For, Show } from "solid-js";
-import { cn } from "@/lib/classname";
 import { Portal } from "solid-js/web";
+import { cn } from "@/lib/classname";
 
 export const Dropdown: Component<{
   class?: string;

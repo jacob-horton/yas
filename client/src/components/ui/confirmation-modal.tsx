@@ -41,7 +41,7 @@ export const ConfirmationModalUI: Component<UIProps> = (props) => {
                 </Button>
 
                 <Button
-                  variant="secondary"
+                  variant={opts().danger ? "secondary" : "primary"}
                   danger={opts().danger}
                   onClick={props.onConfirm}
                 >

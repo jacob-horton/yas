@@ -14,15 +14,7 @@ import { userKeys } from "@/features/users/hooks/query-keys";
 import type { User } from "@/features/users/types";
 import { setupAxiosInterceptors } from "@/lib/api";
 
-type ErrorDetail = {
-  property: string;
-  codes: string;
-};
-
-type DetailedStatusError = {
-  message: string;
-  details: ErrorDetail[];
-};
+export type RegisterError = "email-taken" | "unknown";
 
 export type AuthContextValue = {
   user: Accessor<User | null | undefined>;
@@ -34,7 +26,7 @@ export type AuthContextValue = {
     name: string,
     email: string,
     password: string,
-  ) => Promise<DetailedStatusError | null>;
+  ) => Promise<RegisterError | null>;
 };
 
 const AuthContext = createContext<AuthContextValue>();
@@ -92,9 +84,10 @@ export const AuthProvider: ParentComponent = (props) => {
         queryClient.setQueryData(userKeys.me(), user);
         return null;
       } catch (e) {
-        if (isAxiosError(e) && (e.status === 409 || e.status === 400)) {
-          return (await e.response?.data) as DetailedStatusError;
+        if (isAxiosError(e) && e.status === 409) {
+          return "email-taken";
         }
+
         throw e;
       } finally {
         setIsAuthenticating(false);
