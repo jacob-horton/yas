@@ -58,7 +58,7 @@ export const RolePicker = (props: RolePickerProps) => {
 
       <Portal>
         <Menu.Positioner>
-          <Menu.Content class="z-50 min-w-44 rounded-lg border border-gray-200 bg-white p-1 shadow-xl focus-visible:outline-none">
+          <Menu.Content class="z-50 min-w-44 rounded-md border border-gray-200 bg-white p-1 shadow-xl focus-visible:outline-none">
             {props.possibleRoles.map((role) => (
               <Menu.Item
                 value={role}

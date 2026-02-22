@@ -4,6 +4,7 @@ import type { ParentComponent } from "solid-js";
 import { requireRole } from "@/components/layout/authorised-route";
 import { Sidebar } from "@/components/layout/sidebar";
 import { ConfirmationProvider } from "@/context/confirmation-context";
+import { ToastProvider } from "@/context/toast-context";
 import { ProtectedRoute } from "@/features/auth/components/protected-route";
 import { AuthProvider } from "@/features/auth/context/auth-provider";
 import { Login } from "@/features/auth/views/login";
@@ -46,58 +47,60 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ConfirmationProvider>
-          <div class="flex h-screen max-h-screen min-h-screen w-full flex-col overflow-hidden bg-white dark:bg-gray-900">
-            <Router>
-              {/* Protected routes - must be logged in */}
-              <Route path="/" component={ProtectedRoute}>
-                <Route path="/groups/:groupId" component={WithSidebar}>
-                  <Route path="/" component={GroupDetails} />
-                  <Route path="/members" component={GroupMembers} />
-                  <Route path="/invites" component={Invites} />
-                  <Route path="/games/:gameId" component={Scoreboard} />
-                  <Route
-                    path="/games/:gameId/player/:playerId"
-                    component={PlayerStats}
-                  />
-
-                  {/* Admin routes */}
-                  <Route component={requireRole("admin")}>
-                    <Route path="/edit" component={EditGroup} />
-                    <Route path="/games/create" component={CreateGame} />
-                    <Route path="/games/:gameId/edit" component={EditGame} />
-                    <Route path="/invites/create" component={CreateInvite} />
-                  </Route>
-
-                  {/* Member routes */}
-                  <Route component={requireRole("member")}>
+          <ToastProvider>
+            <div class="flex h-screen max-h-screen min-h-screen w-full flex-col overflow-hidden bg-white dark:bg-gray-900">
+              <Router>
+                {/* Protected routes - must be logged in */}
+                <Route path="/" component={ProtectedRoute}>
+                  <Route path="/groups/:groupId" component={WithSidebar}>
+                    <Route path="/" component={GroupDetails} />
+                    <Route path="/members" component={GroupMembers} />
+                    <Route path="/invites" component={Invites} />
+                    <Route path="/games/:gameId" component={Scoreboard} />
                     <Route
-                      path="/games/:gameId/record"
-                      component={RecordGame}
+                      path="/games/:gameId/player/:playerId"
+                      component={PlayerStats}
                     />
+
+                    {/* Admin routes */}
+                    <Route component={requireRole("admin")}>
+                      <Route path="/edit" component={EditGroup} />
+                      <Route path="/games/create" component={CreateGame} />
+                      <Route path="/games/:gameId/edit" component={EditGame} />
+                      <Route path="/invites/create" component={CreateInvite} />
+                    </Route>
+
+                    {/* Member routes */}
+                    <Route component={requireRole("member")}>
+                      <Route
+                        path="/games/:gameId/record"
+                        component={RecordGame}
+                      />
+                    </Route>
                   </Route>
+
+                  <Route path="/" component={HomePage} />
+                  <Route path="/settings" component={UserSettings} />
+
+                  <Route path="/groups/create" component={CreateGroup} />
+
+                  <Route path="/me/edit" component={EditUser} />
+                  <Route path="/me/password" component={EditPassword} />
+                  <Route path="/me/email" component={EditEmail} />
+
+                  <Route
+                    path="/invites/:inviteId/accept"
+                    component={AcceptInvite}
+                  />
                 </Route>
 
-                <Route path="/" component={HomePage} />
-                <Route path="/settings" component={UserSettings} />
+                <Route path="/verify-email/:token" component={VerifyEmail} />
 
-                <Route path="/groups/create" component={CreateGroup} />
-
-                <Route path="/me/edit" component={EditUser} />
-                <Route path="/me/password" component={EditPassword} />
-                <Route path="/me/email" component={EditEmail} />
-
-                <Route
-                  path="/invites/:inviteId/accept"
-                  component={AcceptInvite}
-                />
-              </Route>
-
-              <Route path="/verify-email/:token" component={VerifyEmail} />
-
-              <Route path="/login" component={Login} />
-              <Route path="/register" component={Register} />
-            </Router>
-          </div>
+                <Route path="/login" component={Login} />
+                <Route path="/register" component={Register} />
+              </Router>
+            </div>
+          </ToastProvider>
         </ConfirmationProvider>
       </AuthProvider>
     </QueryClientProvider>

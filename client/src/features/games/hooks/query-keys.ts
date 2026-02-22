@@ -8,6 +8,11 @@ export const gameKeys = {
   lastPLayers: (gameId: string) =>
     [...gameKeys.game(gameId), "last_players"] as const,
 
-  scoreboard: <T extends string>(gameId: string, sort?: Sort<T>) =>
-    [...gameKeys.game(gameId), "scoreboard", sort] as const,
+  scoreboard: <T extends string>(gameId: string, sort?: Sort<T>) => {
+    if (sort) {
+      return [...gameKeys.game(gameId), "scoreboard", sort] as const;
+    }
+
+    return [...gameKeys.game(gameId), "scoreboard"] as const;
+  },
 };

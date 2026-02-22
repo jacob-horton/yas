@@ -8,7 +8,12 @@ export const groupKeys = {
 
   detail: (groupId: string) => [...groupKeys.all, "detail", groupId] as const,
   games: (groupId: string) => [...groupKeys.all, groupId, "games"] as const,
-  members: <T extends string>(groupId: string, sort?: Sort<T>) =>
-    [...groupKeys.all, groupId, "members", sort] as const,
+  members: <T extends string>(groupId: string, sort?: Sort<T>) => {
+    if (sort) {
+      return [...groupKeys.all, groupId, "members", sort] as const;
+    }
+
+    return [...groupKeys.all, groupId, "members"] as const;
+  },
   invites: (groupId: string) => [...groupKeys.all, groupId, "invites"] as const,
 };

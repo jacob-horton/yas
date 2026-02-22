@@ -1,8 +1,9 @@
-import { createMemo, createSignal, For, Suspense } from "solid-js";
+import { createMemo, createSignal, For, Show, Suspense } from "solid-js";
 import { Container } from "@/components/layout/container";
 import { Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { ErrorMessage } from "@/components/ui/error-message";
 import { RolePicker } from "@/components/ui/role-picker";
 import {
   type Heading,
@@ -17,9 +18,10 @@ import { Authorised } from "@/features/auth/components/authorised";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { cn } from "@/lib/classname";
 import { formatDate } from "@/lib/format-date";
-import { groupsApi } from "../api";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
+import { useRemoveMember } from "../hooks/use-remove-member";
+import { useUpdateRole } from "../hooks/use-update-role";
 import {
   type GroupMember,
   hasPermission,
@@ -49,6 +51,8 @@ export const GroupMembers = () => {
   const members = useGroupMembers(group.groupId, sort);
 
   const { showConfirm } = useConfirmation();
+
+  const removeMember = useRemoveMember();
   const handleRemove = async (member: GroupMember) => {
     const isConfirmed = await showConfirm({
       title: "Remove User From Group",
@@ -63,14 +67,20 @@ export const GroupMembers = () => {
     });
 
     if (isConfirmed) {
-      await groupsApi.group(group.groupId()).member(member.id).delete();
-      members.refetch();
+      removeMember.mutate({
+        groupId: group.groupId(),
+        memberId: member.id,
+      });
     }
   };
 
+  const updateRole = useUpdateRole();
   const handleUpdateRole = async (member: GroupMember, role: MemberRole) => {
-    await groupsApi.group(group.groupId()).member(member.id).updateRole(role);
-    members.refetch();
+    updateRole.mutate({
+      groupId: group.groupId(),
+      memberId: member.id,
+      role,
+    });
   };
 
   // Allow promoting people up to (and including) your role
@@ -92,87 +102,94 @@ export const GroupMembers = () => {
 
   return (
     <Page title="Group Members">
-      <Container>
-        <Table
-          headings={tableHeadings()}
-          caption="All members of this group"
-          sortedBy={sort()}
-          onSort={setSort}
+      <Container class="h-full">
+        <Show
+          when={!members.isError}
+          fallback={
+            <ErrorMessage title="Error" details="Couldn't load members" />
+          }
         >
-          <Suspense
-            fallback={<TableRowSkeleton numCols={tableHeadings().length} />}
+          <Table
+            headings={tableHeadings()}
+            caption="All members of this group"
+            sortedBy={sort()}
+            onSort={setSort}
           >
-            <For each={members.data}>
-              {(member) => (
-                <TableRow
-                  class={cn({
-                    "font-semibold": member.id === auth.user()?.id,
-                  })}
-                >
-                  <TableCell class="flex items-center gap-3">
-                    <Avatar
-                      class="size-7"
-                      avatar={member.avatar}
-                      colour={member.avatar_colour}
-                    />
-                    {member.name}
-                  </TableCell>
-                  <Authorised minRole="admin">
-                    <TableCell>{member.email}</TableCell>
-                  </Authorised>
-                  <TableCell>
-                    <RolePicker
-                      possibleRoles={selectableRoles()}
-                      currentRole={member.role}
-                      onChange={(role) => handleUpdateRole(member, role)}
-                      // Only allow changing people below your role, and you must be admin or above
-                      disabled={
-                        // Can change people below your role
-                        !hasPermission(
-                          group.userRole(),
-                          member.role,
-                          auth.user()?.email_verified,
-                          true,
-                        ) ||
-                        // Can only change if admin or above
-                        !hasPermission(
-                          group.userRole(),
-                          "admin",
-                          auth.user()?.email_verified,
-                        ) ||
-                        // Cannot change owner role (owner can demote themselves otherwise)
-                        member.role === "owner"
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>{formatDate(member.joined_at)}</TableCell>
-                  <TableCell class="w-14">
-                    <Authorised
-                      strictlyAbove={member.role}
-                      minRole="admin"
-                      fallback={
+            <Suspense
+              fallback={<TableRowSkeleton numCols={tableHeadings().length} />}
+            >
+              <For each={members.data}>
+                {(member) => (
+                  <TableRow
+                    class={cn({
+                      "font-semibold": member.id === auth.user()?.id,
+                    })}
+                  >
+                    <TableCell class="flex items-center gap-3">
+                      <Avatar
+                        class="size-7"
+                        avatar={member.avatar}
+                        colour={member.avatar_colour}
+                      />
+                      {member.name}
+                    </TableCell>
+                    <Authorised minRole="admin">
+                      <TableCell>{member.email}</TableCell>
+                    </Authorised>
+                    <TableCell>
+                      <RolePicker
+                        possibleRoles={selectableRoles()}
+                        currentRole={member.role}
+                        onChange={(role) => handleUpdateRole(member, role)}
+                        // Only allow changing people below your role, and you must be admin or above
+                        disabled={
+                          // Can change people below your role
+                          !hasPermission(
+                            group.userRole(),
+                            member.role,
+                            auth.user()?.email_verified,
+                            true,
+                          ) ||
+                          // Can only change if admin or above
+                          !hasPermission(
+                            group.userRole(),
+                            "admin",
+                            auth.user()?.email_verified,
+                          ) ||
+                          // Cannot change owner role (owner can demote themselves otherwise)
+                          member.role === "owner"
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>{formatDate(member.joined_at)}</TableCell>
+                    <TableCell class="w-14">
+                      <Authorised
+                        strictlyAbove={member.role}
+                        minRole="admin"
+                        fallback={
+                          <Button
+                            class="text-gray-200"
+                            variant="ghost"
+                            icon="delete"
+                            disabled
+                          />
+                        }
+                      >
                         <Button
-                          class="text-gray-200"
+                          class="text-gray-400 dark:text-gray-500"
                           variant="ghost"
                           icon="delete"
-                          disabled
+                          danger
+                          onClick={() => handleRemove(member)}
                         />
-                      }
-                    >
-                      <Button
-                        class="text-gray-400 dark:text-gray-500"
-                        variant="ghost"
-                        icon="delete"
-                        danger
-                        onClick={() => handleRemove(member)}
-                      />
-                    </Authorised>
-                  </TableCell>
-                </TableRow>
-              )}
-            </For>
-          </Suspense>
-        </Table>
+                      </Authorised>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </For>
+            </Suspense>
+          </Table>
+        </Show>
       </Container>
     </Page>
   );
