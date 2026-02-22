@@ -1,18 +1,26 @@
 import { useNavigate } from "@solidjs/router";
-import { createMemo, type ParentComponent, Show, Suspense } from "solid-js";
+import { isAxiosError } from "axios";
+import {
+  createEffect,
+  createMemo,
+  type ParentComponent,
+  Show,
+  Suspense,
+} from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { type Action, Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
+import { ErrorMessage } from "@/components/ui/error-message";
 import { useConfirmation } from "@/context/confirmation-context";
 import { useToast } from "@/context/toast-context";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { formatDate } from "@/lib/format-date";
 import { ICON_MAP, type Icon } from "@/lib/icons";
+import { LS_LAST_GROUP_ID } from "@/pages/home-page";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
 import { useRemoveMember } from "../hooks/use-remove-member";
 import { hasPermission } from "../types";
-import { ErrorMessage } from "@/components/ui/error-message";
 
 type DetailCardProps = {
   title: string;
@@ -41,6 +49,19 @@ export const GroupDetails = () => {
   const toast = useToast();
 
   const { showConfirm } = useConfirmation();
+
+  // Return to home page if group not found
+  createEffect(() => {
+    if (!group.groupQuery.isError) {
+      return;
+    }
+
+    const error = group.groupQuery.error;
+    if (isAxiosError(error) && error.response?.status === 404) {
+      localStorage.removeItem(LS_LAST_GROUP_ID);
+      navigate("/");
+    }
+  });
 
   const handleLeave = async () => {
     const isConfirmed = await showConfirm({

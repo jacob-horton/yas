@@ -3,12 +3,12 @@ import { Show, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";
 import { ButtonSkeleton } from "@/components/ui/button.skeleton";
-import { TextSkeleton } from "@/components/ui/text.skeleton";
-import { useAuth } from "@/features/auth/context/auth-provider";
-import { useInvite } from "../hooks/use-invite";
-import { useAcceptInvite } from "../hooks/use-accept-invite";
-import { useToast } from "@/context/toast-context";
 import { ErrorMessage } from "@/components/ui/error-message";
+import { TextSkeleton } from "@/components/ui/text.skeleton";
+import { useToast } from "@/context/toast-context";
+import { useAuth } from "@/features/auth/context/auth-provider";
+import { useAcceptInvite } from "../hooks/use-accept-invite";
+import { useInvite } from "../hooks/use-invite";
 
 export const AcceptInvite = () => {
   const params = useParams<{ inviteId: string }>();

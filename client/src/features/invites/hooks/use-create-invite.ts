@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
 import { useToast } from "@/context/toast-context";
-import { groupKeys } from "@/features/groups/hooks/query-keys";
 import { groupsApi } from "@/features/groups/api";
+import { groupKeys } from "@/features/groups/hooks/query-keys";
 import type { CreateInviteRequest } from "../types/invite";
 
 export const useCreateInvite = () => {

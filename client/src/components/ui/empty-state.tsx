@@ -1,6 +1,6 @@
-import { cn } from "@/lib/classname";
 import type { Component, ParentComponent } from "solid-js";
 import { Dynamic } from "solid-js/web";
+import { cn } from "@/lib/classname";
 
 type Props = {
   title: string;

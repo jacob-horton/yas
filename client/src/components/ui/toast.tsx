@@ -1,11 +1,11 @@
 import { Toast as ArkToast, type ToastOptions } from "@ark-ui/solid/toast";
-import XIcon from "lucide-solid/icons/x";
-import type { Component } from "solid-js";
-import { cn } from "@/lib/classname";
-import { Dynamic } from "solid-js/web";
 import CircleAlertIcon from "lucide-solid/icons/circle-alert";
 import CircleCheckIcon from "lucide-solid/icons/circle-check";
 import InfoIcon from "lucide-solid/icons/info";
+import XIcon from "lucide-solid/icons/x";
+import type { Component } from "solid-js";
+import { Dynamic } from "solid-js/web";
+import { cn } from "@/lib/classname";
 
 export const ICON_MAP = {
   error: CircleAlertIcon,

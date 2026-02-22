@@ -10,9 +10,9 @@ import {
 } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/context/toast-context";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { cn } from "@/lib/classname";
-import { useToast } from "@/context/toast-context";
 import { useUpdateUser } from "../hooks/use-update-user";
 
 const COLOURS = Object.keys(COLOUR_MAP) as AvatarColour[];

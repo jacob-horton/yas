@@ -4,6 +4,7 @@ import type { ParentComponent } from "solid-js";
 import { requireRole } from "@/components/layout/authorised-route";
 import { Sidebar } from "@/components/layout/sidebar";
 import { ConfirmationProvider } from "@/context/confirmation-context";
+import { ToastProvider } from "@/context/toast-context";
 import { ProtectedRoute } from "@/features/auth/components/protected-route";
 import { AuthProvider } from "@/features/auth/context/auth-provider";
 import { Login } from "@/features/auth/views/login";
@@ -27,7 +28,6 @@ import { EditPassword } from "@/features/users/views/edit-password";
 import { EditUser } from "@/features/users/views/edit-user";
 import { UserSettings } from "@/features/users/views/settings";
 import { HomePage } from "@/pages/home-page";
-import { ToastProvider } from "@/context/toast-context";
 
 const queryClient = new QueryClient();
 

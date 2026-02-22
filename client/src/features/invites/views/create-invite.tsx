@@ -3,8 +3,8 @@ import { createSignal } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useGroup } from "@/features/groups/context/group-provider";
 import { useToast } from "@/context/toast-context";
+import { useGroup } from "@/features/groups/context/group-provider";
 import { useCreateInvite } from "../hooks/use-create-invite";
 
 export const CreateInvite = () => {

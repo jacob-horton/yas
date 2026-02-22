@@ -1,9 +1,12 @@
 import { useNavigate, useParams } from "@solidjs/router";
 import { createMemo, createSignal, For, Show, Suspense } from "solid-js";
+import DataSvg from "@/assets/empty-states/data.svg";
 import { Container } from "@/components/layout/container";
 import { type Action, Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
 import { Change } from "@/components/ui/change";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ErrorMessage } from "@/components/ui/error-message";
 import {
   type Heading,
   type Sort,
@@ -21,9 +24,6 @@ import { PodiumCard } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams, ScoringMetric } from "../types/game";
-import { ErrorMessage } from "@/components/ui/error-message";
-import { EmptyState } from "@/components/ui/empty-state";
-import DataSvg from "@/assets/empty-states/data.svg";
 
 const TABLE_CAPTION = "Stats of all players playing this game";
 

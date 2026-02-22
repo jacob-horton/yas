@@ -3,9 +3,9 @@ import { type Component, createSignal, Show } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/context/toast-context";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { useUpdateEmail } from "../hooks/use-update-email";
-import { useToast } from "@/context/toast-context";
 
 type Props = {
   initialEmail: string;

@@ -1,9 +1,9 @@
 import { useNavigate } from "@solidjs/router";
 import { createEffect, Show } from "solid-js";
-import { Button } from "@/components/ui/button";
-import { useMyGroups } from "@/features/users/hooks/use-my-groups";
-import { EmptyState } from "@/components/ui/empty-state";
 import HelloSvg from "@/assets/empty-states/hello.svg";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { useMyGroups } from "@/features/users/hooks/use-my-groups";
 
 export const LS_LAST_GROUP_ID = "lastGroupId";
 

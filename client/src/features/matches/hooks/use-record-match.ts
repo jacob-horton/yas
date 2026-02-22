@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
 import { useToast } from "@/context/toast-context";
-import type { CreateMatchRequest } from "../types";
 import { gamesApi } from "@/features/games/api";
 import { gameKeys } from "@/features/games/hooks/query-keys";
+import type { CreateMatchRequest } from "../types";
 
 export const useRecordMatch = () => {
   const queryClient = useQueryClient();

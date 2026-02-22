@@ -1,9 +1,12 @@
 import { useNavigate } from "@solidjs/router";
 import { formatDistanceToNow } from "date-fns";
-import { type Component, For, Suspense, Show } from "solid-js";
+import { type Component, For, Show, Suspense } from "solid-js";
+import LetterSvg from "@/assets/empty-states/letter.svg";
 import { Container } from "@/components/layout/container";
 import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ErrorMessage } from "@/components/ui/error-message";
 import {
   type Heading,
   Table,
@@ -23,9 +26,6 @@ import { useGroup } from "../context/group-provider";
 import { useDeleteInvite } from "../hooks/use-delete-invite";
 import { useGroupInvites } from "../hooks/use-group-invites";
 import { hasPermission } from "../types";
-import { ErrorMessage } from "@/components/ui/error-message";
-import { EmptyState } from "@/components/ui/empty-state";
-import LetterSvg from "@/assets/empty-states/letter.svg";
 
 type ExpiryCellProps = { expiresAt: string };
 
