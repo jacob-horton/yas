@@ -3,17 +3,20 @@ import { createSignal } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { groupsApi } from "@/features/groups/api";
 import { useGroup } from "@/features/groups/context/group-provider";
+import { useToast } from "@/context/toast-context";
+import { useCreateInvite } from "../hooks/use-create-invite";
 
 export const CreateInvite = () => {
   const group = useGroup();
+  const navigate = useNavigate();
 
   const [name, setName] = createSignal("");
   const [expiresAt, setExpiresAt] = createSignal("");
   const [maxUses, setMaxUses] = createSignal("");
 
-  const navigate = useNavigate();
+  const toast = useToast();
+  const createInvite = useCreateInvite();
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
@@ -30,12 +33,25 @@ export const CreateInvite = () => {
       throw new Error("Max uses must be a valid number");
     }
 
-    await groupsApi.group(group.groupId()).createInvite({
+    const payload = {
       name: name(),
       max_uses,
       expires_at,
-    });
-    navigate(-1);
+    };
+
+    createInvite.mutate(
+      { groupId: group.groupId(), payload },
+      {
+        onSuccess: () => {
+          toast.success({
+            title: "Invite created",
+            description: "Invite created successfully",
+          });
+
+          navigate(-1);
+        },
+      },
+    );
   };
 
   return (

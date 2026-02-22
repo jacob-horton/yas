@@ -1,17 +1,16 @@
 import { useNavigate } from "@solidjs/router";
-import { useQueryClient } from "@tanstack/solid-query";
 import { createMemo, type ParentComponent, Show, Suspense } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { type Action, Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
 import { useConfirmation } from "@/context/confirmation-context";
+import { useToast } from "@/context/toast-context";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { formatDate } from "@/lib/format-date";
 import { ICON_MAP, type Icon } from "@/lib/icons";
-import { groupsApi } from "../api";
 import { useGroup } from "../context/group-provider";
-import { groupKeys } from "../hooks/query-keys";
 import { useGroupMembers } from "../hooks/use-group-members";
+import { useRemoveMember } from "../hooks/use-remove-member";
 import { hasPermission } from "../types";
 
 type DetailCardProps = {
@@ -33,12 +32,15 @@ const DetailCard: ParentComponent<DetailCardProps> = (props) => {
 
 export const GroupDetails = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const group = useGroup();
   const members = useGroupMembers(group.groupId);
   const auth = useAuth();
 
+  const removeMember = useRemoveMember();
+  const toast = useToast();
+
   const { showConfirm } = useConfirmation();
+
   const handleLeave = async () => {
     const isConfirmed = await showConfirm({
       title: "Leave Group",
@@ -53,11 +55,17 @@ export const GroupDetails = () => {
     });
 
     if (isConfirmed) {
-      await groupsApi
-        .group(group.groupId())
-        .member(auth.user()?.id ?? "")
-        .delete();
-      await queryClient.invalidateQueries({ queryKey: groupKeys.all });
+      removeMember.mutate(
+        { groupId: group.groupId(), memberId: auth.user()?.id ?? "" },
+        {
+          onSuccess: () => {
+            toast.success({
+              title: "Left group",
+              description: "Successfully left group",
+            });
+          },
+        },
+      );
     }
   };
 

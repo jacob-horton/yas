@@ -10,7 +10,7 @@ use uuid::Uuid;
 
 use crate::{
     AppState,
-    errors::{AppError, GroupError},
+    errors::{AppError, GroupError, InviteError},
     extractors::{
         auth::AuthUser,
         auth_member::AuthMember,
@@ -84,7 +84,12 @@ async fn delete_invite(
     State(state): State<AppState>,
     user: VerifiedUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let invite = services::invite::get_invite(&state, code).await?;
+    let invite = state
+        .invite_repo
+        .find_by_code_for_update(&state.pool, code)
+        .await
+        .map_err(InviteError::Database)?
+        .ok_or(InviteError::NotFound)?;
 
     let member = state
         .group_repo

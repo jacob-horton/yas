@@ -3,10 +3,14 @@ import { type Component, createSignal } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { usersApi } from "../api";
+import { useToast } from "@/context/toast-context";
+import { useUpdatePassword } from "../hooks/use-update-password";
 
 export const EditPassword: Component = () => {
   const navigate = useNavigate();
+
+  const toast = useToast();
+  const updatePassword = useUpdatePassword();
 
   const [currentPassword, setCurrentPassword] = createSignal("");
   const [newPassword, setNewPassword] = createSignal("");
@@ -21,8 +25,19 @@ export const EditPassword: Component = () => {
       return;
     }
 
-    await usersApi.updateMyPassword(currentPassword(), newPassword());
-    navigate(-1);
+    updatePassword.mutate(
+      { currentPassword: currentPassword(), newPassword: newPassword() },
+      {
+        onSuccess: () => {
+          toast.success({
+            title: "Password updated",
+            description:
+              "Password updated successfully. All other devices have been logged out",
+          });
+          navigate(-1);
+        },
+      },
+    );
   };
 
   return (

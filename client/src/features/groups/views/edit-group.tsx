@@ -1,14 +1,14 @@
 import { useNavigate } from "@solidjs/router";
-import { useQueryClient } from "@tanstack/solid-query";
 import type { Component } from "solid-js";
 import { createSignal, Show } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useConfirmation } from "@/context/confirmation-context";
+import { useToast } from "@/context/toast-context";
 import { useGroup } from "@/features/groups/context/group-provider";
-import { groupsApi } from "../api";
-import { groupKeys } from "../hooks/query-keys";
+import { useDeleteGroup } from "../hooks/use-delete-group";
+import { useUpdateGroup } from "../hooks/use-update-group";
 import type { Group, UpdateGroupRequest } from "../types";
 
 type Props = {
@@ -17,21 +17,34 @@ type Props = {
 
 // TODO: reduce duplication with create?
 const EditGroupForm: Component<Props> = (props) => {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  const deleteGroup = useDeleteGroup();
+  const updateGroup = useUpdateGroup();
+  const toast = useToast();
 
   const [name, setName] = createSignal(props.initialData.name ?? "");
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
 
-    const updateGroup: UpdateGroupRequest = {
+    const payload: UpdateGroupRequest = {
       name: name(),
     };
 
-    await groupsApi.group(props.initialData.id).update(updateGroup);
-    await queryClient.invalidateQueries({ queryKey: groupKeys.all });
-    navigate(-1);
+    updateGroup.mutate(
+      { groupId: props.initialData.id, payload },
+      {
+        onSuccess: () => {
+          toast.success({
+            title: "Group updated",
+            description: "Group updated successfully",
+          });
+
+          navigate(-1);
+        },
+      },
+    );
   }
 
   const { showConfirm } = useConfirmation();
@@ -49,8 +62,16 @@ const EditGroupForm: Component<Props> = (props) => {
     });
 
     if (isConfirmed) {
-      await groupsApi.group(props.initialData.id).delete();
-      await queryClient.invalidateQueries({ queryKey: groupKeys.all });
+      deleteGroup.mutate(props.initialData.id, {
+        onSuccess: () => {
+          toast.success({
+            title: "Group deleted",
+            description: "Group deleted successfully",
+          });
+
+          navigate("/");
+        },
+      });
     }
   };
 

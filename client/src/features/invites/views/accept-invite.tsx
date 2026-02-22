@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { ButtonSkeleton } from "@/components/ui/button.skeleton";
 import { TextSkeleton } from "@/components/ui/text.skeleton";
 import { useAuth } from "@/features/auth/context/auth-provider";
-import { invitesApi } from "../api";
 import { useInvite } from "../hooks/use-invite";
+import { useAcceptInvite } from "../hooks/use-accept-invite";
+import { useToast } from "@/context/toast-context";
 
 export const AcceptInvite = () => {
   const params = useParams<{ inviteId: string }>();
@@ -15,17 +16,35 @@ export const AcceptInvite = () => {
 
   const navigate = useNavigate();
 
-  const handleAccept = async () => {
+  const toast = useToast();
+  const acceptInvite = useAcceptInvite();
+
+  const handleAccept = () => {
     const i = invite.data;
-    if (!i) {
+    if (!i) return;
+
+    // Already a member - skip accepting and just navigate
+    if (i.is_current_user_member) {
+      navigate(`/groups/${i.group_id}`);
+      toast.info({
+        title: "Already in group",
+        description: `You are already in ${i.group_name}`,
+      });
+
       return;
     }
 
-    if (!i.is_current_user_member) {
-      await invitesApi.invite(params.inviteId).accept();
-    }
+    // Not a member - join then navigate
+    acceptInvite.mutate(params.inviteId, {
+      onSuccess: () => {
+        toast.success({
+          title: "Group joined",
+          description: `You've successfully joined ${i.group_name}!`,
+        });
 
-    navigate(`/groups/${i.group_id}`);
+        navigate(`/groups/${i.group_id}`);
+      },
+    });
   };
 
   return (

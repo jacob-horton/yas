@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { TableRowSkeleton } from "@/components/ui/table.skeleton";
 import { useConfirmation } from "@/context/confirmation-context";
+import { useToast } from "@/context/toast-context";
 import { Authorised } from "@/features/auth/components/authorised";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { cn } from "@/lib/classname";
@@ -50,9 +51,11 @@ export const GroupMembers = () => {
   const [sort, setSort] = createSignal<Sort<SortProp>>(DEFAULT_SORT);
   const members = useGroupMembers(group.groupId, sort);
 
+  const removeMember = useRemoveMember();
+  const toast = useToast();
+
   const { showConfirm } = useConfirmation();
 
-  const removeMember = useRemoveMember();
   const handleRemove = async (member: GroupMember) => {
     const isConfirmed = await showConfirm({
       title: "Remove User From Group",
@@ -67,10 +70,17 @@ export const GroupMembers = () => {
     });
 
     if (isConfirmed) {
-      removeMember.mutate({
-        groupId: group.groupId(),
-        memberId: member.id,
-      });
+      removeMember.mutate(
+        { groupId: group.groupId(), memberId: member.id },
+        {
+          onSuccess: () => {
+            toast.success({
+              title: "Member removed",
+              description: "Member successfully removed",
+            });
+          },
+        },
+      );
     }
   };
 

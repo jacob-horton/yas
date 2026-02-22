@@ -1,5 +1,4 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { useQueryClient } from "@tanstack/solid-query";
 import type { Component } from "solid-js";
 import { createSignal, Show } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
@@ -7,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
 import { useConfirmation } from "@/context/confirmation-context";
+import { useToast } from "@/context/toast-context";
 import { useGroup } from "@/features/groups/context/group-provider";
-import { groupKeys } from "@/features/groups/hooks/query-keys";
 import { useGame } from "@/features/matches/hooks/use-game";
-import { gamesApi } from "../api";
 import { SCORING_METRIC_LABELS } from "../constants";
-import { gameKeys } from "../hooks/query-keys";
+import { useDeleteGame } from "../hooks/use-delete-game";
+import { useUpdateGame } from "../hooks/use-update-game";
 import {
   type Game,
   type ScoringMetric,
@@ -26,9 +25,12 @@ type Props = {
 
 // TODO: reduce duplication with create?
 const EditGameForm: Component<Props> = (props) => {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const group = useGroup();
+
+  const deleteGame = useDeleteGame(group.groupId);
+  const updateGame = useUpdateGame();
+  const toast = useToast();
 
   const [name, setName] = createSignal(props.initialData.name ?? "");
   const [numPlayers, setNumPlayers] = createSignal(
@@ -41,20 +43,25 @@ const EditGameForm: Component<Props> = (props) => {
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
 
-    const updateGame: UpdateGameRequest = {
+    const payload: UpdateGameRequest = {
       name: name(),
       players_per_match: Number.parseInt(numPlayers(), 10),
       metric: metric(),
     };
 
-    await gamesApi.game(props.initialData.id).update(updateGame);
-    await queryClient.invalidateQueries({
-      queryKey: gameKeys.game(props.initialData.id),
-    });
-    await queryClient.invalidateQueries({
-      queryKey: groupKeys.games(group.groupId()),
-    });
-    navigate(-1);
+    updateGame.mutate(
+      { groupId: props.initialData.id, payload },
+      {
+        onSuccess: () => {
+          toast.success({
+            title: "Game updated",
+            description: "Game updated successfully",
+          });
+
+          navigate(-1);
+        },
+      },
+    );
   }
 
   const { showConfirm } = useConfirmation();
@@ -72,9 +79,16 @@ const EditGameForm: Component<Props> = (props) => {
     });
 
     if (isConfirmed) {
-      await gamesApi.game(props.initialData.id).delete();
-      await queryClient.invalidateQueries({ queryKey: groupKeys.all });
-      navigate("/");
+      deleteGame.mutate(props.initialData.id, {
+        onSuccess: () => {
+          toast.success({
+            title: "Game deleted",
+            description: "Game deleted successfully",
+          });
+
+          navigate("/");
+        },
+      });
     }
   };
 

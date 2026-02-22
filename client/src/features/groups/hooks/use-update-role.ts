@@ -15,14 +15,16 @@ export const useUpdateRole = () => {
       role: MemberRole;
     }) =>
       groupsApi.group(data.groupId).member(data.memberId).updateRole(data.role),
-    onSuccess: (_, variables) => {
-      console.log(variables.groupId);
-      queryClient.invalidateQueries({
+    onSuccess: async (_, variables) => {
+      await queryClient.invalidateQueries({
         queryKey: groupKeys.members(variables.groupId),
       });
     },
     onError: () => {
-      toast.error({ title: "Error", description: "Failed to update role" });
+      toast.error({
+        title: "Error",
+        description: "Failed to update role",
+      });
     },
   }));
 };

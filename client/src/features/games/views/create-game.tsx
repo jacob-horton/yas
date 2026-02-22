@@ -1,14 +1,13 @@
 import { useNavigate } from "@solidjs/router";
-import { useQueryClient } from "@tanstack/solid-query";
 import { createSignal } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
-import { groupsApi } from "@/features/groups/api";
+import { useToast } from "@/context/toast-context";
 import { useGroup } from "@/features/groups/context/group-provider";
-import { groupKeys } from "@/features/groups/hooks/query-keys";
 import { SCORING_METRIC_LABELS } from "../constants";
+import { useCreateGame } from "../hooks/use-create-game";
 import {
   type CreateGameRequest,
   type ScoringMetric,
@@ -16,9 +15,10 @@ import {
 } from "../types/game";
 
 export const CreateGame = () => {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const group = useGroup();
+  const createGame = useCreateGame();
+  const toast = useToast();
 
   const [name, setName] = createSignal("");
   const [numPlayers, setNumPlayers] = createSignal("");
@@ -27,17 +27,25 @@ export const CreateGame = () => {
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
 
-    const game: CreateGameRequest = {
+    const payload: CreateGameRequest = {
       name: name(),
       players_per_match: Number.parseInt(numPlayers(), 10),
       metric: metric(),
     };
 
-    const res = await groupsApi.group(group.groupId()).createGame(game);
-    await queryClient.invalidateQueries({
-      queryKey: groupKeys.games(group.groupId()),
-    });
-    navigate(`/groups/${group.groupId()}/games/${res.id}`);
+    createGame.mutate(
+      { groupId: group.groupId(), payload },
+      {
+        onSuccess: (resp) => {
+          toast.success({
+            title: "Game created",
+            description: "Game created successfully",
+          });
+
+          navigate(`/groups/${group.groupId()}/games/${resp.id}`);
+        },
+      },
+    );
   }
 
   return (

@@ -14,6 +14,7 @@ export const ToastProvider: ParentComponent = (props) => {
     placement: "bottom-end",
     overlap: true,
     gap: 12,
+    duration: 5 * 1000, // 5s
   });
 
   return (

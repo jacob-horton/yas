@@ -1,5 +1,4 @@
 import { useNavigate } from "@solidjs/router";
-import { useQueryClient } from "@tanstack/solid-query";
 import { createSignal, For } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import {
@@ -13,16 +12,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { cn } from "@/lib/classname";
-import { usersApi } from "../api";
-import { userKeys } from "../hooks/query-keys";
+import { useToast } from "@/context/toast-context";
+import { useUpdateUser } from "../hooks/use-update-user";
 
 const COLOURS = Object.keys(COLOUR_MAP) as AvatarColour[];
 const AVATARS = Object.keys(AVATAR_SVGS) as AvatarIcon[];
 
 export const EditUser = () => {
-  const queryClient = useQueryClient();
   const auth = useAuth();
   const navigate = useNavigate();
+
+  const toast = useToast();
+  const updateUser = useUpdateUser();
 
   const [colour, setColour] = createSignal(
     auth.user()?.avatar_colour ?? COLOURS[0],
@@ -33,9 +34,23 @@ export const EditUser = () => {
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
 
-    await usersApi.updateMe(name(), avatar(), colour());
-    await queryClient.invalidateQueries({ queryKey: userKeys.me() });
-    navigate("/");
+    updateUser.mutate(
+      {
+        name: name(),
+        avatar: avatar(),
+        avatarColour: colour(),
+      },
+      {
+        onSuccess: () => {
+          toast.success({
+            title: "User updated",
+            description: "User updated successfully",
+          });
+
+          navigate("/");
+        },
+      },
+    );
   };
 
   return (

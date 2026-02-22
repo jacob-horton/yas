@@ -1,26 +1,34 @@
 import { useNavigate } from "@solidjs/router";
-import { useQueryClient } from "@tanstack/solid-query";
 import { createSignal } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { groupsApi } from "../api";
-import { groupKeys } from "../hooks/query-keys";
+import { useToast } from "@/context/toast-context";
+import { useCreateGroup } from "../hooks/use-create-group";
+import type { CreateGroupRequest } from "../types";
 
 export const CreateGroup = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const createGroup = useCreateGroup();
+  const toast = useToast();
 
   const [name, setName] = createSignal("");
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
 
-    // TODO: handle errors
-    const res = await groupsApi.create({ name: name() });
-    await queryClient.invalidateQueries({ queryKey: groupKeys.all });
+    const payload: CreateGroupRequest = { name: name() };
 
-    navigate(`/groups/${res.id}`);
+    createGroup.mutate(payload, {
+      onSuccess: (resp) => {
+        toast.success({
+          title: "Group created",
+          description: "Group created successfully",
+        });
+
+        navigate(`/groups/${resp.id}`);
+      },
+    });
   }
 
   return (

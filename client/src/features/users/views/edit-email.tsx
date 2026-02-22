@@ -1,29 +1,36 @@
 import { useNavigate } from "@solidjs/router";
-import { useQueryClient } from "@tanstack/solid-query";
 import { type Component, createSignal, Show } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/features/auth/context/auth-provider";
-import { usersApi } from "../api";
-import { userKeys } from "../hooks/query-keys";
+import { useUpdateEmail } from "../hooks/use-update-email";
+import { useToast } from "@/context/toast-context";
 
 type Props = {
   initialEmail: string;
 };
 
 const EditEmailForm: Component<Props> = (props) => {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [email, setEmail] = createSignal(props.initialEmail);
+
+  const toast = useToast();
+  const updateEmail = useUpdateEmail();
 
   const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
 
-    await usersApi.updateMyEmail(email());
-    await queryClient.invalidateQueries({ queryKey: userKeys.me() });
+    updateEmail.mutate(email(), {
+      onSuccess: () => {
+        toast.success({
+          title: "Email updated",
+          description: "Email updated successfully",
+        });
 
-    navigate(-1);
+        navigate(-1);
+      },
+    });
   };
 
   return (

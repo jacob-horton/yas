@@ -1,10 +1,13 @@
 import CalendarIcon from "lucide-solid/icons/calendar";
 import ChartColumnIcon from "lucide-solid/icons/chart-column";
 import ChevronLeftIcon from "lucide-solid/icons/chevron-left";
+import CircleAlertIcon from "lucide-solid/icons/circle-alert";
+import CircleCheckIcon from "lucide-solid/icons/circle-check";
 import ClipboardIcon from "lucide-solid/icons/clipboard";
 import CrownIcon from "lucide-solid/icons/crown";
 import HashIcon from "lucide-solid/icons/hash";
 import InfinityIcon from "lucide-solid/icons/infinity";
+import InfoIcon from "lucide-solid/icons/info";
 import Layers2Icon from "lucide-solid/icons/layers-2";
 import MountainIcon from "lucide-solid/icons/mountain";
 import PlusIcon from "lucide-solid/icons/plus";
@@ -19,11 +22,14 @@ export const ICON_MAP = {
   calendar: CalendarIcon,
   chart: ChartColumnIcon,
   chevronLeft: ChevronLeftIcon,
+  circleAlert: CircleAlertIcon,
+  circleCheck: CircleCheckIcon,
   copy: ClipboardIcon,
   crown: CrownIcon,
   delete: TrashIcon,
   hash: HashIcon,
   infinity: InfinityIcon,
+  info: InfoIcon,
   mountain: MountainIcon,
   plus: PlusIcon,
   stack: Layers2Icon,

@@ -12,14 +12,15 @@ import {
 } from "@/components/ui/table";
 import { TableRowSkeleton } from "@/components/ui/table.skeleton";
 import { useConfirmation } from "@/context/confirmation-context";
+import { useToast } from "@/context/toast-context";
 import { Authorised } from "@/features/auth/components/authorised";
 import { useAuth } from "@/features/auth/context/auth-provider";
-import { invitesApi } from "@/features/invites/api";
 import type { InviteSummary } from "@/features/invites/types/invite";
 import { cn } from "@/lib/classname";
 import { isExpired } from "@/lib/expiry";
 import { formatDate, formatDateTime } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
+import { useDeleteInvite } from "../hooks/use-delete-invite";
 import { useGroupInvites } from "../hooks/use-group-invites";
 import { hasPermission } from "../types";
 
@@ -66,6 +67,9 @@ export const Invites = () => {
   const group = useGroup();
   const invites = useGroupInvites(group.groupId);
 
+  const deleteInvite = useDeleteInvite(group.groupId);
+  const toast = useToast();
+
   const navigate = useNavigate();
 
   const { showConfirm } = useConfirmation();
@@ -83,8 +87,14 @@ export const Invites = () => {
     });
 
     if (isConfirmed) {
-      await invitesApi.invite(invite.id).delete();
-      invites.refetch();
+      deleteInvite.mutate(invite.id, {
+        onSuccess: () => {
+          toast.success({
+            title: "Invite deleted",
+            description: "Invite deleted successfully",
+          });
+        },
+      });
     }
   };
 
