@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { Suspense } from "solid-js";
+import { Show, Suspense } from "solid-js";
 import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";
 import { ButtonSkeleton } from "@/components/ui/button.skeleton";
@@ -8,6 +8,7 @@ import { useAuth } from "@/features/auth/context/auth-provider";
 import { useInvite } from "../hooks/use-invite";
 import { useAcceptInvite } from "../hooks/use-accept-invite";
 import { useToast } from "@/context/toast-context";
+import { ErrorMessage } from "@/components/ui/error-message";
 
 export const AcceptInvite = () => {
   const params = useParams<{ inviteId: string }>();
@@ -59,30 +60,37 @@ export const AcceptInvite = () => {
           </div>
         </Suspense>
 
-        <div>
-          <h2>Invite Details</h2>
-          <Suspense fallback={<TextSkeleton lines={3} />}>
-            <p>
-              Group: <strong>{invite.data?.group_name}</strong>
-            </p>
-            <p>
-              Invited by: <strong>{invite.data?.created_by_name}</strong>
-            </p>
-            {invite.data?.is_current_user_member && (
-              <p>You are already a member of this group!</p>
-            )}
-          </Suspense>
-        </div>
-
-        <Suspense
-          fallback={<ButtonSkeleton class="w-42">Loading...</ButtonSkeleton>}
+        <Show
+          when={!invite.isError}
+          fallback={
+            <ErrorMessage title="Error" details="Couldn't load invite" />
+          }
         >
-          <Button onClick={handleAccept}>
-            {invite.data?.is_current_user_member
-              ? "Go to group"
-              : "Accept invite"}
-          </Button>
-        </Suspense>
+          <div>
+            <h2>Invite Details</h2>
+            <Suspense fallback={<TextSkeleton lines={3} />}>
+              <p>
+                Group: <strong>{invite.data?.group_name}</strong>
+              </p>
+              <p>
+                Invited by: <strong>{invite.data?.created_by_name}</strong>
+              </p>
+              {invite.data?.is_current_user_member && (
+                <p>You are already a member of this group!</p>
+              )}
+            </Suspense>
+          </div>
+
+          <Suspense
+            fallback={<ButtonSkeleton class="w-42">Loading...</ButtonSkeleton>}
+          >
+            <Button onClick={handleAccept}>
+              {invite.data?.is_current_user_member
+                ? "Go to group"
+                : "Accept invite"}
+            </Button>
+          </Suspense>
+        </Show>
       </div>
     </Page>
   );

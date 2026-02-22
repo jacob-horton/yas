@@ -17,6 +17,7 @@ import {
 export const CreateGame = () => {
   const navigate = useNavigate();
   const group = useGroup();
+
   const createGame = useCreateGame();
   const toast = useToast();
 

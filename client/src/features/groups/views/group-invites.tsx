@@ -1,6 +1,6 @@
 import { useNavigate } from "@solidjs/router";
 import { formatDistanceToNow } from "date-fns";
-import { type Component, For, Suspense } from "solid-js";
+import { type Component, For, Suspense, Show } from "solid-js";
 import { Container } from "@/components/layout/container";
 import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ import { useGroup } from "../context/group-provider";
 import { useDeleteInvite } from "../hooks/use-delete-invite";
 import { useGroupInvites } from "../hooks/use-group-invites";
 import { hasPermission } from "../types";
+import { ErrorMessage } from "@/components/ui/error-message";
 
 type ExpiryCellProps = { expiresAt: string };
 
@@ -114,59 +115,66 @@ export const Invites = () => {
       }
     >
       <Container>
-        <Table headings={TABLE_HEADINGS} caption="All invites for this group">
-          <Suspense fallback={<TableRowSkeleton numCols={5} />}>
-            <For each={invites.data}>
-              {(invite) => (
-                <TableRow>
-                  <TableCell>{invite.name}</TableCell>
-                  <TableCell>{invite.created_by_name}</TableCell>
-                  <TableCell>
-                    {invite.uses}
-                    {invite.max_uses && <>/{invite.max_uses}</>}
-                  </TableCell>
-                  <TableCell>{formatDate(invite.created_at)}</TableCell>
-                  <TableCell>
-                    <ExpiryCell expiresAt={invite.expires_at} />
-                  </TableCell>
-                  <TableCell>
-                    <div class="flex gap-1">
-                      <Button
-                        icon="copy"
-                        variant="ghost"
-                        class="text-gray-400"
-                        onClick={() =>
-                          navigator.clipboard.writeText(
-                            getInviteLink(invite.id),
-                          )
-                        }
-                      />
-                      <Authorised
-                        minRole="admin"
-                        fallback={
-                          <Button
-                            class="text-gray-200"
-                            variant="ghost"
-                            icon="delete"
-                            disabled
-                          />
-                        }
-                      >
+        <Show
+          when={!invites.isError}
+          fallback={
+            <ErrorMessage title="Error" details="Couldn't load invites" />
+          }
+        >
+          <Table headings={TABLE_HEADINGS} caption="All invites for this group">
+            <Suspense fallback={<TableRowSkeleton numCols={5} />}>
+              <For each={invites.data}>
+                {(invite) => (
+                  <TableRow>
+                    <TableCell>{invite.name}</TableCell>
+                    <TableCell>{invite.created_by_name}</TableCell>
+                    <TableCell>
+                      {invite.uses}
+                      {invite.max_uses && <>/{invite.max_uses}</>}
+                    </TableCell>
+                    <TableCell>{formatDate(invite.created_at)}</TableCell>
+                    <TableCell>
+                      <ExpiryCell expiresAt={invite.expires_at} />
+                    </TableCell>
+                    <TableCell>
+                      <div class="flex gap-1">
                         <Button
-                          danger
-                          icon="delete"
+                          icon="copy"
                           variant="ghost"
                           class="text-gray-400"
-                          onClick={() => handleDelete(invite)}
+                          onClick={() =>
+                            navigator.clipboard.writeText(
+                              getInviteLink(invite.id),
+                            )
+                          }
                         />
-                      </Authorised>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </For>
-          </Suspense>
-        </Table>
+                        <Authorised
+                          minRole="admin"
+                          fallback={
+                            <Button
+                              class="text-gray-200"
+                              variant="ghost"
+                              icon="delete"
+                              disabled
+                            />
+                          }
+                        >
+                          <Button
+                            danger
+                            icon="delete"
+                            variant="ghost"
+                            class="text-gray-400"
+                            onClick={() => handleDelete(invite)}
+                          />
+                        </Authorised>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </For>
+            </Suspense>
+          </Table>
+        </Show>
       </Container>
     </Page>
   );

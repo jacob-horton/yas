@@ -12,6 +12,7 @@ import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
 import { useRemoveMember } from "../hooks/use-remove-member";
 import { hasPermission } from "../types";
+import { ErrorMessage } from "@/components/ui/error-message";
 
 type DetailCardProps = {
   title: string;
@@ -104,34 +105,44 @@ export const GroupDetails = () => {
     >
       <div class="no-scrollbar flex snap-x overflow-x-auto px-6">
         <div class="flex w-full flex-nowrap gap-4">
-          <DetailCard icon="users" title="Members">
-            <Suspense>{members.data?.length ?? 0}</Suspense>
-          </DetailCard>
-          <DetailCard icon="calendar" title="Created On">
-            <Suspense>
-              {formatDate(group.groupQuery.data?.created_at ?? "")}
-            </Suspense>
-          </DetailCard>
-          <DetailCard icon="userStar" title="Created By">
-            <Suspense>
-              <Show when={createdBy()}>
-                {(createdBy) => {
-                  return (
-                    <div class="flex items-center gap-4">
-                      <div class="rounded-full border p-2">
-                        <Avatar
-                          avatar={createdBy().avatar}
-                          colour={createdBy().avatar_colour}
-                          class="size-12"
-                        />
+          <Show
+            when={!members.isError && !group.groupQuery.isError}
+            fallback={
+              <ErrorMessage
+                title="Error"
+                details="Couldn't load group details"
+              />
+            }
+          >
+            <DetailCard icon="users" title="Members">
+              <Suspense>{members.data?.length ?? 0}</Suspense>
+            </DetailCard>
+            <DetailCard icon="calendar" title="Created On">
+              <Suspense>
+                {formatDate(group.groupQuery.data?.created_at ?? "")}
+              </Suspense>
+            </DetailCard>
+            <DetailCard icon="userStar" title="Created By">
+              <Suspense>
+                <Show when={createdBy()}>
+                  {(createdBy) => {
+                    return (
+                      <div class="flex items-center gap-4">
+                        <div class="rounded-full border p-2">
+                          <Avatar
+                            avatar={createdBy().avatar}
+                            colour={createdBy().avatar_colour}
+                            class="size-12"
+                          />
+                        </div>
+                        {createdBy().name}
                       </div>
-                      {createdBy().name}
-                    </div>
-                  );
-                }}
-              </Show>
-            </Suspense>
-          </DetailCard>
+                    );
+                  }}
+                </Show>
+              </Suspense>
+            </DetailCard>
+          </Show>
         </div>
       </div>
     </Page>

@@ -20,6 +20,7 @@ import { LIFETIME_STATS } from "../constants";
 import { usePlayerHighlights } from "../hooks/use-player-highlights";
 import { usePlayerHistory } from "../hooks/use-player-history";
 import type { PlayerStatsRouteParams } from "../types";
+import { ErrorMessage } from "@/components/ui/error-message";
 
 const TABLE_HEADINGS = [
   { label: "Date" },
@@ -47,60 +48,75 @@ export const PlayerStats = () => {
       showBack
       class="flex flex-col gap-8"
     >
-      <div class="no-scrollbar flex w-full overflow-x-auto px-6 py-6">
-        <div class="mx-auto flex flex-nowrap gap-4">
-          <For each={LIFETIME_STATS}>
-            {(stat) => (
-              <StatCard
-                icon={stat.icon}
-                colour={stat.colour}
-                label={stat.label}
-                loading={!highlights.data}
-                stat={
-                  highlights.data ? stat.getValue(highlights.data) : undefined
-                }
-              />
-            )}
-          </For>
+      <Show
+        when={!highlights.isError}
+        fallback={
+          <ErrorMessage title="Error" details="Couldn't player highlights" />
+        }
+      >
+        <div class="no-scrollbar flex w-full overflow-x-auto px-6 py-6">
+          <div class="mx-auto flex flex-nowrap gap-4">
+            <For each={LIFETIME_STATS}>
+              {(stat) => (
+                <StatCard
+                  icon={stat.icon}
+                  colour={stat.colour}
+                  label={stat.label}
+                  loading={!highlights.data}
+                  stat={
+                    highlights.data ? stat.getValue(highlights.data) : undefined
+                  }
+                />
+              )}
+            </For>
+          </div>
         </div>
-      </div>
+      </Show>
 
-      <Container class="flex flex-col gap-8">
-        <PlayerHistoryChart
-          data={
-            history.data
-              ?.map((s) => ({ score: s.score, rank: s.rank_in_match }))
-              .toReversed() ?? []
-          }
-        />
+      <Show
+        when={!history.isError}
+        fallback={
+          <ErrorMessage title="Error" details="Couldn't player history" />
+        }
+      >
+        <Container class="flex flex-col gap-8">
+          <PlayerHistoryChart
+            data={
+              history.data
+                ?.map((s) => ({ score: s.score, rank: s.rank_in_match }))
+                .toReversed() ?? []
+            }
+          />
 
-        <Table headings={TABLE_HEADINGS} caption="Match history">
-          <Suspense fallback={<TableRowSkeleton numCols={3} />}>
-            <Show when={history.data}>
-              {(data) =>
-                data().map((s) => (
-                  <TableRow>
-                    <TableCell>{formatDate(s.played_at)}</TableCell>
-                    <TableCell>
-                      <span
-                        class={cn(
-                          {
-                            "font-bold": !!RANK_TEXT_COLOURS[s.rank_in_match],
-                          },
-                          RANK_TEXT_COLOURS[s.rank_in_match] ?? "text-gray-400",
-                        )}
-                      >
-                        {ordinalSuffix(s.rank_in_match)}
-                      </span>
-                    </TableCell>
-                    <TableCell>{s.score}</TableCell>
-                  </TableRow>
-                ))
-              }
-            </Show>
-          </Suspense>
-        </Table>
-      </Container>
+          <Table headings={TABLE_HEADINGS} caption="Match history">
+            <Suspense fallback={<TableRowSkeleton numCols={3} />}>
+              <Show when={history.data}>
+                {(data) =>
+                  data().map((s) => (
+                    <TableRow>
+                      <TableCell>{formatDate(s.played_at)}</TableCell>
+                      <TableCell>
+                        <span
+                          class={cn(
+                            {
+                              "font-bold": !!RANK_TEXT_COLOURS[s.rank_in_match],
+                            },
+                            RANK_TEXT_COLOURS[s.rank_in_match] ??
+                              "text-gray-400",
+                          )}
+                        >
+                          {ordinalSuffix(s.rank_in_match)}
+                        </span>
+                      </TableCell>
+                      <TableCell>{s.score}</TableCell>
+                    </TableRow>
+                  ))
+                }
+              </Show>
+            </Suspense>
+          </Table>
+        </Container>
+      </Show>
     </Page>
   );
 };
