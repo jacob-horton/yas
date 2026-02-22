@@ -143,22 +143,19 @@ export const Dropdown: Component<{
 
   return (
     <div
-      class={cn(
-        "flex h-16 max-w-96 flex-col gap-1 transition",
-        { "text-red-500": !!props.error },
-        props.class,
-      )}
+      class={cn("flex h-min max-w-96 flex-col gap-1 transition", props.class)}
     >
-      <div ref={dropdownWrapperRef} class="relative h-full w-full">
+      <div ref={dropdownWrapperRef} class="relative h-16 h-full w-full">
         <div
           class={cn(
-            "group flex h-full w-full items-center rounded-md border font-semibold transition",
+            "group flex h-16 w-full items-center rounded-md border font-semibold transition",
+
             {
               "border-violet-500 dark:border-violet-700":
                 isOpen() && !props.error,
               "focus-within:border-violet-500 dark:focus-within:border-violet-700":
                 !props.error,
-              "border-red-500 bg-red-100 focus-within:border-red-500":
+              "border-red-300 bg-red-100 text-red-500 focus-within:border-red-500":
                 !!props.error,
             },
           )}
@@ -256,7 +253,7 @@ export const Dropdown: Component<{
 
       {props.error && (
         <span class="flex items-center gap-1 text-sm">
-          <CircleAlertIcon size={18} />
+          <CircleAlertIcon class="size-4 min-h-4 min-w-4" />
           <p>{props.error}</p>
         </span>
       )}

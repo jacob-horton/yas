@@ -1,19 +1,25 @@
 import { useNavigate } from "@solidjs/router";
-import { createSignal } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/context/toast-context";
 import { useGroup } from "@/features/groups/context/group-provider";
+import { useZodForm } from "@/lib/zod/use-zod-form";
 import { useCreateInvite } from "../hooks/use-create-invite";
+import { createInviteSchema } from "../types/invite";
 
 export const CreateInvite = () => {
   const group = useGroup();
   const navigate = useNavigate();
 
-  const [name, setName] = createSignal("");
-  const [expiresAt, setExpiresAt] = createSignal("");
-  const [maxUses, setMaxUses] = createSignal("");
+  const { values, errors, setField, validate } = useZodForm(
+    createInviteSchema,
+    {
+      name: "",
+      expires_at: "",
+      max_uses: "",
+    },
+  );
 
   const toast = useToast();
   const createInvite = useCreateInvite();
@@ -21,26 +27,11 @@ export const CreateInvite = () => {
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
 
-    const rawExpiresAt = expiresAt().trim() || null;
-    const expires_at = rawExpiresAt
-      ? new Date(rawExpiresAt).toISOString()
-      : null;
-
-    const maxUsesStr = maxUses().trim();
-    const max_uses = maxUsesStr ? Number.parseInt(maxUsesStr, 10) : null;
-
-    if (max_uses !== null && Number.isNaN(max_uses)) {
-      throw new Error("Max uses must be a valid number");
-    }
-
-    const payload = {
-      name: name(),
-      max_uses,
-      expires_at,
-    };
+    const validData = validate();
+    if (!validData) return;
 
     createInvite.mutate(
-      { groupId: group.groupId(), payload },
+      { groupId: group.groupId(), payload: validData },
       {
         onSuccess: () => {
           toast.success({
@@ -57,23 +48,26 @@ export const CreateInvite = () => {
   return (
     <FormPage title="Create Invite" onSubmit={handleSubmit}>
       <Input
-        value={name()}
-        onChange={setName}
+        value={values.name}
+        onChange={(val) => setField("name", val)}
         label="Name"
         placeholder="e.g. Friends"
+        error={errors.name}
       />
       <Input
-        type="number"
-        value={maxUses()}
-        onChange={setMaxUses}
+        inputMode="numeric"
+        value={values.max_uses}
+        onChange={(val) => setField("max_uses", val)}
         label="Max Uses"
         placeholder="e.g. 10 (leave empty for no limit)"
+        error={errors.max_uses}
       />
       <Input
         type="datetime-local"
-        value={expiresAt()}
-        onChange={setExpiresAt}
+        value={values.expires_at}
+        onChange={(val) => setField("expires_at", val)}
         label="Expires At"
+        error={errors.expires_at}
       />
 
       <span class="flex gap-4">

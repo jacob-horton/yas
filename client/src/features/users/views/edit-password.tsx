@@ -1,10 +1,12 @@
 import { useNavigate } from "@solidjs/router";
-import { type Component, createSignal } from "solid-js";
+import type { Component } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/context/toast-context";
+import { useZodForm } from "@/lib/zod/use-zod-form";
 import { useUpdatePassword } from "../hooks/use-update-password";
+import { updatePasswordSchema } from "../types";
 
 export const EditPassword: Component = () => {
   const navigate = useNavigate();
@@ -12,32 +14,31 @@ export const EditPassword: Component = () => {
   const toast = useToast();
   const updatePassword = useUpdatePassword();
 
-  const [currentPassword, setCurrentPassword] = createSignal("");
-  const [newPassword, setNewPassword] = createSignal("");
-  const [newPasswordConfirm, setNewPasswordConfirm] = createSignal("");
+  const { values, errors, setField, validate } = useZodForm(
+    updatePasswordSchema,
+    {
+      current_password: "",
+      new_password: "",
+      confirm_new_password: "",
+    },
+  );
 
   const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
 
-    if (newPassword() !== newPasswordConfirm()) {
-      // TODO: proper error
-      console.error("passwords don't match");
-      return;
-    }
+    const validData = validate();
+    if (!validData) return;
 
-    updatePassword.mutate(
-      { currentPassword: currentPassword(), newPassword: newPassword() },
-      {
-        onSuccess: () => {
-          toast.success({
-            title: "Password updated",
-            description:
-              "Password updated successfully. All other devices have been logged out",
-          });
-          navigate(-1);
-        },
+    updatePassword.mutate(validData, {
+      onSuccess: () => {
+        toast.success({
+          title: "Password updated",
+          description:
+            "Password updated successfully. All other devices have been logged out",
+        });
+        navigate(-1);
       },
-    );
+    });
   };
 
   return (
@@ -45,22 +46,25 @@ export const EditPassword: Component = () => {
       <Input
         type="password"
         label="Current password"
-        value={currentPassword()}
-        onChange={setCurrentPassword}
+        value={values.current_password}
+        onChange={(val) => setField("current_password", val)}
+        error={errors.current_password}
         placeholder="●●●●●●●●●●●●"
       />
       <Input
         type="password"
         label="New password"
-        value={newPassword()}
-        onChange={setNewPassword}
+        value={values.new_password}
+        onChange={(val) => setField("new_password", val)}
+        error={errors.new_password}
         placeholder="●●●●●●●●●●●●"
       />
       <Input
         type="password"
         label="Confirm new password"
-        value={newPasswordConfirm()}
-        onChange={setNewPasswordConfirm}
+        value={values.confirm_new_password}
+        onChange={(val) => setField("confirm_new_password", val)}
+        error={errors.confirm_new_password}
         placeholder="●●●●●●●●●●●●"
       />
 

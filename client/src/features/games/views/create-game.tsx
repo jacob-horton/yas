@@ -1,18 +1,14 @@
 import { useNavigate } from "@solidjs/router";
-import { createSignal } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/context/toast-context";
 import { useGroup } from "@/features/groups/context/group-provider";
+import { useZodForm } from "@/lib/zod/use-zod-form";
 import { SCORING_METRIC_LABELS } from "../constants";
 import { useCreateGame } from "../hooks/use-create-game";
-import {
-  type CreateGameRequest,
-  type ScoringMetric,
-  scoringMetrics,
-} from "../types/game";
+import { createGameSchema, scoringMetrics } from "../types/game";
 
 export const CreateGame = () => {
   const navigate = useNavigate();
@@ -21,21 +17,20 @@ export const CreateGame = () => {
   const createGame = useCreateGame();
   const toast = useToast();
 
-  const [name, setName] = createSignal("");
-  const [numPlayers, setNumPlayers] = createSignal("");
-  const [metric, setMetric] = createSignal<ScoringMetric>(scoringMetrics[0]);
+  const { values, errors, setField, validate } = useZodForm(createGameSchema, {
+    name: "",
+    players_per_match: "",
+    metric: scoringMetrics[0],
+  });
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
 
-    const payload: CreateGameRequest = {
-      name: name(),
-      players_per_match: Number.parseInt(numPlayers(), 10),
-      metric: metric(),
-    };
+    const validData = validate();
+    if (!validData) return;
 
     createGame.mutate(
-      { groupId: group.groupId(), payload },
+      { groupId: group.groupId(), payload: validData },
       {
         onSuccess: (resp) => {
           toast.success({
@@ -53,27 +48,30 @@ export const CreateGame = () => {
     <FormPage title="Create Game" onSubmit={handleSubmit}>
       <Input
         label="Name"
-        value={name()}
-        onChange={setName}
+        value={values.name}
+        onChange={(val) => setField("name", val)}
         placeholder="e.g. Mario Kart Wii"
+        error={errors.name}
       />
 
       {/* TODO: tooltips to explain these inputs */}
       <Input
         label="Number of players per match"
-        value={numPlayers()}
-        onChange={setNumPlayers}
+        value={values.players_per_match}
+        onChange={(val) => setField("players_per_match", val)}
         placeholder="e.g. 4"
+        error={errors.players_per_match}
       />
 
       <Dropdown
         label="Scoring metric"
-        value={metric()}
-        onChange={setMetric}
+        value={values.metric}
+        onChange={(val) => setField("metric", val)}
         options={scoringMetrics.map((m) => ({
           label: SCORING_METRIC_LABELS[m],
           value: m,
         }))}
+        error={errors.metric}
       />
 
       <span class="flex gap-4">

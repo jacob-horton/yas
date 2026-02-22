@@ -6,8 +6,8 @@ export const useUpdatePassword = () => {
   const toast = useToast();
 
   return useMutation(() => ({
-    mutationFn: (data: { currentPassword: string; newPassword: string }) =>
-      usersApi.updateMyPassword(data.currentPassword, data.newPassword),
+    mutationFn: (data: { current_password: string; new_password: string }) =>
+      usersApi.updateMyPassword(data.current_password, data.new_password),
     onError: () => {
       toast.error({
         title: "Error",

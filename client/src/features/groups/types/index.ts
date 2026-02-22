@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type { AvatarColour, AvatarIcon } from "@/components/ui/avatar";
 
 export type Group = {
@@ -22,9 +23,14 @@ export type GroupMember = {
   avatar_colour: AvatarColour;
 };
 
-export type CreateGroupRequest = {
-  name: string;
-};
+export const createGroupSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(3, "Must be at least 3 characters")
+    .max(50, "Cannot exceed 50 characters"),
+});
+export type CreateGroupRequest = z.output<typeof createGroupSchema>;
 
 export const ROLE_HIERARCHY: Record<MemberRole, number> = {
   viewer: 0,
@@ -47,6 +53,11 @@ export function hasPermission(
   return verified && (strict ? myLevel > targetLevel : myLevel >= targetLevel);
 }
 
-export type UpdateGroupRequest = {
-  name: string;
-};
+export const updateGroupSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(3, "Must be at least 3 characters")
+    .max(50, "Cannot exceed 50 characters"),
+});
+export type UpdateGroupRequest = z.output<typeof createGroupSchema>;

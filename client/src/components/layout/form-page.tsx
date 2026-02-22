@@ -12,7 +12,7 @@ export const FormPage: ParentComponent<Props> = (props) => {
   return (
     <Page title={props.title} actions={props.actions} showBack narrow>
       <Container narrow>
-        <form onSubmit={props.onSubmit} class="flex flex-col gap-6">
+        <form onSubmit={props.onSubmit} class="flex flex-col gap-6" novalidate>
           {props.children}
         </form>
       </Container>

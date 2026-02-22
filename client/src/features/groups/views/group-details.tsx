@@ -14,13 +14,13 @@ import { ErrorMessage } from "@/components/ui/error-message";
 import { useConfirmation } from "@/context/confirmation-context";
 import { useToast } from "@/context/toast-context";
 import { useAuth } from "@/features/auth/context/auth-provider";
+import { LS_LAST_GROUP_ID } from "@/features/home/constants";
 import { formatDate } from "@/lib/format-date";
 import { ICON_MAP, type Icon } from "@/lib/icons";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
 import { useRemoveMember } from "../hooks/use-remove-member";
 import { hasPermission } from "../types";
-import { LS_LAST_GROUP_ID } from "@/features/home/constants";
 
 type DetailCardProps = {
   title: string;

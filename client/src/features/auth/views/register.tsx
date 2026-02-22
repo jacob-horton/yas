@@ -1,25 +1,18 @@
 import { A, useNavigate } from "@solidjs/router";
 import { type Component, createEffect } from "solid-js";
-import { createStore } from "solid-js/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ERROR_MESSAGES } from "../constants";
+import { createUserSchema } from "@/features/users/types";
+import { useZodForm } from "@/lib/zod/use-zod-form";
 import { useAuth } from "../context/auth-provider";
 
 export const Register: Component = () => {
-  const [data, setData] = createStore({
+  const { values, errors, setField, validate } = useZodForm(createUserSchema, {
     name: "",
     email: "",
     password: "",
-    confirmPassword: "",
+    confirm_password: "",
   });
-
-  const [errors, setErrors] = createStore<{
-    name?: string;
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-  }>({});
 
   const navigate = useNavigate();
   const auth = useAuth();
@@ -33,30 +26,11 @@ export const Register: Component = () => {
   const register = async (e: SubmitEvent) => {
     e.preventDefault();
 
-    setErrors("name", undefined);
-    setErrors("email", undefined);
-    setErrors("password", undefined);
-    setErrors("confirmPassword", undefined);
-
-    if (data.password !== data.confirmPassword) {
-      setErrors("confirmPassword", "Password doesn't match");
-      return;
-    }
+    const validData = validate();
+    if (!validData) return;
 
     // TODO: check type of error here
-    const errorDetails = await auth.register(
-      data.name,
-      data.email,
-      data.password,
-    );
-    if (errorDetails) {
-      for (const detail of errorDetails.details) {
-        setErrors(
-          detail.property as "name" | "email" | "password" | "confirmPassword",
-          ERROR_MESSAGES[detail.codes[0] as keyof typeof ERROR_MESSAGES],
-        );
-      }
-    }
+    await auth.register(values.name, values.email, values.password);
   };
 
   return (
@@ -66,38 +40,32 @@ export const Register: Component = () => {
         <form onSubmit={register} class="flex flex-col gap-4">
           <Input
             label="Name"
-            value={data.name}
+            value={values.name}
             error={errors.name}
-            onChange={(value) => setData("name", value)}
+            onChange={(value) => setField("name", value)}
             placeholder="User"
           />
           <Input
             label="Email address"
             error={errors.email}
-            value={data.email}
-            onChange={(value) => setData("email", value)}
+            value={values.email}
+            onChange={(value) => setField("email", value)}
             placeholder="user@email.com"
           />
           <Input
             label="Password"
             type="password"
-            value={data.password}
+            value={values.password}
             error={errors.password}
-            onChange={(value) => setData("password", value)}
+            onChange={(value) => setField("password", value)}
             placeholder="●●●●●●●●●●●●"
           />
           <Input
             label="Confirm Password"
             type="password"
-            error={errors.confirmPassword}
-            value={data.confirmPassword}
-            onChange={(value) => {
-              setErrors(
-                "confirmPassword",
-                value !== data.password ? "Password doesn't match" : "",
-              );
-              setData("confirmPassword", value);
-            }}
+            error={errors.confirm_password}
+            value={values.confirm_password}
+            onChange={(value) => setField("confirm_password", value)}
             placeholder="●●●●●●●●●●●●"
           />
 
@@ -106,7 +74,7 @@ export const Register: Component = () => {
           </Button>
 
           <div class="text-center text-sm">
-            <span class="text-gray-500">Already have an account? </span>
+            <span class="text-gray-500">Already have an account?</span>
             <A
               href="/login"
               class="font-semibold text-violet-600 hover:underline"

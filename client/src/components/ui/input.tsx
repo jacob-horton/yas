@@ -9,25 +9,29 @@ export const Input: Component<{
   type?: string;
   value: string;
   error?: string;
+  inputMode?: "none" | "numeric" | "decimal";
   onChange: (value: string) => void;
 }> = (props) => {
   return (
     <div
       class={cn(
-        "flex h-16 flex-col gap-1 transition",
+        "flex h-min flex-col gap-1 transition",
         { "text-red-500": !!props.error },
         props.class,
       )}
     >
       <div
         class={cn(
-          "group flex h-full max-w-96 items-center rounded-md border font-semibold transition focus-within:border-violet-500",
-          { "bg-red-100 focus-within:border-red-500": !!props.error },
+          `group flex h-16 h-full max-w-96 items-center rounded-md border font-semibold transition focus-within:border-violet-500`,
+          {
+            "border-red-300 bg-red-100 focus-within:border-red-500":
+              !!props.error,
+          },
         )}
       >
         <div
           class={cn(
-            "h-full w-2 rounded-l-sm bg-transparent transition group-focus-within:bg-violet-500",
+            "h-16 w-2 rounded-l-sm transition group-focus-within:bg-violet-500",
             { "group-focus-within:bg-red-500": !!props.error },
           )}
         />
@@ -45,15 +49,16 @@ export const Input: Component<{
               { "placeholder:text-red-300": !!props.error },
             )}
             value={props.value}
-            onChange={(e) => props.onChange(e.target.value)}
+            onInput={(e) => props.onChange(e.target.value)}
             placeholder={props.placeholder}
             type={props.type}
+            inputMode={props.inputMode}
           />
         </div>
       </div>
       {props.error && (
-        <span class="flex items-center gap-1 text-sm">
-          <CircleAlertIcon size={18} />
+        <span class="flex items-center gap-1 whitespace-nowrap text-sm">
+          <CircleAlertIcon class="size-4 min-h-4 min-w-4" />
           <p>{props.error}</p>
         </span>
       )}
