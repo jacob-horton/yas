@@ -69,7 +69,7 @@ export const RecordMatchForm = (props: {
         {(row, i) => (
           <div class="flex gap-4">
             <Dropdown
-              class="flex-1"
+              class="min-w-64 flex-1"
               value={row.user_id}
               onChange={(val) => setField("scores", i(), "user_id", val)}
               error={errors[`scores.${i()}.user_id`]}
@@ -83,7 +83,7 @@ export const RecordMatchForm = (props: {
               label={`Player ${i() + 1}`}
             />
             <Input
-              class="w-32"
+              class="w-32 min-w-32 max-w-32"
               inputMode="numeric"
               value={row.score}
               onChange={(val) => setField("scores", i(), "score", val)}

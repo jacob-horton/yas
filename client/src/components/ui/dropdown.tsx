@@ -1,15 +1,9 @@
+import { createListCollection, Select } from "@ark-ui/solid";
 import ChevronDownIcon from "lucide-solid/icons/chevron-down";
 import CircleAlertIcon from "lucide-solid/icons/circle-alert";
-import {
-  type Component,
-  createEffect,
-  createSignal,
-  createUniqueId,
-  For,
-  onCleanup,
-  Show,
-} from "solid-js";
+import { type Component, createMemo, For, Show } from "solid-js";
 import { cn } from "@/lib/classname";
+import { Portal } from "solid-js/web";
 
 export const Dropdown: Component<{
   class?: string;
@@ -20,243 +14,112 @@ export const Dropdown: Component<{
   onChange: (value: string) => void;
   error?: string;
 }> = (props) => {
-  const [isOpen, setIsOpen] = createSignal(false);
-  const [focusedOptionIndex, setFocusedOptionIndex] = createSignal(-1);
-
-  // Generate unique IDs for ARIA accessibility linking
-  const listboxId = createUniqueId();
-  const labelId = createUniqueId();
-  const buttonId = createUniqueId();
-
-  let dropdownWrapperRef: HTMLDivElement | undefined;
-  let triggerButtonRef: HTMLButtonElement | undefined;
-  let listboxRef: HTMLDivElement | undefined;
-
-  const selectedOption = () =>
-    props.options.find((o) => o.value === props.value);
-  const currentLabel = () =>
-    selectedOption()?.label ?? props.fallback ?? "Select an option";
-
-  // Focus management when opening/closing
-  createEffect(() => {
-    if (isOpen()) {
-      // Find index of currently selected value to focus it, or default to 0
-      const index = props.options.findIndex((o) => o.value === props.value);
-      setFocusedOptionIndex(index >= 0 ? index : 0);
-
-      // We must wait for the DOM to render the list before focusing
-      requestAnimationFrame(() => {
-        const options = listboxRef?.querySelectorAll('[role="option"]');
-        if (options?.[index >= 0 ? index : 0]) {
-          (options[index >= 0 ? index : 0] as HTMLElement).focus();
-        }
-      });
-    } else {
-      // Return focus to button when closed (if it was previously focused)
-      if (
-        document.activeElement &&
-        listboxRef?.contains(document.activeElement)
-      ) {
-        triggerButtonRef?.focus();
-      }
-    }
-  });
-
-  const closeDropdown = () => {
-    setIsOpen(false);
-    triggerButtonRef?.focus();
-  };
-
-  const handleOptionSelect = (value: string) => {
-    props.onChange(value);
-    closeDropdown();
-  };
-
-  // Helper to find next non-disabled option
-  const moveFocus = (direction: 1 | -1) => {
-    setFocusedOptionIndex((prev) => {
-      let next = prev + direction;
-      // Loop through options max 'length' times to prevent infinite loop
-      for (let i = 0; i < props.options.length; i++) {
-        if (next >= props.options.length) next = 0;
-        if (next < 0) next = props.options.length - 1;
-
-        if (!props.options[next].disabled) {
-          (listboxRef?.children[next] as HTMLElement)?.focus();
-          return next;
-        }
-
-        next += direction;
-      }
-
-      return prev;
-    });
-  };
-
-  const handleListKeyDown = (e: KeyboardEvent) => {
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        moveFocus(1);
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        moveFocus(-1);
-        break;
-      case "Enter":
-      case " ":
-        e.preventDefault();
-        // Check if current focused option is disabled before selecting
-        if (
-          focusedOptionIndex() >= 0 &&
-          !props.options[focusedOptionIndex()].disabled
-        ) {
-          handleOptionSelect(props.options[focusedOptionIndex()].value);
-        }
-        break;
-      case "Escape":
-        e.preventDefault();
-        closeDropdown();
-        break;
-      case "Tab":
-        setIsOpen(false);
-        break;
-    }
-  };
-
-  // Keyboard handler for the TRIGGER BUTTON
-  const handleTriggerKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-      e.preventDefault();
-      setIsOpen(true);
-    }
-  };
-
-  const handleClickOutside = (e: MouseEvent) => {
-    if (dropdownWrapperRef && !dropdownWrapperRef.contains(e.target as Node)) {
-      setIsOpen(false);
-    }
-  };
-
-  document.addEventListener("click", handleClickOutside);
-  onCleanup(() => document.removeEventListener("click", handleClickOutside));
+  const collection = createMemo(() =>
+    createListCollection({
+      items: props.options,
+      itemToValue: (item) => item.value,
+      itemToString: (item) => item.label,
+    }),
+  );
 
   return (
-    <div
-      class={cn("flex h-min max-w-96 flex-col gap-1 transition", props.class)}
+    <Select.Root
+      collection={collection()}
+      value={[props.value]}
+      onValueChange={(details) => props.onChange(details.value[0])}
+      disabled={props.options.length === 0}
+      invalid={!!props.error}
+      positioning={{
+        gutter: 4,
+        sameWidth: true,
+        placement: "bottom",
+      }}
+      class={cn(
+        "flex h-min max-w-96 flex-1 flex-col gap-1 transition",
+        props.class,
+      )}
     >
-      <div ref={dropdownWrapperRef} class="relative h-16 h-full w-full">
+      <Select.Trigger
+        class={cn(
+          "group flex h-16 w-full items-center rounded-md border text-left font-semibold outline-none transition",
+          {
+            "data-[focus]:border-violet-500 data-[state=open]:border-violet-500":
+              !props.error,
+            "border-red-300 bg-red-100 text-red-500 data-[focus]:border-red-500 data-[state=open]:border-red-500":
+              !!props.error,
+          },
+        )}
+      >
+        {/* Visual indicator bar */}
         <div
-          class={cn(
-            "group flex h-16 w-full items-center rounded-md border font-semibold transition",
+          class={cn("h-full w-2 rounded-l-sm transition", {
+            "group-data-[focus]:bg-violet-500 group-data-[state=open]:bg-violet-500":
+              !props.error,
+            "group-data-[focus]:bg-red-500 group-data-[state=open]:bg-red-500":
+              !!props.error,
+          })}
+        />
 
-            {
-              "border-violet-500 dark:border-violet-700":
-                isOpen() && !props.error,
-              "focus-within:border-violet-500 dark:focus-within:border-violet-700":
-                !props.error,
-              "border-red-300 bg-red-100 text-red-500 focus-within:border-red-500":
-                !!props.error,
-            },
-          )}
-        >
-          <div
-            class={cn("h-full w-2 rounded-l-sm bg-transparent transition", {
-              "bg-violet-500 dark:bg-violet-700": isOpen() && !props.error,
-              "group-focus-within:bg-violet-500 dark:group-focus-within:bg-violet-700":
-                !props.error,
-              "bg-red-500": isOpen() && !!props.error,
-              "group-focus-within:bg-red-500": !!props.error,
+        <div class="flex flex-1 flex-col justify-center overflow-hidden px-3 py-2">
+          <Select.Label
+            class={cn("text-gray-400 text-xs transition", {
+              "text-red-400": !!props.error,
             })}
-          />
-          <div class="w-full px-3 py-2">
-            <p
-              id={labelId}
-              class={cn("text-gray-400 text-xs transition", {
-                "text-red-400": !!props.error,
-              })}
-            >
-              {props.label}
-            </p>
+          >
+            {props.label}
+          </Select.Label>
 
-            <button
-              ref={triggerButtonRef}
-              id={buttonId}
-              type="button"
-              class={cn(
-                "flex w-full items-center justify-between outline-none transition disabled:text-gray-300",
-                { "disabled:text-red-300": !!props.error },
-              )}
-              disabled={props.options.length === 0}
-              onClick={() => setIsOpen(!isOpen())}
-              onKeyDown={handleTriggerKeyDown}
-              aria-haspopup="listbox"
-              aria-expanded={isOpen()}
-              aria-controls={listboxId}
-              aria-labelledby={`${labelId} ${buttonId}`}
-            >
-              <span class="text-left">{currentLabel()}</span>
+          <div class="flex items-center justify-between gap-2">
+            <Select.ValueText
+              class="truncate"
+              placeholder={props.fallback ?? "Select an option"}
+            />
+            <Select.Indicator>
               <ChevronDownIcon
                 size={18}
-                class={cn("text-gray-500 transition-transform", {
-                  "rotate-180": isOpen(),
-                })}
+                class={cn(
+                  "text-gray-500 transition-transform group-data-[state=open]:rotate-180",
+                  { "text-red-400": !!props.error },
+                )}
               />
-            </button>
+            </Select.Indicator>
           </div>
         </div>
+      </Select.Trigger>
 
-        <Show when={isOpen()}>
-          <div
-            ref={listboxRef}
-            id={listboxId}
-            role="listbox"
-            aria-labelledby={labelId}
-            tabIndex={-1}
-            class="absolute top-full left-0 z-10 mt-2 w-full overflow-y-auto rounded-md border bg-white shadow-lg outline-none dark:bg-gray-900"
-          >
-            <For
-              each={props.options}
-              fallback={
-                <div class="px-3 py-2 text-gray-400">
-                  {props.fallback ?? "No options available"}
-                </div>
-              }
-            >
-              {(option, index) => (
-                <div
-                  role="option"
-                  id={`${listboxId}-option-${index()}`}
-                  tabIndex={-1}
-                  aria-selected={props.value === option.value}
+      <Portal>
+        <Select.Positioner>
+          <Select.Content class="z-10 w-full overflow-y-auto rounded-md border bg-white shadow-lg outline-none dark:bg-gray-900">
+            <For each={collection().items}>
+              {(item) => (
+                <Select.Item
+                  item={item}
                   class={cn(
-                    "cursor-pointer px-3 py-2 outline-none transition hover:bg-gray-100 focus:bg-gray-100 dark:focus:bg-gray-200/10 dark:hover:bg-gray-200/10",
-                    { "font-semibold": props.value === option.value },
-                    {
-                      "cursor-not-allowed text-gray-400 dark:text-gray-500":
-                        option.disabled,
-                    },
+                    "cursor-pointer px-3 py-2 outline-none transition",
+                    "data-[highlighted]:bg-gray-100 dark:data-[highlighted]:bg-gray-200/10",
+                    "aria-selected:font-semibold",
+                    "data-[disabled]:cursor-not-allowed data-[disabled]:text-gray-400 dark:data-[disabled]:text-gray-500",
                   )}
-                  onClick={() => {
-                    if (option.disabled) return;
-                    handleOptionSelect(option.value);
-                  }}
-                  onKeyDown={handleListKeyDown}
                 >
-                  {option.label}
-                </div>
+                  <Select.ItemText>{item.label}</Select.ItemText>
+                </Select.Item>
               )}
             </For>
-          </div>
-        </Show>
-      </div>
+            <Show when={props.options.length === 0}>
+              <div class="px-3 py-2 text-gray-400">
+                {props.fallback ?? "No options available"}
+              </div>
+            </Show>
+          </Select.Content>
+        </Select.Positioner>
+      </Portal>
 
-      {props.error && (
-        <span class="flex items-center gap-1 text-sm">
-          <CircleAlertIcon class="size-4 min-h-4 min-w-4" />
+      <Show when={props.error}>
+        <span class="flex items-center gap-1 text-red-500 text-sm">
+          <CircleAlertIcon class="size-4" />
           <p>{props.error}</p>
         </span>
-      )}
-    </div>
+      </Show>
+    </Select.Root>
   );
 };
