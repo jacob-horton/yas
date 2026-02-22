@@ -4,8 +4,7 @@ import HelloSvg from "@/assets/empty-states/hello.svg";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useMyGroups } from "@/features/users/hooks/use-my-groups";
-
-export const LS_LAST_GROUP_ID = "lastGroupId";
+import { LS_LAST_GROUP_ID } from "../constants";
 
 export const HomePage = () => {
   const navigate = useNavigate();

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useConfirmation } from "@/context/confirmation-context";
 import { useToast } from "@/context/toast-context";
 import { useGroup } from "@/features/groups/context/group-provider";
-import { useGame } from "@/features/matches/hooks/use-game";
+import { useGame } from "@/features/games/hooks/use-game";
 import { SCORING_METRIC_LABELS } from "../constants";
 import { useDeleteGame } from "../hooks/use-delete-game";
 import { useUpdateGame } from "../hooks/use-update-game";

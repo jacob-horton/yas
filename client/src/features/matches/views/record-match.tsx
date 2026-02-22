@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/context/toast-context";
+import { useGame } from "@/features/games/hooks/use-game";
 import { useLastPlayers } from "@/features/games/hooks/use-last-players";
 import type { GameRouteParams } from "@/features/games/types/game";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { useGroupMembers } from "@/features/groups/hooks/use-group-members";
-import { useGame } from "../hooks/use-game";
 import { useRecordMatch } from "../hooks/use-record-match";
 
 export const RecordMatch = () => {

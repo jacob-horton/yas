@@ -1,10 +1,10 @@
 import { Route, Router } from "@solidjs/router";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import type { ParentComponent } from "solid-js";
-import { requireRole } from "@/components/layout/authorised-route";
 import { Sidebar } from "@/components/layout/sidebar";
 import { ConfirmationProvider } from "@/context/confirmation-context";
 import { ToastProvider } from "@/context/toast-context";
+import { requireRole } from "@/features/auth/components/authorised-route";
 import { ProtectedRoute } from "@/features/auth/components/protected-route";
 import { AuthProvider } from "@/features/auth/context/auth-provider";
 import { Login } from "@/features/auth/views/login";
@@ -19,6 +19,7 @@ import { EditGroup } from "@/features/groups/views/edit-group";
 import { GroupDetails } from "@/features/groups/views/group-details";
 import { Invites } from "@/features/groups/views/group-invites";
 import { GroupMembers } from "@/features/groups/views/group-members";
+import { HomePage } from "@/features/home/views/home-page";
 import { AcceptInvite } from "@/features/invites/views/accept-invite";
 import { CreateInvite } from "@/features/invites/views/create-invite";
 import { RecordMatch } from "@/features/matches/views/record-match";
@@ -27,7 +28,6 @@ import { EditEmail } from "@/features/users/views/edit-email";
 import { EditPassword } from "@/features/users/views/edit-password";
 import { EditUser } from "@/features/users/views/edit-user";
 import { UserSettings } from "@/features/users/views/settings";
-import { HomePage } from "@/pages/home-page";
 
 const queryClient = new QueryClient();
 

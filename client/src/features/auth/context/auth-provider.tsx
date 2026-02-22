@@ -8,11 +8,11 @@ import {
   useContext,
 } from "solid-js";
 import { authApi } from "@/features/auth/api";
+import { LS_LAST_GROUP_ID } from "@/features/home/constants";
 import { usersApi } from "@/features/users/api";
 import { userKeys } from "@/features/users/hooks/query-keys";
 import type { User } from "@/features/users/types";
 import { setupAxiosInterceptors } from "@/lib/api";
-import { LS_LAST_GROUP_ID } from "@/pages/home-page";
 
 type ErrorDetail = {
   property: string;

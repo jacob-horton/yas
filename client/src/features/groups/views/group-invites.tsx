@@ -18,12 +18,12 @@ import { useConfirmation } from "@/context/confirmation-context";
 import { useToast } from "@/context/toast-context";
 import { Authorised } from "@/features/auth/components/authorised";
 import { useAuth } from "@/features/auth/context/auth-provider";
+import { useDeleteInvite } from "@/features/invites/hooks/use-delete-invite";
 import type { InviteSummary } from "@/features/invites/types/invite";
 import { cn } from "@/lib/classname";
 import { isExpired } from "@/lib/expiry";
 import { formatDate, formatDateTime } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
-import { useDeleteInvite } from "../hooks/use-delete-invite";
 import { useGroupInvites } from "../hooks/use-group-invites";
 import { hasPermission } from "../types";
 

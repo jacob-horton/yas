@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/solid-query";
 import type { Accessor } from "solid-js";
 import { useToast } from "@/context/toast-context";
+import { groupKeys } from "@/features/groups/hooks/query-keys";
 import { invitesApi } from "@/features/invites/api";
-import { groupKeys } from "./query-keys";
 
 export const useDeleteInvite = (groupId: Accessor<string>) => {
   const queryClient = useQueryClient();

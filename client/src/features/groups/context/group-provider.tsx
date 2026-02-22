@@ -14,7 +14,7 @@ import {
   useContext,
 } from "solid-js";
 import { groupsApi } from "@/features/groups/api";
-import { LS_LAST_GROUP_ID } from "@/pages/home-page";
+import { LS_LAST_GROUP_ID } from "@/features/home/constants";
 import { groupKeys } from "../hooks/query-keys";
 import type { Group, MemberRole } from "../types";
 import type { GroupRouteParams } from "../types/params";
