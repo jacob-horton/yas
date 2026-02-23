@@ -71,9 +71,9 @@ pub struct CreateGameReq {
     pub name: String,
 
     #[validate(range(
-        min = 2,
+        min = 1,
         max = 50,
-        message = "Number of players per match must be between 2 and 50"
+        message = "Number of players per match must be between 1 and 50"
     ))]
     pub players_per_match: i32,
 
@@ -87,9 +87,9 @@ pub struct UpdateGameReq {
     pub name: String,
 
     #[validate(range(
-        min = 2,
+        min = 1,
         max = 50,
-        message = "Number of players per match must be between 2 and 50"
+        message = "Number of players per match must be between 1 and 50"
     ))]
     pub players_per_match: i32,
 

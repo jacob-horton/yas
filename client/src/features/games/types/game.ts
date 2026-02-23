@@ -26,7 +26,7 @@ export const createGameSchema = z.object({
   players_per_match: numericStringSchema.pipe(
     z
       .number()
-      .min(2, "Must have at least 2 players")
+      .min(1, "Must have at least 1 player")
       .max(50, "Cannot exceed 50 players"),
   ),
 
@@ -44,7 +44,7 @@ export const updateGameSchema = z.object({
   players_per_match: numericStringSchema.pipe(
     z
       .number()
-      .min(2, "Must have at least 2 players")
+      .min(1, "Must have at least 1 player")
       .max(50, "Cannot exceed 50 players"),
   ),
 
