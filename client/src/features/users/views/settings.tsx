@@ -1,4 +1,3 @@
-import { A } from "@solidjs/router";
 import { Container } from "@/components/layout/container";
 import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";
@@ -10,25 +9,18 @@ export const UserSettings = () => {
   return (
     <Page title="User Settings" showBack narrow>
       <Container narrow class="flex flex-col gap-4">
-        <A
-          href="/me/edit"
-          class="h-8 w-fit rounded-md bg-violet-500 px-6 py-1 font-semibold text-white dark:bg-violet-700"
-        >
-          Edit Details
-        </A>
-        <A
-          href="/me/email"
-          class="h-8 w-fit rounded-md bg-violet-500 px-6 py-1 font-semibold text-white dark:bg-violet-700"
-        >
-          Change Email
-        </A>
-        <A
-          href="/me/password"
-          class="h-8 w-fit rounded-md bg-violet-500 px-6 py-1 font-semibold text-white dark:bg-violet-700"
-        >
+        <Button href="/me/edit" variant="secondary" icon="edit">
+          Edit details
+        </Button>
+        <Button href="/me/email" variant="secondary" icon="atSign">
+          Change email
+        </Button>
+        <Button href="/me/password" variant="secondary" icon="lockKeyhole">
           Change password
-        </A>
-        <Button onClick={auth.logout}>Logout</Button>
+        </Button>
+        <Button onClick={auth.logout} icon="logOut" variant="secondary" danger>
+          Logout
+        </Button>
       </Container>
     </Page>
   );

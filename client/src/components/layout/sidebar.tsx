@@ -69,11 +69,7 @@ export const Sidebar: Component = () => {
           class="w-full"
         />
 
-        <Button
-          variant="ghost"
-          icon="plus"
-          onClick={() => navigate("/groups/create")}
-        />
+        <Button variant="ghost" icon="plus" href="/groups/create" />
       </div>
 
       <div class="flex flex-col gap-6">

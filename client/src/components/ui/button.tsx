@@ -1,6 +1,7 @@
+import { A } from "@solidjs/router";
 import LoaderCircleIcon from "lucide-solid/icons/loader-circle";
 import type { ParentComponent } from "solid-js";
-import { Show } from "solid-js";
+import { Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { cn } from "@/lib/classname";
 import { ICON_MAP, type Icon } from "@/lib/icons";
@@ -14,53 +15,88 @@ const COLOUR_MAP: Record<Variant, string> = {
   ghost: "hover:bg-gray-100 dark:hover:bg-gray-100/10 transition",
 } as const;
 
-export const Button: ParentComponent<{
+type BaseProps = {
   variant?: Variant;
-  type?: "button" | "submit";
-  onClick?: () => void;
-  disabled?: boolean;
   icon?: Icon;
   class?: string;
   danger?: boolean;
   loading?: boolean;
-}> = (props) => {
-  const disabled = () => props.disabled || props.loading;
+  disabled?: boolean;
+};
+
+type AnchorProps = BaseProps & {
+  href: string;
+  type?: never;
+  onClick?: never;
+};
+
+type ButtonElementProps = BaseProps & {
+  href?: never;
+  type?: "button" | "submit";
+  onClick?: () => void;
+};
+
+type ButtonProps = AnchorProps | ButtonElementProps;
+
+export const Button: ParentComponent<ButtonProps> = (props) => {
+  const [local, others] = splitProps(props, [
+    "href",
+    "children",
+    "class",
+    "variant",
+    "loading",
+    "disabled",
+    "danger",
+    "icon",
+  ]);
+
+  const isDisabled = () => local.loading || local.disabled;
+
+  const isA = () => !!local.href;
+  const Tag = () => (isA() ? A : "button");
+
+  const commonClasses = cn(
+    "relative flex h-8 w-fit cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-5 py-1 font-semibold",
+    COLOUR_MAP[local.variant ?? "primary"],
+    {
+      "p-1.5": local.icon && !local.children,
+      "hover:bg-red-50 hover:text-red-600":
+        local.danger && local.variant === "ghost",
+      "border-red-700 text-red-700 hover:bg-red-100 dark:hover:bg-red-500/20":
+        local.danger && local.variant === "secondary",
+
+      "cursor-not-allowed bg-gray-300 hover:bg-gray-300": isDisabled(),
+      "bg-transparent text-gray-400 hover:bg-transparent dark:text-gray-700 dark:hover:bg-transparent":
+        local.variant === "ghost" && isDisabled(),
+      "bg-gray-100 hover:bg-gray-100":
+        local.variant === "secondary" && isDisabled(),
+
+      "pointer-events-none opacity-50": isA() && isDisabled(),
+    },
+    local.class,
+  );
 
   return (
-    <button
-      class={cn(
-        "relative flex h-8 w-fit cursor-pointer items-center justify-center whitespace-nowrap rounded-md p-10 py-1 font-semibold",
-        COLOUR_MAP[props.variant ?? "primary"],
-        {
-          "p-1.5": props.icon && !props.children,
-          "hover:bg-red-50 hover:text-red-600":
-            props.danger && props.variant === "ghost",
-          "border-red-700 text-red-700 hover:bg-red-100 dark:hover:bg-red-500/20":
-            props.danger && props.variant === "secondary",
-          "cursor-not-allowed bg-gray-300 hover:bg-gray-300": disabled(),
-          "bg-transparent text-gray-400 hover:bg-transparent dark:text-gray-700 dark:hover:bg-transparent":
-            props.variant === "ghost" && disabled(),
-          "bg-gray-100 hover:bg-gray-100":
-            props.variant === "secondary" && disabled(),
-        },
-        props.class,
-      )}
-      onClick={props.onClick}
-      type={props.type ?? "button"}
-      disabled={disabled()}
+    <Dynamic
+      component={Tag()}
+      href={local.href}
+      class={commonClasses}
+      disabled={isA() ? undefined : isDisabled()}
+      tabIndex={isA() && isDisabled() ? -1 : undefined}
+      {...others}
     >
-      <Show when={props.loading}>
+      <Show when={local.loading}>
         <div class="absolute inset-0 flex items-center justify-center">
           <LoaderCircleIcon class="animate-spin" />
         </div>
       </Show>
 
-      <div class={cn("flex items-center gap-2", { invisible: props.loading })}>
-        <Show when={props.icon}>
-          {(icon) => <Dynamic component={ICON_MAP[icon()]} />}
+      <div class={cn("flex items-center gap-2", { invisible: local.loading })}>
+        <Show when={local.icon}>
+          {(iconName) => <Dynamic component={ICON_MAP[iconName()]} size={18} />}
         </Show>
-        {props.children}
+        {local.children}
       </div>
-    </button>
+    </Dynamic>
   );
 };

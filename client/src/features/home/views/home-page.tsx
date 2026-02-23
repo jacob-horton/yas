@@ -40,9 +40,7 @@ export const HomePage = () => {
             You aren't in any groups yet. Get started by creating your own group
             or using an invite to join another group
           </p>
-          <Button onClick={() => navigate("/groups/create")}>
-            Create your first group
-          </Button>
+          <Button href="/groups/create">Create your first group</Button>
         </EmptyState>
       </div>
     </Show>

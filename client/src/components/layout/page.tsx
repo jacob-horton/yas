@@ -1,14 +1,17 @@
 import { useNavigate } from "@solidjs/router";
 import { For, type ParentComponent, Show } from "solid-js";
 import { cn } from "@/lib/classname";
+import type { Icon } from "@/lib/icons";
 import { Button, type Variant } from "../ui/button";
 import { Container } from "./container";
 
 export type Action = {
   variant: Variant;
   text: string;
-  onAction: () => void;
+  onAction?: () => void;
   danger?: boolean;
+  icon?: Icon;
+  href?: string;
 };
 
 type Props = {
@@ -43,6 +46,8 @@ export const Page: ParentComponent<Props> = (props) => {
                   onClick={action.onAction}
                   variant={action.variant}
                   danger={action.danger}
+                  icon={action.icon}
+                  href={action.href}
                 >
                   {action.text}
                 </Button>

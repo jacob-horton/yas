@@ -1,3 +1,4 @@
+import AtSignIcon from "lucide-solid/icons/at-sign";
 import CalendarIcon from "lucide-solid/icons/calendar";
 import ChartColumnIcon from "lucide-solid/icons/chart-column";
 import ChevronLeftIcon from "lucide-solid/icons/chevron-left";
@@ -10,8 +11,12 @@ import InfinityIcon from "lucide-solid/icons/infinity";
 import InfoIcon from "lucide-solid/icons/info";
 import Layers2Icon from "lucide-solid/icons/layers-2";
 import LoaderCircleIcon from "lucide-solid/icons/loader-circle";
+import LockKeyholeIcon from "lucide-solid/icons/lock-keyhole";
+import LogOutIcon from "lucide-solid/icons/log-out";
 import MountainIcon from "lucide-solid/icons/mountain";
+import NotebookPenIcon from "lucide-solid/icons/notebook-pen";
 import PlusIcon from "lucide-solid/icons/plus";
+import EditIcon from "lucide-solid/icons/square-pen";
 import StarIcon from "lucide-solid/icons/star";
 import TrashIcon from "lucide-solid/icons/trash-2";
 import TrophyIcon from "lucide-solid/icons/trophy";
@@ -28,11 +33,14 @@ export const ICON_MAP = {
   copy: ClipboardIcon,
   crown: CrownIcon,
   delete: TrashIcon,
+  edit: EditIcon,
   hash: HashIcon,
   infinity: InfinityIcon,
   info: InfoIcon,
   loaderCircle: LoaderCircleIcon,
+  logOut: LogOutIcon,
   mountain: MountainIcon,
+  notebookPen: NotebookPenIcon,
   plus: PlusIcon,
   stack: Layers2Icon,
   star: StarIcon,
@@ -40,6 +48,8 @@ export const ICON_MAP = {
   userStar: UserStarIcon,
   users: UsersIcon,
   wheat: WheatIcon,
+  lockKeyhole: LockKeyholeIcon,
+  atSign: AtSignIcon,
 } as const;
 
 export type Icon = keyof typeof ICON_MAP;

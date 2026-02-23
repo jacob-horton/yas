@@ -73,7 +73,7 @@ export const Invites = () => {
   const deleteInvite = useDeleteInvite(group.groupId);
   const toast = useToast();
 
-  const navigate = useNavigate();
+  const _navigate = useNavigate();
 
   const { showConfirm } = useConfirmation();
   const handleDelete = async (invite: InviteSummary) => {
@@ -110,7 +110,8 @@ export const Invites = () => {
               {
                 text: "Create",
                 variant: "primary",
-                onAction: () => navigate("create"),
+                href: "create",
+                icon: "plus",
               },
             ]
           : []

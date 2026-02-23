@@ -97,8 +97,9 @@ export const GroupDetails = () => {
     if (hasPermission(group.userRole(), "admin", auth.user()?.email_verified)) {
       actions.push({
         text: "Edit",
-        onAction: () => navigate("edit"),
+        href: "edit",
         variant: "secondary",
+        icon: "edit",
       });
     }
 
@@ -107,6 +108,7 @@ export const GroupDetails = () => {
       onAction: handleLeave,
       variant: "secondary",
       danger: true,
+      icon: "logOut",
     });
 
     return actions;

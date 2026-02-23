@@ -49,7 +49,7 @@ export const CreateGroup = () => {
         </Button>
         <Button
           variant="secondary"
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)}
           loading={createGroup.isPending}
         >
           Cancel

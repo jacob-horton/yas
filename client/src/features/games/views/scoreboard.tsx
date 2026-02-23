@@ -73,7 +73,8 @@ export const Scoreboard = () => {
       actions.push({
         text: "Edit",
         variant: "secondary",
-        onAction: () => navigate("edit"),
+        href: "edit",
+        icon: "edit",
       });
     }
 
@@ -83,7 +84,8 @@ export const Scoreboard = () => {
       actions.push({
         text: "Record Match",
         variant: "primary",
-        onAction: () => navigate("record"),
+        href: "record",
+        icon: "notebookPen",
       });
     }
 
