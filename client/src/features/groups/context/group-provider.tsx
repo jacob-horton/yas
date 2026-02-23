@@ -4,7 +4,6 @@ import {
   type UseQueryResult,
   useQuery,
 } from "@tanstack/solid-query";
-import { isAxiosError } from "axios";
 import {
   type Accessor,
   createContext,

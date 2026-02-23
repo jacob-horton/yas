@@ -1,26 +1,22 @@
-import { useMutation, useQueryClient } from "@tanstack/solid-query";
-import { useToast } from "@/context/toast-context";
+import { useQueryClient } from "@tanstack/solid-query";
 import { gamesApi } from "@/features/games/api";
 import { gameKeys } from "@/features/games/hooks/query-keys";
+import { useAppMutation } from "@/lib/use-app-mutation";
 import type { CreateMatchRequest } from "../types";
 
 export const useRecordMatch = () => {
   const queryClient = useQueryClient();
-  const toast = useToast();
 
-  return useMutation(() => ({
-    mutationFn: (data: { gameId: string; payload: CreateMatchRequest }) =>
-      gamesApi.game(data.gameId).createMatch(data.payload),
-    onSuccess: async (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: gameKeys.game(variables.gameId),
-      });
-    },
-    onError: () => {
-      toast.error({
-        title: "Error",
-        description: "Failed to record match",
-      });
-    },
-  }));
+  return useAppMutation(
+    () => ({
+      mutationFn: (data: { gameId: string; payload: CreateMatchRequest }) =>
+        gamesApi.game(data.gameId).createMatch(data.payload),
+      onSuccess: async (_, variables) => {
+        queryClient.invalidateQueries({
+          queryKey: gameKeys.game(variables.gameId),
+        });
+      },
+    }),
+    () => ({ errorMessage: "Failed to record match" }),
+  );
 };

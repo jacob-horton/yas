@@ -1,24 +1,20 @@
-import { useMutation, useQueryClient } from "@tanstack/solid-query";
-import { useToast } from "@/context/toast-context";
+import { useQueryClient } from "@tanstack/solid-query";
 import { groupKeys } from "@/features/groups/hooks/query-keys";
+import { useAppMutation } from "@/lib/use-app-mutation";
 import { invitesApi } from "../api";
 
 export const useAcceptInvite = () => {
   const queryClient = useQueryClient();
-  const toast = useToast();
 
-  return useMutation(() => ({
-    mutationFn: (inviteId: string) => invitesApi.invite(inviteId).accept(),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: groupKeys.myGroups(),
-      });
-    },
-    onError: () => {
-      toast.error({
-        title: "Error",
-        description: "Failed to accept invite",
-      });
-    },
-  }));
+  return useAppMutation(
+    () => ({
+      mutationFn: (inviteId: string) => invitesApi.invite(inviteId).accept(),
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: groupKeys.myGroups(),
+        });
+      },
+    }),
+    () => ({ errorMessage: "Failed to accept invite" }),
+  );
 };

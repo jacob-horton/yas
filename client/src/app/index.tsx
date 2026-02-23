@@ -1,5 +1,6 @@
 import { Route, Router } from "@solidjs/router";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
+import { isAxiosError } from "axios";
 import type { ParentComponent } from "solid-js";
 import { Sidebar } from "@/components/layout/sidebar";
 import { ConfirmationProvider } from "@/context/confirmation-context";
@@ -28,7 +29,6 @@ import { EditEmail } from "@/features/users/views/edit-email";
 import { EditPassword } from "@/features/users/views/edit-password";
 import { EditUser } from "@/features/users/views/edit-user";
 import { UserSettings } from "@/features/users/views/settings";
-import { isAxiosError } from "axios";
 
 const queryClient = new QueryClient({
   defaultOptions: {

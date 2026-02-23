@@ -8,8 +8,8 @@ import {
   Match,
   type ParentComponent,
   type ParentProps,
-  Switch,
   Show,
+  Switch,
 } from "solid-js";
 import type { JSX } from "solid-js/jsx-runtime";
 import { cn } from "@/lib/classname";
