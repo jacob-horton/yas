@@ -1,3 +1,4 @@
+use crate::models::trim_string;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
@@ -108,6 +109,7 @@ pub struct InviteDetailResponse {
 #[derive(Debug, Deserialize, Validate)]
 pub struct CreateInviteReq {
     #[validate(length(min = 3, max = 50, message = "Name must be between 3 and 50 chars"))]
+    #[serde(deserialize_with = "trim_string")]
     pub name: String,
 
     pub expires_at: Option<String>,

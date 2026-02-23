@@ -1,3 +1,4 @@
+use crate::models::trim_string;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, prelude::Type};
@@ -119,14 +120,19 @@ impl From<UserDb> for PublicUserDetailsResponse {
 #[derive(Debug, Deserialize, Validate)]
 pub struct CreateUserReq {
     #[validate(email(message = "Email must be valid"))]
+    #[serde(deserialize_with = "trim_string")]
     pub email: String,
+
     #[validate(length(min = 1, max = 512, message = "Name must be between 1 and 512 chars"))]
+    #[serde(deserialize_with = "trim_string")]
     pub name: String,
+
     #[validate(length(
         min = 8,
         max = 1023,
         message = "Password must be between 8 and 1023 chars"
     ))]
+    #[serde(deserialize_with = "trim_string")]
     pub password: String,
 }
 
@@ -139,7 +145,9 @@ impl RateLimitKeyExtractor for CreateUserReq {
 #[derive(Debug, Deserialize, Validate)]
 pub struct UpdateUserReq {
     #[validate(length(min = 1, max = 512, message = "Name must be between 1 and 512 chars"))]
+    #[serde(deserialize_with = "trim_string")]
     pub name: String,
+
     pub avatar: Avatar,
     pub avatar_colour: AvatarColour,
 }
@@ -147,11 +155,13 @@ pub struct UpdateUserReq {
 #[derive(Debug, Deserialize, Validate)]
 pub struct UpdateEmailReq {
     #[validate(email(message = "Email must be valid"))]
+    #[serde(deserialize_with = "trim_string")]
     pub email: String,
 }
 
 #[derive(Debug, Deserialize, Validate)]
 pub struct UpdatePasswordReq {
+    #[serde(deserialize_with = "trim_string")]
     pub current_password: String,
 
     #[validate(length(
@@ -159,5 +169,6 @@ pub struct UpdatePasswordReq {
         max = 1023,
         message = "Password must be between 8 and 1023 chars"
     ))]
+    #[serde(deserialize_with = "trim_string")]
     pub new_password: String,
 }
