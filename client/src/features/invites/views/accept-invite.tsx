@@ -75,9 +75,9 @@ export const AcceptInvite = () => {
               <p>
                 Invited by: <strong>{invite.data?.created_by_name}</strong>
               </p>
-              {invite.data?.is_current_user_member && (
+              <Show when={invite.data?.is_current_user_member}>
                 <p>You are already a member of this group!</p>
-              )}
+              </Show>
             </Suspense>
           </div>
 

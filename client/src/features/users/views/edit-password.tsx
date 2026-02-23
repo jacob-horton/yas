@@ -69,8 +69,14 @@ export const EditPassword: Component = () => {
       />
 
       <div class="flex gap-4">
-        <Button type="submit">Save</Button>
-        <Button variant="secondary" onClick={() => navigate(-1)}>
+        <Button type="submit" loading={updatePassword.isPending}>
+          Save
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => navigate(-1)}
+          loading={updatePassword.isPending}
+        >
           Cancel
         </Button>
       </div>

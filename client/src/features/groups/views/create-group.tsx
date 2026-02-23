@@ -44,8 +44,14 @@ export const CreateGroup = () => {
         error={errors.name}
       />
       <span class="flex gap-4">
-        <Button type="submit">Create</Button>
-        <Button variant="secondary" onClick={() => navigate("/")}>
+        <Button type="submit" loading={createGroup.isPending}>
+          Create
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => navigate("/")}
+          loading={createGroup.isPending}
+        >
           Cancel
         </Button>
       </span>

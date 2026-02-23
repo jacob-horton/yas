@@ -143,7 +143,7 @@ export const Invites = () => {
                       <TableCell>{invite.created_by_name}</TableCell>
                       <TableCell>
                         {invite.uses}
-                        {invite.max_uses && <>/{invite.max_uses}</>}
+                        <Show when={invite.max_uses}>{invite.max_uses}</Show>
                       </TableCell>
                       <TableCell>{formatDate(invite.created_at)}</TableCell>
                       <TableCell>

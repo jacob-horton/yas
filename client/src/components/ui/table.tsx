@@ -9,6 +9,7 @@ import {
   type ParentComponent,
   type ParentProps,
   Switch,
+  Show,
 } from "solid-js";
 import type { JSX } from "solid-js/jsx-runtime";
 import { cn } from "@/lib/classname";
@@ -89,7 +90,7 @@ export function Table<T extends string>(props: TableProps<T>) {
               >
                 <div class="flex items-center gap-2">
                   {heading.label}
-                  {heading.sortProp && (
+                  <Show when={heading.sortProp}>
                     <button
                       type="button"
                       class="cursor-pointer rounded-md p-1 transition hover:bg-black/5 dark:hover:bg-white/5"
@@ -121,7 +122,7 @@ export function Table<T extends string>(props: TableProps<T>) {
                         }
                       />
                     </button>
-                  )}
+                  </Show>
                 </div>
               </th>
             )}

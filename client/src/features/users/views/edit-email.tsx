@@ -89,8 +89,14 @@ const EditEmailForm: Component<Props> = (props) => {
       />
 
       <div class="flex gap-4">
-        <Button type="submit">Save</Button>
-        <Button variant="secondary" onClick={() => navigate(-1)}>
+        <Button type="submit" loading={updateEmail.isPending}>
+          Save
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => navigate(-1)}
+          loading={updateEmail.isPending}
+        >
           Cancel
         </Button>
       </div>

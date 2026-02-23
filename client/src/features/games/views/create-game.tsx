@@ -75,8 +75,14 @@ export const CreateGame = () => {
       />
 
       <span class="flex gap-4">
-        <Button type="submit">Create</Button>
-        <Button variant="secondary" onClick={() => navigate(-1)}>
+        <Button type="submit" loading={createGame.isPending}>
+          Create
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => navigate(-1)}
+          loading={createGame.isPending}
+        >
           Cancel
         </Button>
       </span>

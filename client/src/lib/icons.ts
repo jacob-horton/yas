@@ -9,6 +9,7 @@ import HashIcon from "lucide-solid/icons/hash";
 import InfinityIcon from "lucide-solid/icons/infinity";
 import InfoIcon from "lucide-solid/icons/info";
 import Layers2Icon from "lucide-solid/icons/layers-2";
+import LoaderCircleIcon from "lucide-solid/icons/loader-circle";
 import MountainIcon from "lucide-solid/icons/mountain";
 import PlusIcon from "lucide-solid/icons/plus";
 import StarIcon from "lucide-solid/icons/star";
@@ -30,6 +31,7 @@ export const ICON_MAP = {
   hash: HashIcon,
   infinity: InfinityIcon,
   info: InfoIcon,
+  loaderCircle: LoaderCircleIcon,
   mountain: MountainIcon,
   plus: PlusIcon,
   stack: Layers2Icon,

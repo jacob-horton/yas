@@ -125,8 +125,14 @@ const EditGameForm: Component<Props> = (props) => {
       />
 
       <span class="flex gap-4">
-        <Button type="submit">Update</Button>
-        <Button variant="secondary" onClick={() => navigate(-1)}>
+        <Button type="submit" loading={updateGame.isPending}>
+          Update
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => navigate(-1)}
+          loading={updateGame.isPending}
+        >
           Cancel
         </Button>
       </span>

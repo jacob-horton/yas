@@ -1,5 +1,5 @@
 import CircleAlertIcon from "lucide-solid/icons/circle-alert";
-import type { Component } from "solid-js";
+import { Show, type Component } from "solid-js";
 import { cn } from "@/lib/classname";
 
 export const Input: Component<{
@@ -56,12 +56,12 @@ export const Input: Component<{
           />
         </div>
       </div>
-      {props.error && (
+      <Show when={props.error}>
         <span class="flex items-center gap-1 whitespace-nowrap text-sm">
           <CircleAlertIcon class="size-4 min-h-4 min-w-4" />
           <p>{props.error}</p>
         </span>
-      )}
+      </Show>
     </div>
   );
 };

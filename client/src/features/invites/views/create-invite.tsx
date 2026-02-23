@@ -71,8 +71,14 @@ export const CreateInvite = () => {
       />
 
       <span class="flex gap-4">
-        <Button type="submit">Create</Button>
-        <Button variant="secondary" onClick={() => navigate(-1)}>
+        <Button type="submit" loading={createInvite.isPending}>
+          Create
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => navigate(-1)}
+          loading={createInvite.isPending}
+        >
           Cancel
         </Button>
       </span>

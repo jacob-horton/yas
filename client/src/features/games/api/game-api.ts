@@ -26,6 +26,7 @@ export class GameApi implements GameApiContract {
   }
 
   public async update(payload: UpdateGameRequest): Promise<Game> {
+    await new Promise((asdf) => setTimeout(asdf, 5000));
     return api.put(`/games/${this.gameId}`, payload).then((resp) => resp.data);
   }
 

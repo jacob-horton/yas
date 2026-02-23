@@ -94,7 +94,18 @@ export const RecordMatchForm = (props: {
         )}
       </For>
 
-      <Button type="submit">Submit</Button>
+      <span class="flex gap-4">
+        <Button type="submit" loading={recordMatch.isPending}>
+          Submit
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => navigate(-1)}
+          loading={recordMatch.isPending}
+        >
+          Cancel
+        </Button>
+      </span>
     </FormPage>
   );
 };

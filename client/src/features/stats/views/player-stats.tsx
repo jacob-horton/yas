@@ -82,7 +82,7 @@ export const PlayerStats = () => {
         }
       >
         <Show
-          when={(history.data?.length ?? 0) > 2}
+          when={history.isLoading || (history.data?.length ?? 0) > 2}
           fallback={
             <EmptyState title="Not enough data" img={VisualiseDataSvg}>
               Record more matches to see your match history

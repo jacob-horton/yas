@@ -96,8 +96,14 @@ export const EditUser = () => {
       </div>
 
       <div class="flex gap-4">
-        <Button type="submit">Save</Button>
-        <Button variant="secondary" onClick={() => navigate(-1)}>
+        <Button type="submit" loading={updateUser.isPending}>
+          Save
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => navigate(-1)}
+          loading={updateUser.isPending}
+        >
           Cancel
         </Button>
       </div>

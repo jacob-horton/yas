@@ -24,6 +24,7 @@ import { PodiumCard } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams, ScoringMetric } from "../types/game";
+import { Button } from "@/components/ui/button";
 
 const TABLE_CAPTION = "Stats of all players playing this game";
 
