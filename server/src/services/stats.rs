@@ -246,6 +246,16 @@ pub async fn get_player_highlights(
 ) -> Result<PlayerHighlightStats, AppError> {
     let (game, _) = fetch_game_guarded(state, game_id, user_id).await?;
 
+    // Check if logged in user shares a group with lookup user for privacy
+    let shares_group = state
+        .group_repo
+        .users_share_group(&state.pool, user_id, player_id)
+        .await?;
+
+    if !shares_group {
+        return Err(GroupError::MemberNotFound.into());
+    }
+
     let scoreboard = get_scoreboard_entries(state, &game).await?;
     let (rank_index, entry) = scoreboard
         .iter()

@@ -28,9 +28,6 @@ pub enum UserError {
     #[error("User not found")]
     NotFound,
 
-    #[error("Not permitted to view user data")]
-    NotPermittedToView,
-
     #[error("Invalid current password")]
     InvalidCurrentPassword,
 
@@ -149,7 +146,6 @@ impl IntoResponse for AppError {
             AppError::User(err) => match err {
                 UserError::UserAlreadyExists => (StatusCode::CONFLICT, err.to_string()),
                 UserError::NotFound => (StatusCode::NOT_FOUND, err.to_string()),
-                UserError::NotPermittedToView => (StatusCode::FORBIDDEN, err.to_string()),
                 UserError::InvalidCurrentPassword => (StatusCode::BAD_REQUEST, err.to_string()),
                 UserError::Database(e) => {
                     eprintln!("User DB error: {:?}", e);

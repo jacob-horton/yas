@@ -35,17 +35,6 @@ export const GroupProvider: ParentComponent = (props) => {
     queryKey: groupKeys.detail(groupId()),
     queryFn: () => groupsApi.group(groupId()).get(),
     enabled: !!groupId(),
-    retry: (failureCount, error) => {
-      if (failureCount >= 3) {
-        return false;
-      }
-
-      if (isAxiosError(error) && error.response?.status === 404) {
-        return false;
-      }
-
-      return true;
-    },
     placeholderData: keepPreviousData,
   }));
 

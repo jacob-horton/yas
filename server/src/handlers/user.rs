@@ -78,7 +78,7 @@ async fn get_user(
         .await?;
 
     if !shares_group {
-        return Err(UserError::NotPermittedToView.into());
+        return Err(GroupError::MemberNotFound.into());
     }
 
     let user = state
