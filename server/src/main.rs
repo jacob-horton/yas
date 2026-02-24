@@ -8,11 +8,12 @@ mod repositories;
 mod services;
 
 use axum::{
-    Router,
+    Extension, Router,
     http::{
         HeaderValue, Method,
         header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE},
     },
+    middleware,
 };
 use resend_rs::Resend;
 use sqlx::{PgPool, postgres::PgPoolOptions};
@@ -22,6 +23,7 @@ use tower_sessions::{Expiry, SessionManagerLayer, cookie::SameSite};
 use tower_sessions_sqlx_store::PostgresStore;
 
 use crate::{
+    extractors::rate_limiting::ip::{create_ip_limiter, ip_limit_mw},
     repositories::{
         game_repo::GameRepo, group_repo::GroupRepo, invite_repo::InviteRepo, match_repo::MatchRepo,
         stats_repo::StatsRepo, user_repo::UserRepo, verification_repo::VerificationRepo,
@@ -123,6 +125,8 @@ async fn main() {
     let app = Router::new()
         .nest("/api", handlers::api_router())
         .layer(session_layer) // Handles sessions/auth
+        .layer(middleware::from_fn(ip_limit_mw))
+        .layer(Extension(create_ip_limiter(100, 10)))
         .layer(cors_layer)
         .with_state(app_state);
 
