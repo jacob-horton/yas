@@ -44,13 +44,22 @@ impl VerificationRepo {
         executor: impl PgExecutor<'e, Database = Postgres>,
         email: &str,
     ) -> Result<(), sqlx::Error> {
-        sqlx::query!(
-            "DELETE FROM email_verifications WHERE email = $1",
-            email.to_lowercase()
-        )
-        .execute(executor)
-        .await?;
+        sqlx::query("DELETE FROM email_verifications WHERE email = $1")
+            .bind(email.to_lowercase())
+            .execute(executor)
+            .await?;
 
         Ok(())
+    }
+
+    pub async fn delete_expired_tokens<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+    ) -> Result<u64, sqlx::Error> {
+        let result = sqlx::query("DELETE FROM email_verifications WHERE expiration < NOW()")
+            .execute(executor)
+            .await?;
+
+        Ok(result.rows_affected())
     }
 }

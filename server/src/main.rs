@@ -122,6 +122,25 @@ async fn main() {
 
     let app_state = AppState::new(pool.clone());
 
+    // Clean up expired verification tokens each hour
+    let cleanup_pool = app_state.pool.clone();
+    let cleanup_verification_repo = app_state.verification_repo.clone();
+    tokio::spawn(async move {
+        let mut interval = tokio::time::interval(std::time::Duration::from_secs(60 * 60));
+
+        loop {
+            interval.tick().await; // Wait for the next tick
+
+            match cleanup_verification_repo
+                .delete_expired_tokens(&cleanup_pool)
+                .await
+            {
+                Ok(count) => println!("Cleaned up {} expired verification tokens", count),
+                Err(e) => eprintln!("Failed to clean up tokens: {}", e),
+            }
+        }
+    });
+
     let app = Router::new()
         .nest("/api", handlers::api_router())
         .layer(session_layer) // Handles sessions/auth
