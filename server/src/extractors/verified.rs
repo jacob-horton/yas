@@ -5,33 +5,39 @@ use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
 use crate::{
     AppState,
     errors::{AppError, AuthError},
-    extractors::auth::AuthUser,
-    models::user::UserDb,
 };
 
-pub struct VerifiedUser(pub UserDb);
+pub trait IsVerified {
+    fn is_verified(&self) -> bool;
+}
 
-impl Deref for VerifiedUser {
-    type Target = UserDb;
+pub struct Verified<T>(pub T);
+
+impl<T> Deref for Verified<T> {
+    type Target = T;
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
+// Checks email is valid for given inner type
 #[async_trait]
-impl FromRequestParts<AppState> for VerifiedUser {
+impl<T> FromRequestParts<AppState> for Verified<T>
+where
+    T: FromRequestParts<AppState, Rejection = AppError> + IsVerified + Send + Sync,
+{
     type Rejection = AppError;
 
     async fn from_request_parts(
         parts: &mut Parts,
         state: &AppState,
     ) -> Result<Self, Self::Rejection> {
-        let AuthUser(user) = AuthUser::from_request_parts(parts, state).await?;
+        let inner = T::from_request_parts(parts, state).await?;
 
-        if !user.email_verified {
+        if !inner.is_verified() {
             return Err(AuthError::UnverifiedEmail.into());
         }
 
-        Ok(VerifiedUser(user))
+        Ok(Verified(inner))
     }
 }

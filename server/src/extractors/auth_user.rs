@@ -4,6 +4,7 @@ use crate::{
     AppState,
     constants::{SESSION_USER_KEY, SESSION_VERSION_KEY},
     errors::{AppError, AuthError},
+    extractors::verified::IsVerified,
     models::user::UserDb,
 };
 use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
@@ -58,7 +59,13 @@ impl FromRequestParts<AppState> for AuthUser {
             return Err(AuthError::InvalidSession.into());
         }
 
-        // 4. Return the user
+        // Return the user
         Ok(AuthUser(user))
+    }
+}
+
+impl IsVerified for AuthUser {
+    fn is_verified(&self) -> bool {
+        self.0.email_verified
     }
 }

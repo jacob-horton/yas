@@ -10,7 +10,7 @@ use uuid::Uuid;
 use crate::{
     AppState,
     errors::AppError,
-    extractors::auth::AuthUser,
+    extractors::auth_user::AuthUser,
     models::stats::{PlayerHighlightsResponse, PlayerMatchResponse},
     services,
 };

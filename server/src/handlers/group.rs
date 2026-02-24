@@ -13,10 +13,10 @@ use crate::{
     errors::AppError,
     extractors::{
         auth_member::AuthMember,
+        auth_user::AuthUser,
         rate_limiting::ip::{create_ip_limiter, ip_limit_mw},
         validated_json::ValidatedJson,
-        verified_member::VerifiedMember,
-        verified_user::VerifiedUser,
+        verified::Verified,
     },
     models::{
         group::{
@@ -29,7 +29,7 @@ use crate::{
 };
 
 async fn create_group(
-    user: VerifiedUser,
+    user: Verified<AuthUser>,
     State(state): State<AppState>,
     ValidatedJson(payload): ValidatedJson<CreateGroupReq>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -40,7 +40,7 @@ async fn create_group(
 }
 
 async fn get_group_details(
-    AuthMember(member): AuthMember,
+    AuthMember { member, .. }: AuthMember,
     State(state): State<AppState>,
 ) -> Result<impl IntoResponse, AppError> {
     let group = services::group::get_group(&state, member).await?;
@@ -50,7 +50,7 @@ async fn get_group_details(
 }
 
 async fn update_group(
-    VerifiedMember(member): VerifiedMember,
+    Verified(AuthMember { member, .. }): Verified<AuthMember>,
     State(state): State<AppState>,
     ValidatedJson(payload): ValidatedJson<UpdateGroupReq>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -60,7 +60,7 @@ async fn update_group(
 }
 
 async fn delete_group(
-    VerifiedMember(member): VerifiedMember,
+    Verified(AuthMember { member, .. }): Verified<AuthMember>,
     State(state): State<AppState>,
 ) -> Result<impl IntoResponse, AppError> {
     services::group::delete_group(&state, member).await?;
@@ -69,7 +69,7 @@ async fn delete_group(
 }
 
 async fn get_group_members(
-    AuthMember(member): AuthMember,
+    AuthMember { member, .. }: AuthMember,
     State(state): State<AppState>,
     Query(query): Query<GroupMembersParams>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -85,7 +85,7 @@ async fn get_group_members(
 }
 
 async fn remove_group_member(
-    VerifiedMember(member): VerifiedMember,
+    Verified(AuthMember { member, .. }): Verified<AuthMember>,
     State(state): State<AppState>,
     Path((_, member_id)): Path<(Uuid, Uuid)>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -95,7 +95,7 @@ async fn remove_group_member(
 }
 
 async fn set_member_role(
-    VerifiedMember(member): VerifiedMember,
+    Verified(AuthMember { member, .. }): Verified<AuthMember>,
     State(state): State<AppState>,
     Path((_, member_id)): Path<(Uuid, Uuid)>,
     Json(payload): Json<SetRoleReq>,

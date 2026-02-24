@@ -9,16 +9,25 @@ use uuid::Uuid;
 use crate::{
     AppState,
     errors::AppError,
-    extractors::{auth::AuthUser, guarded_member::fetch_member_guarded},
-    models::group::GroupMemberDb,
+    extractors::{auth_user::AuthUser, guarded_member::fetch_member_guarded, verified::IsVerified},
+    models::{group::GroupMemberDb, user::UserDb},
 };
 
-pub struct AuthMember(pub GroupMemberDb);
+pub struct AuthMember {
+    pub member: GroupMemberDb,
+    pub user: UserDb,
+}
 
 impl Deref for AuthMember {
     type Target = GroupMemberDb;
     fn deref(&self) -> &Self::Target {
-        &self.0
+        &self.member
+    }
+}
+
+impl IsVerified for AuthMember {
+    fn is_verified(&self) -> bool {
+        self.user.email_verified
     }
 }
 
@@ -46,6 +55,6 @@ impl FromRequestParts<AppState> for AuthMember {
 
         let member = fetch_member_guarded(state, user.id, group_id).await?;
 
-        Ok(AuthMember(member))
+        Ok(AuthMember { member, user })
     }
 }

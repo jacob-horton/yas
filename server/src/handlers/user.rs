@@ -14,7 +14,7 @@ use crate::{
     constants::{SESSION_USER_KEY, SESSION_VERSION_KEY},
     errors::{AppError, GroupError, UserError},
     extractors::{
-        auth::AuthUser,
+        auth_user::AuthUser,
         rate_limiting::{
             ip::{create_ip_limiter, ip_limit_mw},
             payload::{RateLimitedPayload, create_payload_limiter},

@@ -12,15 +12,14 @@ use crate::{
     AppState,
     errors::{AppError, GroupError, InviteError},
     extractors::{
-        auth::AuthUser,
         auth_member::AuthMember,
+        auth_user::AuthUser,
         rate_limiting::{
             ip::{create_ip_limiter, ip_limit_mw},
             user_id::{create_user_limiter, user_limit_mw},
         },
         validated_json::ValidatedJson,
-        verified_member::VerifiedMember,
-        verified_user::VerifiedUser,
+        verified::Verified,
     },
     models::invite::{
         CreateInviteReq, InviteBasicResponse, InviteDetailResponse, InviteSummaryResponse,
@@ -30,7 +29,7 @@ use crate::{
 };
 
 async fn create_invite(
-    VerifiedMember(member): VerifiedMember,
+    Verified(AuthMember { member, .. }): Verified<AuthMember>,
     State(state): State<AppState>,
     ValidatedJson(payload): ValidatedJson<CreateInviteReq>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -41,7 +40,7 @@ async fn create_invite(
 }
 
 async fn get_group_invites(
-    AuthMember(member): AuthMember,
+    AuthMember { member, .. }: AuthMember,
     State(state): State<AppState>,
 ) -> Result<impl IntoResponse, AppError> {
     let invites = services::invite::get_group_invites(&state, member).await?;
@@ -82,7 +81,7 @@ async fn get_invite(
 async fn delete_invite(
     Path(code): Path<Uuid>,
     State(state): State<AppState>,
-    user: VerifiedUser,
+    user: Verified<AuthUser>,
 ) -> Result<impl IntoResponse, AppError> {
     let invite = state
         .invite_repo
@@ -109,7 +108,7 @@ async fn delete_invite(
 async fn accept_invite(
     Path(code): Path<Uuid>,
     State(state): State<AppState>,
-    user: VerifiedUser,
+    user: Verified<AuthUser>,
 ) -> Result<impl IntoResponse, AppError> {
     services::invite::accept_invite(&state, user.id, code).await?;
 

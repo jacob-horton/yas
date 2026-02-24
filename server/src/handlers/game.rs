@@ -12,12 +12,11 @@ use crate::{
     AppState,
     errors::AppError,
     extractors::{
-        auth::AuthUser,
         auth_member::AuthMember,
+        auth_user::AuthUser,
         rate_limiting::ip::{create_ip_limiter, ip_limit_mw},
         validated_json::ValidatedJson,
-        verified_member::VerifiedMember,
-        verified_user::VerifiedUser,
+        verified::Verified,
     },
     models::{
         game::{CreateGameReq, GameResponse, UpdateGameReq},
@@ -27,7 +26,7 @@ use crate::{
 };
 
 async fn create_game(
-    VerifiedMember(member): VerifiedMember,
+    Verified(AuthMember { member, .. }): Verified<AuthMember>,
     State(state): State<AppState>,
     ValidatedJson(payload): ValidatedJson<CreateGameReq>,
 ) -> Result<impl IntoResponse, AppError> {
@@ -40,7 +39,7 @@ async fn create_game(
 async fn update_game(
     State(state): State<AppState>,
     Path(game_id): Path<Uuid>,
-    user: VerifiedUser,
+    user: Verified<AuthUser>,
     ValidatedJson(payload): ValidatedJson<UpdateGameReq>,
 ) -> Result<impl IntoResponse, AppError> {
     let game = services::game::update_game(&state, user.id, game_id, payload).await?;
@@ -52,7 +51,7 @@ async fn update_game(
 async fn delete_game(
     State(state): State<AppState>,
     Path(game_id): Path<Uuid>,
-    user: VerifiedUser,
+    user: Verified<AuthUser>,
 ) -> Result<impl IntoResponse, AppError> {
     services::game::delete_game(&state, user.id, game_id).await?;
 
