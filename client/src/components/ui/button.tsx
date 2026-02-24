@@ -50,37 +50,41 @@ export const Button: ParentComponent<ButtonProps> = (props) => {
     "icon",
   ]);
 
-  const isDisabled = () => local.loading || local.disabled;
+  const isDisabled = () => {
+    console.log("recalculating disabled", local.disabled);
+    return local.loading || local.disabled;
+  };
 
   const isA = () => !!local.href;
   const Tag = () => (isA() ? A : "button");
 
-  const commonClasses = cn(
-    "relative flex h-8 w-fit cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-5 py-1 font-semibold",
-    COLOUR_MAP[local.variant ?? "primary"],
-    {
-      "p-1.5": local.icon && !local.children,
-      "hover:bg-red-50 hover:text-red-600":
-        local.danger && local.variant === "ghost",
-      "border-red-700 text-red-700 hover:bg-red-100 dark:hover:bg-red-500/20":
-        local.danger && local.variant === "secondary",
+  const commonClasses = () =>
+    cn(
+      "relative flex h-8 w-fit cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-5 py-1 font-semibold",
+      COLOUR_MAP[local.variant ?? "primary"],
+      {
+        "p-1.5": local.icon && !local.children,
+        "hover:bg-red-50 hover:text-red-600":
+          local.danger && local.variant === "ghost",
+        "border-red-700 text-red-700 hover:bg-red-100 dark:hover:bg-red-500/20":
+          local.danger && local.variant === "secondary",
 
-      "cursor-not-allowed bg-gray-300 hover:bg-gray-300": isDisabled(),
-      "bg-transparent text-gray-400 hover:bg-transparent dark:text-gray-700 dark:hover:bg-transparent":
-        local.variant === "ghost" && isDisabled(),
-      "bg-gray-100 hover:bg-gray-100":
-        local.variant === "secondary" && isDisabled(),
+        "cursor-not-allowed bg-gray-300 hover:bg-gray-300": isDisabled(),
+        "bg-transparent text-gray-400 hover:bg-transparent dark:text-gray-700 dark:hover:bg-transparent":
+          local.variant === "ghost" && isDisabled(),
+        "bg-gray-100 hover:bg-gray-100":
+          local.variant === "secondary" && isDisabled(),
 
-      "pointer-events-none opacity-50": isA() && isDisabled(),
-    },
-    local.class,
-  );
+        "pointer-events-none opacity-50": isA() && isDisabled(),
+      },
+      local.class,
+    );
 
   return (
     <Dynamic
       component={Tag()}
       href={local.href}
-      class={commonClasses}
+      class={commonClasses()}
       disabled={isA() ? undefined : isDisabled()}
       tabIndex={isA() && isDisabled() ? -1 : undefined}
       {...others}

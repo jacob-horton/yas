@@ -75,7 +75,6 @@ async fn get_session(user: AuthUser) -> Result<impl IntoResponse, AppError> {
     Ok(Json(serde_json::json!({ "user_id": user.id.to_string() })))
 }
 
-// Verify email address
 async fn verify_email(
     State(state): State<AppState>,
     Json(payload): Json<VerifyEmailReq>,

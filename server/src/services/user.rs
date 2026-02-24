@@ -45,7 +45,7 @@ pub async fn create_user(state: &AppState, payload: CreateUserReq) -> Result<Use
         .map_err(|e| match e.as_database_error() {
             Some(db_err)
                 if db_err.code() == Some("23505".into())
-                    && db_err.message().contains("users_email_unique") =>
+                    && db_err.constraint() == Some("users_email_unique") =>
             {
                 UserError::UserAlreadyExists
             }
@@ -90,7 +90,7 @@ pub async fn update_email(
         .map_err(|e| match e.as_database_error() {
             Some(db_err)
                 if db_err.code() == Some("23505".into())
-                    && db_err.message().contains("users_email_unique") =>
+                    && db_err.constraint() == Some("users_email_unique") =>
             {
                 UserError::UserAlreadyExists
             }
@@ -112,4 +112,32 @@ pub async fn update_email(
         .await?;
 
     Ok(user)
+}
+
+pub async fn resend_verification(state: &AppState, user: UserDb) -> Result<(), AppError> {
+    if user.email_verified {
+        return Err(UserError::EmailAlreadyVerified.into());
+    }
+
+    let mut tx = state.pool.begin().await?;
+
+    state
+        .verification_repo
+        .delete_all_tokens_for_email(&mut *tx, &user.email)
+        .await?;
+
+    let token = state
+        .verification_repo
+        .create_verification_record(&mut *tx, &user.email)
+        .await
+        .map_err(AppError::Database)?;
+
+    tx.commit().await?;
+
+    state
+        .email_service
+        .send_verification_email(&user.email, &user.name, token)
+        .await?;
+
+    Ok(())
 }

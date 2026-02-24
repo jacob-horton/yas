@@ -10,6 +10,7 @@ export interface UsersApiContract {
   updateMe(name: string, avatar: string, avatarColour: string): Promise<User>;
   updateMyPassword(currentPassword: string, newPassword: string): Promise<void>;
   updateMyEmail(email: string): Promise<User>;
+  resendVerification(): Promise<void>;
 
   user(id: string): UserApiContract;
 }
@@ -50,6 +51,10 @@ class UsersApi implements UsersApiContract {
 
   public async myGroups(): Promise<Group[]> {
     return api.get("/users/me/groups").then((resp) => resp.data);
+  }
+
+  public async resendVerification(): Promise<void> {
+    return api.post("/resend-verification");
   }
 
   public user(id: string): UserApiContract {

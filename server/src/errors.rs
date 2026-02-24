@@ -31,6 +31,9 @@ pub enum UserError {
     #[error("Invalid current password")]
     InvalidCurrentPassword,
 
+    #[error("Email already verified")]
+    EmailAlreadyVerified,
+
     #[error(transparent)]
     Database(#[from] sqlx::Error),
 }
@@ -147,6 +150,7 @@ impl IntoResponse for AppError {
                 UserError::UserAlreadyExists => (StatusCode::CONFLICT, err.to_string()),
                 UserError::NotFound => (StatusCode::NOT_FOUND, err.to_string()),
                 UserError::InvalidCurrentPassword => (StatusCode::BAD_REQUEST, err.to_string()),
+                UserError::EmailAlreadyVerified => (StatusCode::CONFLICT, err.to_string()),
                 UserError::Database(e) => {
                     eprintln!("User DB error: {:?}", e);
                     (

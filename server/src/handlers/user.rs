@@ -40,9 +40,21 @@ async fn create_user(
 ) -> Result<impl IntoResponse, AppError> {
     let user = services::user::create_user(&state, payload).await?;
 
+    // Cycle ID to prevent Session Fixation attacks
+    session
+        .cycle_id()
+        .await
+        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
+
     // Create session (sets the cookie automatically)
     session
         .insert(SESSION_USER_KEY, user.id.to_string())
+        .await
+        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
+
+    // Save session version
+    session
+        .insert(SESSION_VERSION_KEY, user.session_version)
         .await
         .map_err(|e| AppError::InternalServerError(e.to_string()))?;
 
@@ -161,6 +173,15 @@ async fn update_password(
     Ok(StatusCode::NO_CONTENT)
 }
 
+async fn resend_verification(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+) -> Result<impl IntoResponse, AppError> {
+    services::user::resend_verification(&state, user).await?;
+
+    Ok(StatusCode::NO_CONTENT)
+}
+
 pub fn router() -> Router<AppState> {
     Router::new()
         .route(
@@ -190,4 +211,12 @@ pub fn router() -> Router<AppState> {
         )
         .route("/users/me/groups", get(get_current_user_groups))
         .route("/users/:id", get(get_user))
+        .route(
+            "/resend-verification",
+            post(resend_verification)
+                .route_layer(middleware::from_fn(user_limit_mw))
+                .route_layer(middleware::from_fn(ip_limit_mw))
+                .route_layer(Extension(create_user_limiter(3, 60 * 60)))
+                .route_layer(Extension(create_ip_limiter(5, 60 * 60))),
+        )
 }

@@ -7,6 +7,7 @@ use uuid::Uuid;
 use crate::{
     AppState,
     errors::{AppError, AuthError},
+    models::user::UserDb,
 };
 
 pub fn hash_password(password: &str) -> Result<String, AppError> {
