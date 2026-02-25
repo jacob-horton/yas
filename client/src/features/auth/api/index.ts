@@ -5,6 +5,8 @@ export interface AuthApiContract {
   login(email: string, password: string): Promise<User>;
   logout(): Promise<void>;
   verifyEmail(token: string): Promise<void>;
+  forgotPassword(email: string): Promise<void>;
+  resetPassword(email: string, password: string): Promise<void>;
 }
 
 class AuthApi implements AuthApiContract {
@@ -18,6 +20,14 @@ class AuthApi implements AuthApiContract {
 
   public verifyEmail(token: string): Promise<void> {
     return api.post("/verify-email", { token });
+  }
+
+  public async forgotPassword(email: string): Promise<void> {
+    return api.post("/forgot-password", { email });
+  }
+
+  public async resetPassword(token: string, password: string): Promise<void> {
+    return api.post("/reset-password", { token, password });
   }
 }
 

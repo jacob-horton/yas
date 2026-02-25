@@ -1,3 +1,4 @@
+use sha256::digest;
 use uuid::Uuid;
 
 use crate::{
@@ -52,9 +53,12 @@ pub async fn create_user(state: &AppState, payload: CreateUserReq) -> Result<Use
             _ => UserError::Database(e),
         })?;
 
-    let token = state
+    let token = Uuid::new_v4();
+    let token_hash = digest(token.to_string());
+
+    state
         .verification_repo
-        .create_verification_record(&mut *tx, &user.email)
+        .create_verification_record(&mut *tx, &user.email, &token_hash)
         .await
         .map_err(AppError::Database)?;
 
@@ -97,10 +101,13 @@ pub async fn update_email(
             _ => UserError::Database(e),
         })?;
 
+    let token = Uuid::new_v4();
+    let token_hash = digest(token.to_string());
+
     // Create a new verification token
-    let token = state
+    state
         .verification_repo
-        .create_verification_record(&mut *tx, new_email)
+        .create_verification_record(&mut *tx, new_email, &token_hash)
         .await?;
 
     tx.commit().await?;
@@ -126,9 +133,12 @@ pub async fn resend_verification(state: &AppState, user: UserDb) -> Result<(), A
         .delete_all_tokens_for_email(&mut *tx, &user.email)
         .await?;
 
-    let token = state
+    let token = Uuid::new_v4();
+    let token_hash = digest(token.to_string());
+
+    state
         .verification_repo
-        .create_verification_record(&mut *tx, &user.email)
+        .create_verification_record(&mut *tx, &user.email, &token_hash)
         .await
         .map_err(AppError::Database)?;
 

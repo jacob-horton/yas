@@ -1,22 +1,23 @@
 use chrono::{Duration, Utc};
 use sqlx::{PgExecutor, Postgres};
+use uuid::Uuid;
 
 #[derive(Debug, Clone)]
-pub struct VerificationRepo {}
+pub struct PasswordResetsRepo {}
 
-impl VerificationRepo {
-    pub async fn create_verification_record<'e>(
+impl PasswordResetsRepo {
+    pub async fn create_reset_record<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,
-        email: &str,
+        user_id: &Uuid,
         token_hash: &str,
     ) -> Result<(), sqlx::Error> {
-        let expiration = Utc::now() + Duration::hours(24);
+        let expiration = Utc::now() + Duration::minutes(15);
 
         sqlx::query(
-            "INSERT INTO email_verifications (email, token_hash, expiration) VALUES ($1, $2, $3)",
+            "INSERT INTO password_resets (user_id, token_hash, expiration) VALUES ($1, $2, $3)",
         )
-        .bind(email.to_lowercase())
+        .bind(user_id)
         .bind(token_hash)
         .bind(expiration)
         .execute(executor)
@@ -25,26 +26,26 @@ impl VerificationRepo {
         Ok(())
     }
 
-    pub async fn delete_token_and_get_email<'e>(
+    pub async fn delete_token_and_get_user_id<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,
         token_hash: &str,
-    ) -> Result<Option<String>, sqlx::Error> {
+    ) -> Result<Option<Uuid>, sqlx::Error> {
         sqlx::query_scalar(
-            "DELETE FROM email_verifications WHERE token_hash = $1 AND expiration > NOW() RETURNING email",
+            "DELETE FROM password_resets WHERE token_hash = $1 AND expiration > NOW() RETURNING user_id",
         )
         .bind(token_hash)
         .fetch_optional(executor)
         .await
     }
 
-    pub async fn delete_all_tokens_for_email<'e>(
+    pub async fn delete_all_tokens_for_user_id<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,
-        email: &str,
+        user_id: &Uuid,
     ) -> Result<(), sqlx::Error> {
-        sqlx::query("DELETE FROM email_verifications WHERE email = $1")
-            .bind(email.to_lowercase())
+        sqlx::query("DELETE FROM password_resets WHERE user_id = $1")
+            .bind(user_id)
             .execute(executor)
             .await?;
 
@@ -55,7 +56,7 @@ impl VerificationRepo {
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,
     ) -> Result<u64, sqlx::Error> {
-        let result = sqlx::query("DELETE FROM email_verifications WHERE expiration < NOW()")
+        let result = sqlx::query("DELETE FROM password_resets WHERE expiration < NOW()")
             .execute(executor)
             .await?;
 

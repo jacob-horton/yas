@@ -46,13 +46,22 @@ export const Login: Component = () => {
             Login
           </Button>
 
-          <div class="text-center text-sm">
-            <span class="text-gray-500">Don't have an account? </span>
+          <div class="flex flex-col items-center gap-1 text-center text-sm">
+            <span>
+              <span class="text-gray-500">Don't have an account? </span>
+              <A
+                href="/register"
+                class="font-semibold text-violet-600 hover:underline"
+              >
+                Sign up
+              </A>
+            </span>
+
             <A
-              href="/register"
-              class="font-semibold text-violet-600 hover:underline"
+              href="/forgot-password"
+              class="text-violet-600 text-xs hover:underline"
             >
-              Sign up
+              Forgotten password?
             </A>
           </div>
         </form>

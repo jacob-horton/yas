@@ -57,6 +57,7 @@ impl UserRepo {
         .await
     }
 
+    /// Updates password and invalidates sessions
     pub async fn update_password<'e>(
         &self,
         executor: impl PgExecutor<'e, Database = Postgres>,

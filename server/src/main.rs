@@ -26,7 +26,8 @@ use crate::{
     extractors::rate_limiting::ip::{create_ip_limiter, ip_limit_mw},
     repositories::{
         game_repo::GameRepo, group_repo::GroupRepo, invite_repo::InviteRepo, match_repo::MatchRepo,
-        stats_repo::StatsRepo, user_repo::UserRepo, verification_repo::VerificationRepo,
+        password_resets_repo::PasswordResetsRepo, stats_repo::StatsRepo, user_repo::UserRepo,
+        verification_repo::VerificationRepo,
     },
     services::email::EmailService,
 };
@@ -37,6 +38,7 @@ pub struct AppState {
 
     pub email_service: Arc<EmailService>,
 
+    pub password_resets_repo: Arc<PasswordResetsRepo>,
     pub verification_repo: Arc<VerificationRepo>,
     pub user_repo: Arc<UserRepo>,
     pub group_repo: Arc<GroupRepo>,
@@ -55,6 +57,7 @@ impl AppState {
         let match_repo = Arc::new(MatchRepo {});
         let stats_repo = Arc::new(StatsRepo {});
         let verification_repo = Arc::new(VerificationRepo {});
+        let password_resets_repo = Arc::new(PasswordResetsRepo {});
 
         let resend_client = Resend::new(&env::var("RESEND_KEY").expect("RESEND_KEY must be set"));
         let email_service = Arc::new(EmailService { resend_client });
@@ -64,6 +67,7 @@ impl AppState {
 
             email_service,
 
+            password_resets_repo,
             verification_repo,
             user_repo,
             group_repo,
@@ -122,9 +126,10 @@ async fn main() {
 
     let app_state = AppState::new(pool.clone());
 
-    // Clean up expired verification tokens each hour
+    // Clean up expired tokens each hour
     let cleanup_pool = app_state.pool.clone();
     let cleanup_verification_repo = app_state.verification_repo.clone();
+    let cleanup_password_reset_repo = app_state.password_resets_repo.clone();
     tokio::spawn(async move {
         let mut interval = tokio::time::interval(std::time::Duration::from_secs(60 * 60));
 
@@ -135,8 +140,16 @@ async fn main() {
                 .delete_expired_tokens(&cleanup_pool)
                 .await
             {
-                Ok(count) => println!("Cleaned up {} expired verification tokens", count),
-                Err(e) => eprintln!("Failed to clean up tokens: {}", e),
+                Ok(count) => println!("Cleaned up {} expired email verification tokens", count),
+                Err(e) => eprintln!("Failed to clean up email verification tokens: {}", e),
+            }
+
+            match cleanup_password_reset_repo
+                .delete_expired_tokens(&cleanup_pool)
+                .await
+            {
+                Ok(count) => println!("Cleaned up {} expired password reset tokens", count),
+                Err(e) => eprintln!("Failed to clean up password reset tokens: {}", e),
             }
         }
     });

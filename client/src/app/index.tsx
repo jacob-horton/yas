@@ -8,8 +8,10 @@ import { ToastProvider } from "@/context/toast-context";
 import { requireRole } from "@/features/auth/components/authorised-route";
 import { ProtectedRoute } from "@/features/auth/components/protected-route";
 import { AuthProvider } from "@/features/auth/context/auth-provider";
+import { ForgotPassword } from "@/features/auth/views/forgot-password";
 import { Login } from "@/features/auth/views/login";
 import { Register } from "@/features/auth/views/register";
+import { ResetPassword } from "@/features/auth/views/reset-password";
 import { VerifyEmail } from "@/features/auth/views/verify-email";
 import { CreateGame } from "@/features/games/views/create-game";
 import { EditGame } from "@/features/games/views/edit-game";
@@ -116,6 +118,11 @@ export default function App() {
 
                 <Route path="/login" component={Login} />
                 <Route path="/register" component={Register} />
+                <Route path="/forgot-password" component={ForgotPassword} />
+                <Route
+                  path="/reset-password/:token"
+                  component={ResetPassword}
+                />
               </Router>
             </div>
           </ToastProvider>

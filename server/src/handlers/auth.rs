@@ -11,7 +11,7 @@ use crate::{
         validated_json::ValidatedJson,
     },
     models::{
-        auth::{CreateSessionReq, VerifyEmailReq},
+        auth::{CreateSessionReq, ForgotPasswordReq, ResetPasswordReq, VerifyEmailReq},
         user::UserResponse,
     },
     services,
@@ -84,6 +84,45 @@ async fn verify_email(
     Ok(StatusCode::NO_CONTENT)
 }
 
+async fn forgot_password(
+    State(state): State<AppState>,
+    Json(payload): Json<ForgotPasswordReq>,
+) -> Result<impl IntoResponse, AppError> {
+    services::auth::forgot_password(&state, payload.email).await?;
+
+    Ok(StatusCode::NO_CONTENT)
+}
+
+async fn reset_password(
+    session: Session,
+    State(state): State<AppState>,
+    Json(payload): Json<ResetPasswordReq>,
+) -> Result<impl IntoResponse, AppError> {
+    let user = services::auth::reset_password(&state, payload.token, payload.password).await?;
+
+    // TODO: reduce duplication with login
+    // Cycle ID to prevent Session Fixation attacks
+    session
+        .cycle_id()
+        .await
+        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
+
+    // Create session (sets the cookie automatically)
+    session
+        .insert(SESSION_USER_KEY, user.id.to_string())
+        .await
+        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
+
+    // Save session version
+    session
+        .insert(SESSION_VERSION_KEY, user.session_version)
+        .await
+        .map_err(|e| AppError::InternalServerError(e.to_string()))?;
+
+    let response: UserResponse = user.into();
+    Ok((StatusCode::OK, Json(response)))
+}
+
 pub fn router() -> Router<AppState> {
     Router::new()
         .route(
@@ -100,5 +139,19 @@ pub fn router() -> Router<AppState> {
             post(verify_email)
                 .route_layer(middleware::from_fn(ip_limit_mw))
                 .route_layer(Extension(create_ip_limiter(10, 60 * 60))),
+        )
+        .route(
+            "/forgot-password",
+            post(forgot_password)
+                .route_layer(middleware::from_fn(ip_limit_mw))
+                .route_layer(Extension(create_ip_limiter(5, 60 * 60)))
+                .route_layer(Extension(create_payload_limiter(3, 60 * 60))),
+        )
+        .route(
+            "/reset-password",
+            post(reset_password)
+                .route_layer(middleware::from_fn(ip_limit_mw))
+                .route_layer(Extension(create_ip_limiter(5, 60 * 60)))
+                .route_layer(Extension(create_payload_limiter(3, 60 * 60))),
         )
 }

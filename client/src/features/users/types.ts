@@ -23,6 +23,19 @@ export const createUserSchema = z
   .transform(({ confirm_password, ...rest }) => rest);
 export type CreateUserRequest = z.output<typeof createUserSchema>;
 
+export const resetPasswordSchema = z
+  .object({
+    password: passwordSchema,
+    confirm_password: z.string(),
+  })
+  .refine((data) => data.password === data.confirm_password, {
+    message: "Passwords do not match",
+    path: ["confirm_password"],
+  })
+  // Remove confirm_password
+  .transform(({ confirm_password, ...rest }) => rest);
+export type ResetPasswordRequest = z.output<typeof resetPasswordSchema>;
+
 export type User = {
   id: string;
   name: string;
