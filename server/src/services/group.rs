@@ -143,6 +143,21 @@ pub async fn remove_group_member(
         return Err(GroupError::Forbidden.into());
     }
 
+    if member.user_id == member_to_remove_id {
+        // Leaving group - allow unless owner
+        if member.role == GroupMemberRole::Owner {
+            return Err(GroupError::Forbidden.into());
+        }
+    } else {
+        // Removing someone else - check perms
+        if !member
+            .role
+            .can_perform(GroupAction::RemoveMember(member_to_be_deleted.role))
+        {
+            return Err(GroupError::Forbidden.into());
+        }
+    }
+
     state
         .group_repo
         .remove_member(&state.pool, member.group_id, member_to_remove_id)

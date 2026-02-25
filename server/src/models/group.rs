@@ -73,6 +73,7 @@ impl GroupMemberRole {
             (GroupMemberRole::Admin, GroupAction::UpdateGame) => true,
             (GroupMemberRole::Admin, GroupAction::UpdateGroup) => true,
             (GroupMemberRole::Admin, GroupAction::RemoveMember(GroupMemberRole::Member)) => true,
+            (GroupMemberRole::Admin, GroupAction::RemoveMember(GroupMemberRole::Viewer)) => true,
             (
                 GroupMemberRole::Admin,
                 // Admins can promote people to admin, but not demote them

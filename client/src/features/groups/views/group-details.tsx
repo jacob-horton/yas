@@ -103,13 +103,15 @@ export const GroupDetails = () => {
       });
     }
 
-    actions.push({
-      text: "Leave",
-      onAction: handleLeave,
-      variant: "secondary",
-      danger: true,
-      icon: "logOut",
-    });
+    if (group.userRole() !== "owner") {
+      actions.push({
+        text: "Leave",
+        onAction: handleLeave,
+        variant: "secondary",
+        danger: true,
+        icon: "logOut",
+      });
+    }
 
     return actions;
   });
