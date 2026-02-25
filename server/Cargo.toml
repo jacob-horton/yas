@@ -15,7 +15,7 @@ sqlx = { version = "0.8", features = ["runtime-tokio", "tls-native-tls", "postgr
 
 # Auth & Sessions
 argon2 = "0.5" # Password hashing
-tower-sessions = "0.14"
+tower-sessions = { version = "0.14", features = ["signed"] }
 tower-sessions-sqlx-store = { version = "0.15", features = ["postgres"] }
 tower = { version = "0.5", features =["util"] }
 

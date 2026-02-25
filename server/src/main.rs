@@ -19,7 +19,7 @@ use resend_rs::Resend;
 use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::{env, net::SocketAddr, sync::Arc};
 use tower_http::cors::CorsLayer;
-use tower_sessions::ExpiredDeletion;
+use tower_sessions::{ExpiredDeletion, cookie::Key};
 use tower_sessions::{Expiry, SessionManagerLayer, cookie::SameSite};
 use tower_sessions_sqlx_store::PostgresStore;
 
@@ -104,6 +104,10 @@ async fn main() {
         .await
         .expect("Failed to init session store");
 
+    // Key for hashing sessions
+    let session_secret = env::var("SESSION_SECRET").expect("SESSION_SECRET must be set");
+    let key = Key::from(session_secret.as_bytes());
+
     let use_secure_cookies = env::var("SECURE_COOKIES").expect("SECURE_COOKIES must be set");
     let session_layer = SessionManagerLayer::new(session_store.clone())
         .with_secure(use_secure_cookies == "true")
@@ -111,7 +115,8 @@ async fn main() {
         .with_same_site(SameSite::Lax)
         .with_expiry(Expiry::OnInactivity(
             tower_sessions::cookie::time::Duration::days(30),
-        ));
+        ))
+        .with_signed(key);
 
     let cors_layer = CorsLayer::new()
         .allow_origin("http://localhost:3000".parse::<HeaderValue>().unwrap())
