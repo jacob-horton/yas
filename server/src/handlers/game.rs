@@ -112,15 +112,15 @@ async fn get_last_players(
 pub fn router() -> Router<AppState> {
     Router::new()
         .route(
-            "/groups/:group_id/games",
+            "/groups/{group_id}/games",
             post(create_game)
                 .route_layer(middleware::from_fn(ip_limit_mw))
                 .route_layer(Extension(create_ip_limiter(5, 60 * 60))),
         )
-        .route("/groups/:group_id/games", get(get_games_in_group))
-        .route("/games/:game_id", get(get_game_details))
-        .route("/games/:game_id", put(update_game))
-        .route("/games/:game_id", delete(delete_game))
-        .route("/games/:game_id/scoreboard", get(get_scoreboard))
-        .route("/games/:game_id/last-players", get(get_last_players))
+        .route("/groups/{group_id}/games", get(get_games_in_group))
+        .route("/games/{game_id}", get(get_game_details))
+        .route("/games/{game_id}", put(update_game))
+        .route("/games/{game_id}", delete(delete_game))
+        .route("/games/{game_id}/scoreboard", get(get_scoreboard))
+        .route("/games/{game_id}/last-players", get(get_last_players))
 }

@@ -52,12 +52,12 @@ pub async fn get_distributions(
 pub fn router() -> Router<AppState> {
     Router::new()
         .route(
-            "/games/:game_id/players/:player_id/history",
+            "/games/{game_id}/players/{player_id}/history",
             get(get_user_history),
         )
         .route(
-            "/games/:game_id/players/:player_id/highlights",
+            "/games/{game_id}/players/{player_id}/highlights",
             get(get_player_highlights),
         )
-        .route("/games/:game_id/distributions", get(get_distributions))
+        .route("/games/{game_id}/distributions", get(get_distributions))
 }

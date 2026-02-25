@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
+use axum::{extract::FromRequestParts, http::request::Parts};
 
 use crate::{
     AppState,
@@ -21,7 +21,6 @@ impl<T> Deref for Verified<T> {
 }
 
 // Checks email is valid for given inner type
-#[async_trait]
 impl<T> FromRequestParts<AppState> for Verified<T>
 where
     T: FromRequestParts<AppState, Rejection = AppError> + IsVerified + Send + Sync,

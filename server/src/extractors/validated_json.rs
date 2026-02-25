@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use axum::{
-    Json, async_trait,
+    Json,
     extract::{FromRequest, Request},
 };
 use serde::de::DeserializeOwned;
@@ -12,7 +12,6 @@ use crate::errors::AppError;
 pub struct ValidatedJson<T>(pub T);
 
 // Like `Json<_>` but also calls `validator::validate()` on the struct
-#[async_trait]
 impl<T, S> FromRequest<S> for ValidatedJson<T>
 where
     T: DeserializeOwned + Validate,

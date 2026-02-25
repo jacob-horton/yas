@@ -35,7 +35,7 @@ async fn create_match(
 
 pub fn router() -> Router<AppState> {
     Router::new().route(
-        "/games/:game_id/matches",
+        "/games/{game_id}/matches",
         post(create_match)
             .route_layer(middleware::from_fn(ip_limit_mw))
             .route_layer(Extension(create_ip_limiter(10, 60))),

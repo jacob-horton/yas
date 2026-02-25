@@ -1,5 +1,5 @@
 use axum::{
-    Json, async_trait,
+    Json,
     extract::{FromRequest, Request},
     http::StatusCode,
     response::{IntoResponse, Response},
@@ -24,7 +24,6 @@ pub fn create_payload_limiter(requests: u32, per_seconds: u64) -> Arc<PayloadLim
 
 pub struct RateLimitedPayload<T>(pub T);
 
-#[async_trait]
 impl<S, T, P> FromRequest<S> for RateLimitedPayload<T>
 where
     S: Send + Sync,

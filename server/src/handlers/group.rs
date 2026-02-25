@@ -113,16 +113,16 @@ pub fn router() -> Router<AppState> {
                 .route_layer(middleware::from_fn(ip_limit_mw))
                 .route_layer(Extension(create_ip_limiter(5, 60 * 60))),
         )
-        .route("/groups/:group_id", get(get_group_details))
-        .route("/groups/:group_id", put(update_group))
-        .route("/groups/:group_id", delete(delete_group))
-        .route("/groups/:group_id/members", get(get_group_members))
+        .route("/groups/{group_id}", get(get_group_details))
+        .route("/groups/{group_id}", put(update_group))
+        .route("/groups/{group_id}", delete(delete_group))
+        .route("/groups/{group_id}/members", get(get_group_members))
         .route(
-            "/groups/:group_id/member/:member_id",
+            "/groups/{group_id}/member/{member_id}",
             delete(remove_group_member),
         )
         .route(
-            "/groups/:group_id/member/:member_id/role",
+            "/groups/{group_id}/member/{member_id}/role",
             put(set_member_role),
         )
 }

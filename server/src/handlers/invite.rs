@@ -118,7 +118,7 @@ async fn accept_invite(
 pub fn router() -> Router<AppState> {
     Router::new()
         .route(
-            "/groups/:group_id/invites",
+            "/groups/{group_id}/invites",
             post(create_invite)
                 .route_layer(middleware::from_fn(user_limit_mw))
                 .route_layer(Extension(create_user_limiter(20, 60 * 60 * 24)))
@@ -126,22 +126,22 @@ pub fn router() -> Router<AppState> {
                 .route_layer(Extension(create_ip_limiter(10, 60 * 60))),
         )
         .route(
-            "/groups/:group_id/invites",
+            "/groups/{group_id}/invites",
             get(get_group_invites)
                 .route_layer(middleware::from_fn(ip_limit_mw))
                 .route_layer(Extension(create_ip_limiter(20, 60))),
         )
         .route(
-            "/invites/:invite_code/accept",
+            "/invites/{invite_code}/accept",
             post(accept_invite)
                 .route_layer(middleware::from_fn(ip_limit_mw))
                 .route_layer(Extension(create_ip_limiter(20, 60))),
         )
         .route(
-            "/invites/:invite_code",
+            "/invites/{invite_code}",
             get(get_invite)
                 .route_layer(middleware::from_fn(ip_limit_mw))
                 .route_layer(Extension(create_ip_limiter(20, 60))),
         )
-        .route("/invites/:invite_code", delete(delete_invite))
+        .route("/invites/{invite_code}", delete(delete_invite))
 }

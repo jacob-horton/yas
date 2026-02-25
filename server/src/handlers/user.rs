@@ -210,7 +210,7 @@ pub fn router() -> Router<AppState> {
                 .route_layer(Extension(create_ip_limiter(5, 3600))),
         )
         .route("/users/me/groups", get(get_current_user_groups))
-        .route("/users/:id", get(get_user))
+        .route("/users/{id}", get(get_user))
         .route(
             "/resend-verification",
             post(resend_verification)

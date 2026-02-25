@@ -19,6 +19,7 @@ use resend_rs::Resend;
 use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::{env, net::SocketAddr, sync::Arc};
 use tower_http::cors::CorsLayer;
+use tower_sessions::ExpiredDeletion;
 use tower_sessions::{Expiry, SessionManagerLayer, cookie::SameSite};
 use tower_sessions_sqlx_store::PostgresStore;
 
@@ -104,7 +105,7 @@ async fn main() {
         .expect("Failed to init session store");
 
     let use_secure_cookies = env::var("SECURE_COOKIES").expect("SECURE_COOKIES must be set");
-    let session_layer = SessionManagerLayer::new(session_store)
+    let session_layer = SessionManagerLayer::new(session_store.clone())
         .with_secure(use_secure_cookies == "true")
         .with_http_only(true)
         .with_same_site(SameSite::Lax)
@@ -130,11 +131,12 @@ async fn main() {
     let cleanup_pool = app_state.pool.clone();
     let cleanup_verification_repo = app_state.verification_repo.clone();
     let cleanup_password_reset_repo = app_state.password_resets_repo.clone();
+    let cleanup_session_store = session_store.clone();
     tokio::spawn(async move {
         let mut interval = tokio::time::interval(std::time::Duration::from_secs(60 * 60));
 
         loop {
-            interval.tick().await; // Wait for the next tick
+            interval.tick().await;
 
             match cleanup_verification_repo
                 .delete_expired_tokens(&cleanup_pool)
@@ -150,6 +152,11 @@ async fn main() {
             {
                 Ok(count) => println!("Cleaned up {} expired password reset tokens", count),
                 Err(e) => eprintln!("Failed to clean up password reset tokens: {}", e),
+            }
+
+            match cleanup_session_store.delete_expired().await {
+                Ok(()) => println!("Cleaned up expired sessions"),
+                Err(e) => eprintln!("Failed to clean up expired sessions: {}", e),
             }
         }
     });

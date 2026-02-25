@@ -1,5 +1,4 @@
 use axum::{
-    async_trait,
     extract::{FromRequestParts, Path},
     http::request::Parts,
 };
@@ -31,7 +30,6 @@ impl IsVerified for AuthMember {
     }
 }
 
-#[async_trait]
 impl FromRequestParts<AppState> for AuthMember {
     type Rejection = AppError;
 

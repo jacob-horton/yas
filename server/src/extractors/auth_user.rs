@@ -7,7 +7,7 @@ use crate::{
     extractors::verified::IsVerified,
     models::user::UserDb,
 };
-use axum::{async_trait, extract::FromRequestParts, http::request::Parts};
+use axum::{extract::FromRequestParts, http::request::Parts};
 use tower_sessions::Session;
 use uuid::Uuid;
 
@@ -21,7 +21,6 @@ impl Deref for AuthUser {
 }
 
 // Checks user is authenticated from session cookie
-#[async_trait]
 impl FromRequestParts<AppState> for AuthUser {
     type Rejection = AppError;
 
