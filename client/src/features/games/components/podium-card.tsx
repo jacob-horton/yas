@@ -38,12 +38,13 @@ export const PodiumCard: Component<{
       >
         {ordinalSuffix(props.position)}
         <div class="-translate-y-1/2 absolute top-full flex size-20 items-center justify-center rounded-full border bg-white p-2 dark:bg-gray-800">
-          <Show
-            when={props.stats}
-            fallback={<AvatarSkeleton class="size-10" />}
-          >
+          <Show when={props.stats} fallback={<AvatarSkeleton />}>
             {(stats) => (
-              <Avatar colour={stats().avatarColour} avatar={stats().avatar} />
+              <Avatar
+                class="size-14"
+                colour={stats().avatarColour}
+                avatar={stats().avatar}
+              />
             )}
           </Show>
         </div>
