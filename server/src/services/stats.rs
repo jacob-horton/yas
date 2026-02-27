@@ -82,36 +82,71 @@ pub async fn get_scoreboard_and_stats(
     Ok(scoreboard)
 }
 
+#[derive(Debug, Clone, Default)]
+struct Medals {
+    star: u32,
+    gold: u32,
+    silver: u32,
+    bronze: u32,
+}
+
+impl Medals {
+    fn count_medal(&mut self, score: i32, thresholds: &MedalsThresholds) {
+        if thresholds.star.is_some_and(|t| score >= t) {
+            self.star += 1;
+        } else if thresholds.gold.is_some_and(|t| score >= t) {
+            self.gold += 1;
+        } else if thresholds.silver.is_some_and(|t| score >= t) {
+            self.silver += 1;
+        } else if thresholds.bronze.is_some_and(|t| score >= t) {
+            self.bronze += 1;
+        }
+    }
+}
+
+pub struct MedalsThresholds {
+    pub star: Option<i32>,
+    pub gold: Option<i32>,
+    pub silver: Option<i32>,
+    pub bronze: Option<i32>,
+}
+
+#[derive(Debug, Clone, Default)]
 struct PlayerStats {
     matches_played: i64,
     average_score: f64,
     wins: i64,
     best_score: i32,
     win_rate: f64,
+
+    medals: Medals,
 }
 
-fn calculate_stats(matches: &[RawMatchStats]) -> PlayerStats {
-    let matches_played = matches.len() as i64;
+fn calculate_stats(matches: &[RawMatchStats], thresholds: MedalsThresholds) -> PlayerStats {
+    let mut stats = PlayerStats::default();
+    let mut sum_score = 0;
+    let count = matches.len() as i64;
 
-    let sum_score: i32 = matches.iter().map(|m| m.score).sum();
-    let best_score: i32 = matches.iter().map(|m| m.score).max().unwrap_or(0);
-
-    let average_score = if matches_played > 0 {
-        sum_score as f64 / matches_played as f64
-    } else {
-        0.0
-    };
-
-    let total_wins = matches.iter().filter(|m| m.rank_in_match == 1).count();
-    let win_rate = total_wins as f64 / matches_played as f64;
-
-    PlayerStats {
-        matches_played,
-        average_score,
-        wins: total_wins as i64,
-        best_score,
-        win_rate,
+    if count == 0 {
+        return stats;
     }
+
+    for m in matches {
+        sum_score += m.score;
+        stats.best_score = stats.best_score.max(m.score);
+
+        if m.rank_in_match == 1 {
+            stats.wins += 1;
+        }
+
+        stats.medals.count_medal(m.score, &thresholds);
+    }
+
+    stats.matches_played = count;
+    stats.average_score = sum_score as f64 / count as f64;
+    stats.win_rate = stats.wins as f64 / count as f64;
+
+    stats
 }
 
 async fn get_scoreboard_entries(
@@ -145,7 +180,16 @@ async fn get_scoreboard_entries(
         let user_avatar_colour = matches[0].avatar_colour.clone();
 
         // Calculate current stats
-        let current_stats = calculate_stats(&matches);
+        let current_stats = calculate_stats(
+            &matches,
+            MedalsThresholds {
+                star: game.star_threshold,
+                gold: game.gold_threshold,
+                silver: game.silver_threshold,
+                bronze: game.bronze_threshold,
+            },
+        );
+
         entries.push(ScoreboardEntry {
             user_id,
             user_name: user_name.clone(),
@@ -156,6 +200,11 @@ async fn get_scoreboard_entries(
             best_score: current_stats.best_score,
             wins: current_stats.wins,
             win_rate: current_stats.win_rate,
+
+            star_medals: current_stats.medals.star,
+            gold_medals: current_stats.medals.gold,
+            silver_medals: current_stats.medals.silver,
+            bronze_medals: current_stats.medals.bronze,
 
             rank: 0,
 
@@ -169,7 +218,17 @@ async fn get_scoreboard_entries(
             .into_iter()
             .filter(|m| m.match_id != most_recent_match)
             .collect();
-        let prev_stats = calculate_stats(&prev_matches);
+
+        let prev_stats = calculate_stats(
+            &prev_matches,
+            MedalsThresholds {
+                star: game.star_threshold,
+                gold: game.gold_threshold,
+                silver: game.silver_threshold,
+                bronze: game.bronze_threshold,
+            },
+        );
+
         prev_entries.push(ScoreboardEntry {
             // TODO: a lot of data that isn't used here - maybe simplify?
             user_id,
@@ -181,6 +240,11 @@ async fn get_scoreboard_entries(
             best_score: prev_stats.best_score,
             wins: prev_stats.wins,
             win_rate: prev_stats.win_rate,
+
+            star_medals: prev_stats.medals.star,
+            gold_medals: prev_stats.medals.gold,
+            silver_medals: prev_stats.medals.silver,
+            bronze_medals: prev_stats.medals.bronze,
 
             rank: 0,
 

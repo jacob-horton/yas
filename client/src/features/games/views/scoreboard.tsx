@@ -1,5 +1,13 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { createMemo, createSignal, For, Show, Suspense } from "solid-js";
+import {
+  type Component,
+  createEffect,
+  createMemo,
+  createSignal,
+  For,
+  Show,
+  Suspense,
+} from "solid-js";
 import DataSvg from "@/assets/empty-states/data.svg";
 import { Container } from "@/components/layout/container";
 import { type Action, Page } from "@/components/layout/page";
@@ -24,8 +32,20 @@ import { PodiumCard } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams, ScoringMetric } from "../types/game";
+import { MEDAL_MAP } from "./create-game";
 
 const TABLE_CAPTION = "Stats of all players playing this game";
+
+const Medal: Component<{ medal: string; count: number }> = (props) => {
+  return (
+    <Show when={props.count > 0}>
+      <span>
+        {props.count}
+        {props.medal}
+      </span>
+    </Show>
+  );
+};
 
 export const Scoreboard = () => {
   const params = useParams<GameRouteParams>();
@@ -55,16 +75,33 @@ export const Scoreboard = () => {
     } satisfies Sort<ScoringMetric>;
   };
 
-  const tableHeadings = [
-    { label: "Rank", class: "w-12" },
-    { label: "Name", sortProp: "name" },
-    { label: "Win Rate", sortProp: "win_rate", defaultDirection: "descending" },
-    {
-      label: "Points/Game",
-      sortProp: "average_score",
-      defaultDirection: "descending",
-    },
-  ] as const satisfies Heading<string>[];
+  const hasMedals = () =>
+    !!(
+      scoreboardData.data?.game.star_threshold ??
+      scoreboardData.data?.game.gold_threshold ??
+      scoreboardData.data?.game.silver_threshold ??
+      scoreboardData.data?.game.bronze_threshold
+    );
+
+  createEffect(() => console.log(hasMedals()));
+
+  const tableHeadings = () =>
+    [
+      { label: "Rank", class: "w-12" },
+      { label: "Name", sortProp: "name" },
+      ...(hasMedals() ? [{ label: "Medals" }] : []),
+      {
+        label: "Win Rate",
+        sortProp: "win_rate",
+        defaultDirection: "descending",
+        class: "w-1/3",
+      },
+      {
+        label: "Points/Game",
+        sortProp: "average_score",
+        defaultDirection: "descending",
+      },
+    ] as const satisfies Heading<string>[];
 
   const actions = createMemo(() => {
     const actions: Action[] = [];
@@ -222,7 +259,7 @@ export const Scoreboard = () => {
             <Table
               sortedBy={effectiveSort()}
               onSort={setSort}
-              headings={tableHeadings}
+              headings={tableHeadings()}
               caption={TABLE_CAPTION}
             >
               <Suspense fallback={<TableRowSkeleton numCols={4} />}>
@@ -247,14 +284,29 @@ export const Scoreboard = () => {
                           <Change value={score.rank_diff} />
                         </span>
                       </TableCell>
-                      <TableCell class="flex items-center gap-3">
-                        <Avatar
-                          class="size-7"
-                          avatar={score.user_avatar}
-                          colour={score.user_avatar_colour}
-                        />
-                        {score.user_name}
+
+                      <TableCell>
+                        <span class="inline-flex items-center gap-3">
+                          <Avatar
+                            class="size-7"
+                            avatar={score.user_avatar}
+                            colour={score.user_avatar_colour}
+                          />
+                          {score.user_name}
+                        </span>
                       </TableCell>
+
+                      <Show when={hasMedals()}>
+                        <TableCell>
+                          <span class="flex gap-3">
+                            <Medal count={score.star_medals} medal={MEDAL_MAP.star} />
+                            <Medal count={score.gold_medals} medal={MEDAL_MAP.gold} />
+                            <Medal count={score.silver_medals} medal={MEDAL_MAP.silver} />
+                            <Medal count={score.bronze_medals} medal={MEDAL_MAP.bronze} />
+                          </span>
+                        </TableCell>
+                      </Show>
+
                       <TableCell>
                         <span class="flex w-4/5 min-w-32 items-center gap-2">
                           <ProgressBar percentage={score.win_rate * 100} />
@@ -266,6 +318,7 @@ export const Scoreboard = () => {
                           </span>
                         </span>
                       </TableCell>
+
                       <TableCell>
                         <span class="flex items-center gap-2">
                           {score.average_score.toFixed(2)}

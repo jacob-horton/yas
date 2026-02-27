@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "@solidjs/router";
 import type { Component } from "solid-js";
-import { Show } from "solid-js";
-import { FormPage } from "@/components/layout/form-page";
+import { For, Show } from "solid-js";
+import { FormPage, FormSection } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import { SCORING_METRIC_LABELS } from "../constants";
 import { useDeleteGame } from "../hooks/use-delete-game";
 import { useUpdateGame } from "../hooks/use-update-game";
 import { type Game, scoringMetrics, updateGameSchema } from "../types/game";
+import { MEDAL_MAP, type MedalType } from "./create-game";
 
 type Props = {
   initialData: Game;
@@ -32,6 +33,12 @@ const EditGameForm: Component<Props> = (props) => {
     name: props.initialData.name,
     players_per_match: props.initialData.players_per_match.toString(),
     metric: props.initialData.metric,
+    medal_scores: {
+      star: props.initialData.star_threshold?.toString() ?? "",
+      gold: props.initialData.gold_threshold?.toString() ?? "",
+      silver: props.initialData.silver_threshold?.toString() ?? "",
+      bronze: props.initialData.bronze_threshold?.toString() ?? "",
+    },
   });
 
   async function handleSubmit(e: SubmitEvent) {
@@ -96,33 +103,56 @@ const EditGameForm: Component<Props> = (props) => {
         },
       ]}
     >
-      <Input
-        label="Name"
-        value={values.name}
-        onChange={(val) => setField("name", val)}
-        placeholder="e.g. Mario Kart Wii"
-        error={errors.name}
-      />
+      <FormSection title="Details">
+        <Input
+          label="Name"
+          value={values.name}
+          onChange={(val) => setField("name", val)}
+          placeholder="e.g. Mario Kart Wii"
+          error={errors.name}
+        />
 
-      {/* TODO: tooltips to explain these inputs */}
-      <Input
-        label="Number of players per match"
-        value={values.players_per_match}
-        onChange={(val) => setField("players_per_match", val)}
-        placeholder="e.g. 4"
-        error={errors.players_per_match}
-      />
+        {/* TODO: tooltips to explain these inputs */}
+        <Input
+          label="Number of players per match"
+          value={values.players_per_match}
+          onChange={(val) => setField("players_per_match", val)}
+          placeholder="e.g. 4"
+          error={errors.players_per_match}
+        />
 
-      <Dropdown
-        label="Scoring metric"
-        value={values.metric}
-        onChange={(val) => setField("metric", val)}
-        options={scoringMetrics.map((m) => ({
-          label: SCORING_METRIC_LABELS[m],
-          value: m,
-        }))}
-        error={errors.metric}
-      />
+        <Dropdown
+          label="Scoring metric"
+          value={values.metric}
+          onChange={(val) => setField("metric", val)}
+          options={scoringMetrics.map((m) => ({
+            label: SCORING_METRIC_LABELS[m],
+            value: m,
+          }))}
+          error={errors.metric}
+        />
+      </FormSection>
+
+      <FormSection title="Medals">
+        <div class="grid max-w-96 grid-cols-2 gap-6">
+          <For each={Object.entries(MEDAL_MAP)}>
+            {([medal, emoji], i) => {
+              return (
+                <Input
+                  label={`Number of points for ${emoji}`}
+                  inputMode="numeric"
+                  value={values.medal_scores[medal as MedalType]}
+                  onChange={(val) =>
+                    setField("medal_scores", medal as MedalType, val)
+                  }
+                  placeholder={`e.g. ${((3 - i()) / 5) * 25 + 75}`}
+                  error={errors[`medal_scores.${medal as MedalType}`]}
+                />
+              );
+            }}
+          </For>
+        </div>
+      </FormSection>
 
       <span class="flex gap-4">
         <Button type="submit" loading={updateGame.isPending}>

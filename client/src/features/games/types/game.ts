@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { numericStringSchema } from "@/lib/zod/schemas";
+import {
+  nullableNumericStringSchema,
+  numericStringSchema,
+} from "@/lib/zod/schemas";
 
 export const scoringMetrics = ["win_rate", "average_score"] as const;
 export type ScoringMetric = (typeof scoringMetrics)[number];
@@ -14,7 +17,19 @@ export type Game = {
   created_at: string;
   players_per_match: number;
   metric: ScoringMetric;
+
+  star_threshold: number | null;
+  gold_threshold: number | null;
+  silver_threshold: number | null;
+  bronze_threshold: number | null;
 };
+
+const medalScoresSchema = z.object({
+  star: nullableNumericStringSchema,
+  gold: nullableNumericStringSchema,
+  silver: nullableNumericStringSchema,
+  bronze: nullableNumericStringSchema,
+});
 
 export const createGameSchema = z.object({
   name: z
@@ -31,6 +46,8 @@ export const createGameSchema = z.object({
   ),
 
   metric: z.string().pipe(z.enum(scoringMetrics)),
+
+  medal_scores: medalScoresSchema,
 });
 export type CreateGameRequest = z.output<typeof createGameSchema>;
 
@@ -49,5 +66,7 @@ export const updateGameSchema = z.object({
   ),
 
   metric: z.string().pipe(z.enum(scoringMetrics)),
+
+  medal_scores: medalScoresSchema,
 });
 export type UpdateGameRequest = z.output<typeof updateGameSchema>;

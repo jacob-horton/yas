@@ -13,6 +13,11 @@ pub struct GameDb {
     pub created_at: DateTime<Utc>,
     pub players_per_match: i32,
     pub metric: ScoringMetric,
+
+    pub star_threshold: Option<i32>,
+    pub gold_threshold: Option<i32>,
+    pub silver_threshold: Option<i32>,
+    pub bronze_threshold: Option<i32>,
 }
 
 #[derive(Debug, Serialize)]
@@ -23,6 +28,11 @@ pub struct GameResponse {
     pub created_at: DateTime<Utc>,
     pub players_per_match: i32,
     pub metric: ScoringMetric,
+
+    pub star_threshold: Option<i32>,
+    pub gold_threshold: Option<i32>,
+    pub silver_threshold: Option<i32>,
+    pub bronze_threshold: Option<i32>,
 }
 
 impl From<GameDb> for GameResponse {
@@ -34,6 +44,11 @@ impl From<GameDb> for GameResponse {
             created_at: game.created_at,
             players_per_match: game.players_per_match,
             metric: game.metric,
+
+            star_threshold: game.star_threshold,
+            gold_threshold: game.gold_threshold,
+            silver_threshold: game.silver_threshold,
+            bronze_threshold: game.bronze_threshold,
         }
     }
 }
@@ -65,6 +80,14 @@ impl From<ScoringMetric> for OrderBy {
 }
 
 #[derive(Debug, Deserialize, Validate)]
+pub struct GameMedals {
+    pub star: Option<i32>,
+    pub gold: Option<i32>,
+    pub silver: Option<i32>,
+    pub bronze: Option<i32>,
+}
+
+#[derive(Debug, Deserialize, Validate)]
 pub struct CreateGameReq {
     #[validate(length(min = 3, max = 50, message = "Name must be between 3 and 50 chars"))]
     #[serde(deserialize_with = "trim_string")]
@@ -78,6 +101,7 @@ pub struct CreateGameReq {
     pub players_per_match: i32,
 
     pub metric: ScoringMetric,
+    pub medal_scores: GameMedals,
 }
 
 #[derive(Debug, Deserialize, Validate)]
@@ -94,4 +118,5 @@ pub struct UpdateGameReq {
     pub players_per_match: i32,
 
     pub metric: ScoringMetric,
+    pub medal_scores: GameMedals,
 }

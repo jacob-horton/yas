@@ -23,6 +23,10 @@ pub async fn create_game(
             &payload.name,
             payload.players_per_match,
             payload.metric,
+            payload.medal_scores.star,
+            payload.medal_scores.gold,
+            payload.medal_scores.silver,
+            payload.medal_scores.bronze,
         )
         .await
         .map_err(GameError::Database)?;
@@ -49,6 +53,10 @@ pub async fn update_game(
             &payload.name,
             payload.players_per_match,
             payload.metric,
+            payload.medal_scores.star,
+            payload.medal_scores.gold,
+            payload.medal_scores.silver,
+            payload.medal_scores.bronze,
         )
         .await
         .map_err(GameError::Database)?;

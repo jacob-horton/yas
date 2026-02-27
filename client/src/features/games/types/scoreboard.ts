@@ -38,6 +38,11 @@ export type ScoreboardEntry = {
   wins: number;
   rank: number;
 
+  star_medals: number;
+  gold_medals: number;
+  silver_medals: number;
+  bronze_medals: number;
+
   rank_diff: number;
   average_score_diff: number;
   win_rate_diff: number;

@@ -19,3 +19,17 @@ export const FormPage: ParentComponent<Props> = (props) => {
     </Page>
   );
 };
+
+type FormSectionProps = {
+  title: string;
+};
+
+export const FormSection: ParentComponent<FormSectionProps> = (props) => {
+  return (
+    <section class="flex flex-col gap-2">
+      <h2 class="font-semibold">{props.title}</h2>
+
+      <div class="flex flex-col gap-6">{props.children}</div>
+    </section>
+  );
+};

@@ -59,6 +59,11 @@ pub struct ScoreboardEntry {
     pub wins: i64,
     pub win_rate: f64,
 
+    pub star_medals: u32,
+    pub gold_medals: u32,
+    pub silver_medals: u32,
+    pub bronze_medals: u32,
+
     pub rank: i32,
 
     pub rank_diff: i32,
@@ -116,6 +121,11 @@ pub struct ScoreboardEntryResponse {
     pub wins: i64,
     pub win_rate: f64,
 
+    pub star_medals: u32,
+    pub gold_medals: u32,
+    pub silver_medals: u32,
+    pub bronze_medals: u32,
+
     pub rank_diff: i32,
     pub average_score_diff: f64,
     pub win_rate_diff: f64,
@@ -133,6 +143,11 @@ impl From<ScoreboardEntry> for ScoreboardEntryResponse {
             average_score: entry.average_score,
             wins: entry.wins,
             win_rate: entry.win_rate,
+
+            star_medals: entry.star_medals,
+            gold_medals: entry.gold_medals,
+            silver_medals: entry.silver_medals,
+            bronze_medals: entry.bronze_medals,
 
             rank_diff: entry.rank_diff,
             average_score_diff: entry.average_score_diff,
