@@ -21,7 +21,7 @@ import { useDeleteInvite } from "@/features/invites/hooks/use-delete-invite";
 import type { InviteSummary } from "@/features/invites/types/invite";
 import { cn } from "@/lib/classname";
 import { isExpired } from "@/lib/expiry";
-import { formatDate, formatDateTime } from "@/lib/format-date";
+import { formatDate } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupInvites } from "../hooks/use-group-invites";
 import { hasPermission } from "../types";
@@ -35,7 +35,7 @@ const ExpiryCell: Component<ExpiryCellProps> = (props) => {
   return (
     <div class="flex flex-col">
       <span class={cn({ "text-red-500": expired })}>
-        {formatDateTime(props.expiresAt)}
+        {formatDate(props.expiresAt)}
       </span>
       <span
         class={cn("text-sm", {

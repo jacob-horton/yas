@@ -1,3 +1,4 @@
+import type { DateValue } from "@ark-ui/solid";
 import { z } from "zod";
 
 export const passwordSchema = z
@@ -20,24 +21,25 @@ export const nullableNumericStringSchema = z
   .pipe(z.number("Please enter a valid number").nullable());
 
 export const futureDateSchema = z
-  .string()
-  .refine((val) => !Number.isNaN(Date.parse(val)), {
-    message: "Must be a valid date and time",
+  .custom<DateValue>((val) => val !== undefined && val !== null && val !== "", {
+    message: "Must be a valid date",
   })
   .refine(
     (val) => {
-      const inputDate = new Date(val);
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      const inputDate = val.toDate(tz);
       const now = new Date();
       return inputDate > now;
     },
-    { message: "Date and time must be in the future" },
+    { message: "Date must be in the future" },
   )
-  .transform((val) => new Date(val).toISOString());
+  .transform((val) => {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return val.toDate(tz).toISOString();
+  });
 
 export const nullableFutureDateSchema = z
-  .string()
-  .transform((val) => {
-    if (val.trim() === "") return null;
-    return val;
-  })
+  .custom<DateValue | null | undefined>()
+  .transform((val) => val ?? null)
   .pipe(futureDateSchema.nullable());

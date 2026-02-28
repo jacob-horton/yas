@@ -50,7 +50,6 @@ export const Dropdown: Component<{
           },
         )}
       >
-        {/* Visual indicator bar */}
         <div
           class={cn("h-full w-2 rounded-l-sm transition", {
             "group-data-[focus]:bg-violet-500 group-data-[state=open]:bg-violet-500":

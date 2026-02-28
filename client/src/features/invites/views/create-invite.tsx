@@ -1,6 +1,7 @@
 import { useNavigate } from "@solidjs/router";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { TagInput } from "@/components/ui/tag-input";
 import { useToast } from "@/context/toast-context";
@@ -20,7 +21,7 @@ export const CreateInvite = () => {
     createInviteSchema,
     {
       name: "",
-      expires_at: "",
+      expires_at: undefined,
       max_uses: "",
       email_whitelist: [],
     },
@@ -59,9 +60,9 @@ export const CreateInvite = () => {
         placeholder="e.g. Friends"
         error={errors.name}
       />
-      <Input
-        type="datetime-local"
-        value={values.expires_at}
+
+      <DatePicker
+        value={values.expires_at ?? undefined}
         onChange={(val) => setField("expires_at", val)}
         label="Expires At"
         error={errors.expires_at}
