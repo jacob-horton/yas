@@ -53,9 +53,7 @@ export const VerifyEmail: Component = () => {
             <p class="mt-2 text-gray-700">{error()}</p>
           </div>
 
-          <Button type="button" href="/login">
-            Back to Login
-          </Button>
+          <Button href="/login">Back to Login</Button>
         </div>
       </Show>
     </main>

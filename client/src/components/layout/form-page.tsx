@@ -1,4 +1,5 @@
-import type { JSX, ParentComponent } from "solid-js";
+import { type JSX, type ParentComponent, Show } from "solid-js";
+import { Checkbox } from "../ui/checkbox";
 import { Container } from "./container";
 import { type Action, Page } from "./page";
 
@@ -22,14 +23,23 @@ export const FormPage: ParentComponent<Props> = (props) => {
 
 type FormSectionProps = {
   title: string;
+  enabled?: boolean;
+  onToggle?: (enabled: boolean) => void;
 };
 
 export const FormSection: ParentComponent<FormSectionProps> = (props) => {
   return (
     <section class="flex flex-col gap-2">
-      <h2 class="font-semibold">{props.title}</h2>
+      <span class="inline-flex gap-2">
+        <Show when={props.enabled !== undefined}>
+          <Checkbox checked={props.enabled} onCheckedChange={props.onToggle} />
+        </Show>
+        <h2 class="font-semibold">{props.title}</h2>
+      </span>
 
-      <div class="flex flex-col gap-6">{props.children}</div>
+      <Show when={props.enabled === undefined || props.enabled}>
+        <div class="flex flex-col gap-6">{props.children}</div>
+      </Show>
     </section>
   );
 };

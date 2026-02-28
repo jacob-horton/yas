@@ -51,7 +51,6 @@ export const Button: ParentComponent<ButtonProps> = (props) => {
   ]);
 
   const isDisabled = () => {
-    console.log("recalculating disabled", local.disabled);
     return local.loading || local.disabled;
   };
 

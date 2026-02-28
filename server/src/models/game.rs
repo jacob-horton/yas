@@ -79,7 +79,7 @@ impl From<ScoringMetric> for OrderBy {
     }
 }
 
-#[derive(Debug, Deserialize, Validate)]
+#[derive(Debug, Deserialize, Validate, Clone, Copy)]
 pub struct GameMedals {
     pub star: Option<i32>,
     pub gold: Option<i32>,
@@ -101,7 +101,7 @@ pub struct CreateGameReq {
     pub players_per_match: i32,
 
     pub metric: ScoringMetric,
-    pub medal_scores: GameMedals,
+    pub medal_scores: Option<GameMedals>,
 }
 
 #[derive(Debug, Deserialize, Validate)]
@@ -118,5 +118,5 @@ pub struct UpdateGameReq {
     pub players_per_match: i32,
 
     pub metric: ScoringMetric,
-    pub medal_scores: GameMedals,
+    pub medal_scores: Option<GameMedals>,
 }

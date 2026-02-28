@@ -30,13 +30,22 @@ export const CreateGame = () => {
     name: "",
     players_per_match: "",
     metric: scoringMetrics[0],
-    medal_scores: {
-      star: "",
-      gold: "",
-      silver: "",
-      bronze: "",
-    },
+    medal_scores: undefined,
   });
+
+  const isMedalsEnabled = () => !!values.medal_scores;
+  const toggleMedals = (checked: boolean) => {
+    if (checked) {
+      setField("medal_scores", {
+        star: "",
+        gold: "",
+        silver: "",
+        bronze: "",
+      });
+    } else {
+      setField("medal_scores", undefined);
+    }
+  };
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
@@ -91,7 +100,11 @@ export const CreateGame = () => {
         />
       </FormSection>
 
-      <FormSection title="Medals">
+      <FormSection
+        title="Medals"
+        enabled={isMedalsEnabled()}
+        onToggle={toggleMedals}
+      >
         <div class="grid max-w-96 grid-cols-2 gap-6">
           <For each={Object.entries(MEDAL_MAP)}>
             {([medal, emoji], i) => {
@@ -99,7 +112,8 @@ export const CreateGame = () => {
                 <Input
                   label={`Number of points for ${emoji}`}
                   inputMode="numeric"
-                  value={values.medal_scores[medal as MedalType]}
+                  // biome-ignore lint/style/noNonNullAssertion: Will only show when medal_scores is defined
+                  value={values.medal_scores![medal as MedalType]}
                   onChange={(val) =>
                     setField("medal_scores", medal as MedalType, val)
                   }

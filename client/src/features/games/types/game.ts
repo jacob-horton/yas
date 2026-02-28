@@ -24,12 +24,14 @@ export type Game = {
   bronze_threshold: number | null;
 };
 
-const medalScoresSchema = z.object({
-  star: nullableNumericStringSchema,
-  gold: nullableNumericStringSchema,
-  silver: nullableNumericStringSchema,
-  bronze: nullableNumericStringSchema,
-});
+const medalScoresSchema = z
+  .object({
+    star: nullableNumericStringSchema,
+    gold: nullableNumericStringSchema,
+    silver: nullableNumericStringSchema,
+    bronze: nullableNumericStringSchema,
+  })
+  .optional();
 
 export const createGameSchema = z.object({
   name: z
@@ -67,6 +69,13 @@ export const updateGameSchema = z.object({
 
   metric: z.string().pipe(z.enum(scoringMetrics)),
 
-  medal_scores: medalScoresSchema,
+  medal_scores: z
+    .object({
+      star: nullableNumericStringSchema,
+      gold: nullableNumericStringSchema,
+      silver: nullableNumericStringSchema,
+      bronze: nullableNumericStringSchema,
+    })
+    .optional(),
 });
 export type UpdateGameRequest = z.output<typeof updateGameSchema>;

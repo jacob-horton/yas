@@ -5,7 +5,11 @@ import type { z } from "zod";
 type Path<T> = T extends object
   ? {
       [K in keyof T]: K extends string | number
-        ? `${K}` | (T[K] extends object ? `${K}.${Path<T[K]>}` : never)
+        ?
+            | `${K}`
+            | (NonNullable<T[K]> extends object
+                ? `${K}.${Path<NonNullable<T[K]>>}`
+                : never)
         : never;
     }[keyof T]
   : never;

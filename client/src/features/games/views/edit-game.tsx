@@ -33,13 +33,34 @@ const EditGameForm: Component<Props> = (props) => {
     name: props.initialData.name,
     players_per_match: props.initialData.players_per_match.toString(),
     metric: props.initialData.metric,
-    medal_scores: {
-      star: props.initialData.star_threshold?.toString() ?? "",
-      gold: props.initialData.gold_threshold?.toString() ?? "",
-      silver: props.initialData.silver_threshold?.toString() ?? "",
-      bronze: props.initialData.bronze_threshold?.toString() ?? "",
-    },
+
+    medal_scores:
+      (props.initialData.star_threshold ??
+        props.initialData.gold_threshold ??
+        props.initialData.silver_threshold ??
+        props.initialData.bronze_threshold) !== null
+        ? {
+            star: props.initialData.star_threshold?.toString() ?? "",
+            gold: props.initialData.gold_threshold?.toString() ?? "",
+            silver: props.initialData.silver_threshold?.toString() ?? "",
+            bronze: props.initialData.bronze_threshold?.toString() ?? "",
+          }
+        : undefined,
   });
+
+  const isMedalsEnabled = () => !!values.medal_scores;
+  const toggleMedals = (checked: boolean) => {
+    if (checked) {
+      setField("medal_scores", {
+        star: "",
+        gold: "",
+        silver: "",
+        bronze: "",
+      });
+    } else {
+      setField("medal_scores", undefined);
+    }
+  };
 
   async function handleSubmit(e: SubmitEvent) {
     e.preventDefault();
@@ -133,7 +154,11 @@ const EditGameForm: Component<Props> = (props) => {
         />
       </FormSection>
 
-      <FormSection title="Medals">
+      <FormSection
+        title="Medals"
+        enabled={isMedalsEnabled()}
+        onToggle={toggleMedals}
+      >
         <div class="grid max-w-96 grid-cols-2 gap-6">
           <For each={Object.entries(MEDAL_MAP)}>
             {([medal, emoji], i) => {
@@ -141,7 +166,8 @@ const EditGameForm: Component<Props> = (props) => {
                 <Input
                   label={`Number of points for ${emoji}`}
                   inputMode="numeric"
-                  value={values.medal_scores[medal as MedalType]}
+                  // biome-ignore lint/style/noNonNullAssertion: Will only show when medal_scores is defined
+                  value={values.medal_scores![medal as MedalType]}
                   onChange={(val) =>
                     setField("medal_scores", medal as MedalType, val)
                   }

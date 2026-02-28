@@ -5,14 +5,24 @@ import type { Icon } from "@/lib/icons";
 import { Button, type Variant } from "../ui/button";
 import { Container } from "./container";
 
-export type Action = {
+type ActionBase = {
   variant: Variant;
   text: string;
-  onAction?: () => void;
   danger?: boolean;
   icon?: Icon;
-  href?: string;
 };
+
+type ActionHref = ActionBase & {
+  href: string;
+  onAction?: never;
+};
+
+type ActionButton = ActionBase & {
+  onAction: () => void;
+  href?: never;
+};
+
+export type Action = ActionHref | ActionButton;
 
 type Props = {
   title: string;
@@ -42,15 +52,28 @@ export const Page: ParentComponent<Props> = (props) => {
           <div class="flex gap-4">
             <For each={props.actions ?? []}>
               {(action) => (
-                <Button
-                  onClick={action.onAction}
-                  variant={action.variant}
-                  danger={action.danger}
-                  icon={action.icon}
-                  href={action.href}
+                <Show
+                  when={"href" in action}
+                  fallback={
+                    <Button
+                      onClick={action.onAction}
+                      variant={action.variant}
+                      danger={action.danger}
+                      icon={action.icon}
+                    >
+                      {action.text}
+                    </Button>
+                  }
                 >
-                  {action.text}
-                </Button>
+                  <Button
+                    href={(action as ActionHref).href}
+                    variant={action.variant}
+                    danger={action.danger}
+                    icon={action.icon}
+                  >
+                    {action.text}
+                  </Button>
+                </Show>
               )}
             </For>
           </div>

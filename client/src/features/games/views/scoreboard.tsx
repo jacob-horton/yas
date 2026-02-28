@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from "@solidjs/router";
 import {
   type Component,
-  createEffect,
   createMemo,
   createSignal,
   For,
@@ -82,8 +81,6 @@ export const Scoreboard = () => {
       scoreboardData.data?.game.silver_threshold ??
       scoreboardData.data?.game.bronze_threshold
     );
-
-  createEffect(() => console.log(hasMedals()));
 
   const tableHeadings = () =>
     [
@@ -299,10 +296,22 @@ export const Scoreboard = () => {
                       <Show when={hasMedals()}>
                         <TableCell>
                           <span class="flex gap-3">
-                            <Medal count={score.star_medals} medal={MEDAL_MAP.star} />
-                            <Medal count={score.gold_medals} medal={MEDAL_MAP.gold} />
-                            <Medal count={score.silver_medals} medal={MEDAL_MAP.silver} />
-                            <Medal count={score.bronze_medals} medal={MEDAL_MAP.bronze} />
+                            <Medal
+                              count={score.star_medals}
+                              medal={MEDAL_MAP.star}
+                            />
+                            <Medal
+                              count={score.gold_medals}
+                              medal={MEDAL_MAP.gold}
+                            />
+                            <Medal
+                              count={score.silver_medals}
+                              medal={MEDAL_MAP.silver}
+                            />
+                            <Medal
+                              count={score.bronze_medals}
+                              medal={MEDAL_MAP.bronze}
+                            />
                           </span>
                         </TableCell>
                       </Show>
