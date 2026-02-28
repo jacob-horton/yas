@@ -11,11 +11,7 @@ pub struct CreateSessionReq {
     #[serde(deserialize_with = "trim_string")]
     pub email: String,
 
-    #[validate(length(
-        min = 8,
-        max = 1023,
-        message = "Password must be between 8 and 1023 chars"
-    ))]
+    #[validate(length(min = 1, max = 1023, message = "Password must be at least 1 character"))]
     #[serde(deserialize_with = "trim_string")]
     pub password: String,
 }

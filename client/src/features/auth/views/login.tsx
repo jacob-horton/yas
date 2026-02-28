@@ -1,44 +1,67 @@
 import { A, useNavigate } from "@solidjs/router";
-import { type Component, createEffect, createSignal } from "solid-js";
+import { type Component, createEffect } from "solid-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/context/toast-context";
+import { loginSchema } from "@/features/users/types";
+import { useZodForm } from "@/lib/zod/use-zod-form";
 import { useAuth } from "../context/auth-provider";
+import { useLogin } from "../hooks/use-login";
 
 export const Login: Component = () => {
-  const [email, setEmail] = createSignal("jacob@email.com");
-  const [password, setPassword] = createSignal("password");
+  const { values, errors, setField, validate } = useZodForm(loginSchema, {
+    email: "",
+    password: "",
+  });
 
   const navigate = useNavigate();
   const auth = useAuth();
 
+  const login = useLogin();
+  const toast = useToast();
+
   createEffect(() => {
-    if (auth.user()) {
+    if (!auth.loading && auth.user()) {
       navigate("/", { replace: true });
     }
   });
 
-  const login = async (e: SubmitEvent) => {
+  const handleLogin = async (e: SubmitEvent) => {
     e.preventDefault();
-    await auth.login(email(), password());
-    navigate("/", { replace: true });
+
+    const validData = validate();
+    if (!validData) return;
+
+    login.mutate(validData, {
+      onSuccess: () => {
+        toast.success({
+          title: "Logged in",
+          description: "Successfully logged in!",
+        });
+
+        navigate("/", { replace: true });
+      },
+    });
   };
 
   return (
     <main class="flex h-screen max-h-screen min-h-screen overflow-clip">
       <div class="flex min-w-[600px] flex-col justify-center gap-10 px-32">
         <h1 class="font-semibold text-3xl">Login</h1>
-        <form onSubmit={login} class="flex flex-col gap-4">
+        <form onSubmit={handleLogin} class="flex flex-col gap-4">
           <Input
             label="Email address"
-            value={email()}
-            onChange={setEmail}
+            error={errors.email}
+            value={values.email}
+            onChange={(value) => setField("email", value)}
             placeholder="user@email.com"
           />
           <Input
             label="Password"
             type="password"
-            value={password()}
-            onChange={setPassword}
+            error={errors.password}
+            value={values.password}
+            onChange={(value) => setField("password", value)}
             placeholder="●●●●●●●●●●●●"
           />
 

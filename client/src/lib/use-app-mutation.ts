@@ -2,8 +2,8 @@ import { type UseMutationOptions, useMutation } from "@tanstack/solid-query";
 import { isAxiosError } from "axios";
 import { useToast } from "@/context/toast-context";
 
-type AppMutationOptions = {
-  errorMessage?: string;
+type AppMutationOptions<TError> = {
+  errorMessage?: string | ((error: TError) => string);
 };
 
 export const useAppMutation = <
@@ -13,7 +13,7 @@ export const useAppMutation = <
   TContext = unknown,
 >(
   mutationOptions: UseMutationOptions<TData, TError, TVariables, TContext>,
-  appMutationOptions: () => AppMutationOptions,
+  appMutationOptions: () => AppMutationOptions<TError>,
 ) => {
   const toast = useToast();
 
@@ -29,11 +29,17 @@ export const useAppMutation = <
             description: "Too many requests. Please slow down!",
           });
         } else {
+          let errorMessage = "An unexpected error occurred";
+          const userMessage = appMutationOptions().errorMessage;
+          if (typeof userMessage === "string") {
+            errorMessage = userMessage;
+          } else if (typeof userMessage === "function") {
+            errorMessage = userMessage(err);
+          }
+
           toast.error({
             title: "Error",
-            description:
-              appMutationOptions().errorMessage ??
-              "An unexpected error occurred",
+            description: errorMessage,
           });
         }
 

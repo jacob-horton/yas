@@ -1,10 +1,13 @@
 import { A, useNavigate } from "@solidjs/router";
+import { isAxiosError } from "axios";
 import { type Component, createEffect } from "solid-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/context/toast-context";
 import { createUserSchema } from "@/features/users/types";
 import { useZodForm } from "@/lib/zod/use-zod-form";
 import { useAuth } from "../context/auth-provider";
+import { useRegister } from "../hooks/use-register";
 
 export const Register: Component = () => {
   const { values, errors, setField, setError, validate } = useZodForm(
@@ -17,36 +20,44 @@ export const Register: Component = () => {
     },
   );
 
+  const toast = useToast();
+  const register = useRegister();
+
   const navigate = useNavigate();
   const auth = useAuth();
 
   createEffect(() => {
-    if (auth.user()) {
+    if (!register.isPending && auth.user()) {
       navigate("/", { replace: true });
     }
   });
 
-  const register = async (e: SubmitEvent) => {
+  const handleRegister = async (e: SubmitEvent) => {
     e.preventDefault();
 
     const validData = validate();
     if (!validData) return;
 
-    const error = await auth.register(
-      values.name,
-      values.email,
-      values.password,
-    );
-    if (error === "email-taken") {
-      setError("email", "Email already taken");
-    }
+    register.mutate(validData, {
+      onError: (e) => {
+        if (isAxiosError(e) && e.status === 409) {
+          setError("email", "Email already taken");
+        }
+      },
+      onSuccess: () => {
+        toast.success({
+          title: "Registered",
+          description: "Successfully registered!",
+        });
+      },
+    });
   };
 
   return (
     <main class="flex h-screen max-h-screen min-h-screen overflow-clip">
       <div class="flex min-w-[600px] flex-col justify-center gap-10 px-32">
         <h1 class="font-semibold text-3xl">Register</h1>
-        <form onSubmit={register} class="flex flex-col gap-4">
+        <form onSubmit={handleRegister} class="flex flex-col gap-4">
           <Input
             label="Name"
             value={values.name}

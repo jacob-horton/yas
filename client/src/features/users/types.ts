@@ -23,6 +23,12 @@ export const createUserSchema = z
   .transform(({ confirm_password, ...rest }) => rest);
 export type CreateUserRequest = z.output<typeof createUserSchema>;
 
+export const loginSchema = z.object({
+  email: z.email(),
+  password: z.string().trim().nonempty("Must be at least 1 character"),
+});
+export type LoginRequest = z.output<typeof loginSchema>;
+
 export const resetPasswordSchema = z
   .object({
     password: passwordSchema,
