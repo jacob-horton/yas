@@ -1,8 +1,10 @@
 import { TagsInput } from "@ark-ui/solid";
 import CircleAlertIcon from "lucide-solid/icons/circle-alert";
+import InfoIcon from "lucide-solid/icons/info";
 import XIcon from "lucide-solid/icons/x";
 import { type Component, For, Show } from "solid-js";
 import { cn } from "@/lib/classname";
+import { Tooltip } from "./tooltip";
 
 export const TagInput: Component<{
   class?: string;
@@ -12,6 +14,7 @@ export const TagInput: Component<{
   error?: string;
   validate?: (value: string) => boolean;
   onChange: (value: string[]) => void;
+  tooltip?: string;
 }> = (props) => {
   const isItemInvalid = (val: string) => {
     if (!props.validate) return false;
@@ -46,13 +49,20 @@ export const TagInput: Component<{
           )}
         />
 
-        <div class="flex w-full min-w-0 flex-col gap-1 px-3 py-2">
+        <div class="w-full min-w-0 px-3 py-2">
           <TagsInput.Label
-            class={cn("text-gray-400 text-xs transition", {
+            class={cn("inline-flex gap-1.5 text-gray-400 text-xs transition", {
               "text-red-400": !!props.error,
             })}
           >
-            {props.label}
+            <p>{props.label}</p>
+            <Show when={props.tooltip}>
+              {(tooltip) => (
+                <Tooltip tooltip={tooltip()}>
+                  <InfoIcon size={14} />
+                </Tooltip>
+              )}
+            </Show>
           </TagsInput.Label>
 
           <TagsInput.Control class="flex max-h-48 flex-wrap gap-1.5 overflow-y-auto">

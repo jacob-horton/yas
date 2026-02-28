@@ -62,14 +62,16 @@ export const CreateInvite = () => {
       />
 
       <DatePicker
+        label="Expires At"
+        tooltip="Defaults to 1 month in the future if not provided"
         value={values.expires_at ?? undefined}
         onChange={(val) => setField("expires_at", val)}
-        label="Expires At"
         error={errors.expires_at}
       />
 
       <TagInput
         label="Whitelisted Emails"
+        tooltip="If provided, only people with these emails can use the invite. If none are provided, it will work for all emails"
         placeholder="Enter emails or paste a list..."
         value={values.email_whitelist}
         onChange={(val) => setField("email_whitelist", val)}

@@ -135,7 +135,7 @@ const EditGameForm: Component<Props> = (props) => {
 
         {/* TODO: tooltips to explain these inputs */}
         <Input
-          label="Number of players per match"
+          label="# of players per match"
           value={values.players_per_match}
           onChange={(val) => setField("players_per_match", val)}
           placeholder="e.g. 4"
@@ -144,6 +144,7 @@ const EditGameForm: Component<Props> = (props) => {
 
         <Dropdown
           label="Scoring metric"
+          tooltip="The metric you want to use to determine the rankings of players"
           value={values.metric}
           onChange={(val) => setField("metric", val)}
           options={scoringMetrics.map((m) => ({
@@ -156,6 +157,7 @@ const EditGameForm: Component<Props> = (props) => {
 
       <FormSection
         title="Medals"
+        tooltip="Provide players with medals for reaching a certain score"
         enabled={isMedalsEnabled()}
         onToggle={toggleMedals}
       >
@@ -164,7 +166,7 @@ const EditGameForm: Component<Props> = (props) => {
             {([medal, emoji], i) => {
               return (
                 <Input
-                  label={`Number of points for ${emoji}`}
+                  label={`# of points for ${emoji}`}
                   inputMode="numeric"
                   // biome-ignore lint/style/noNonNullAssertion: Will only show when medal_scores is defined
                   value={values.medal_scores![medal as MedalType]}

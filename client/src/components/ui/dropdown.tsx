@@ -1,9 +1,11 @@
 import { createListCollection, Select } from "@ark-ui/solid";
 import ChevronDownIcon from "lucide-solid/icons/chevron-down";
 import CircleAlertIcon from "lucide-solid/icons/circle-alert";
+import InfoIcon from "lucide-solid/icons/info";
 import { type Component, createMemo, For, Show } from "solid-js";
 import { Portal } from "solid-js/web";
 import { cn } from "@/lib/classname";
+import { Tooltip } from "./tooltip";
 
 export const Dropdown: Component<{
   class?: string;
@@ -13,6 +15,7 @@ export const Dropdown: Component<{
   options: { label: string; value: string; disabled?: boolean }[];
   onChange: (value: string) => void;
   error?: string;
+  tooltip?: string;
 }> = (props) => {
   const collection = createMemo(() =>
     createListCollection({
@@ -61,11 +64,18 @@ export const Dropdown: Component<{
 
         <div class="flex flex-1 flex-col justify-center overflow-hidden px-3 py-2">
           <Select.Label
-            class={cn("text-gray-400 text-xs transition", {
+            class={cn("inline-flex gap-1.5 text-gray-400 text-xs transition", {
               "text-red-400": !!props.error,
             })}
           >
-            {props.label}
+            <p>{props.label}</p>
+            <Show when={props.tooltip}>
+              {(tooltip) => (
+                <Tooltip tooltip={tooltip()}>
+                  <InfoIcon size={14} />
+                </Tooltip>
+              )}
+            </Show>
           </Select.Label>
 
           <div class="flex items-center justify-between gap-2">

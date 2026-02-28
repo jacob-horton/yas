@@ -1,6 +1,8 @@
 import CircleAlertIcon from "lucide-solid/icons/circle-alert";
+import InfoIcon from "lucide-solid/icons/info";
 import { type Component, Show } from "solid-js";
 import { cn } from "@/lib/classname";
+import { Tooltip } from "./tooltip";
 
 export const Input: Component<{
   class?: string;
@@ -11,6 +13,7 @@ export const Input: Component<{
   error?: string;
   inputMode?: "none" | "numeric" | "decimal";
   onChange: (value: string) => void;
+  tooltip?: string;
 }> = (props) => {
   return (
     <div
@@ -36,13 +39,21 @@ export const Input: Component<{
           )}
         />
         <div class="w-full min-w-0 px-3 py-2">
-          <p
-            class={cn("text-gray-400 text-xs transition", {
+          <span
+            class={cn("inline-flex gap-1.5 text-gray-400 text-xs transition", {
               "text-red-400": !!props.error,
             })}
           >
-            {props.label}
-          </p>
+            <p>{props.label}</p>
+            <Show when={props.tooltip}>
+              {(tooltip) => (
+                <Tooltip tooltip={tooltip()}>
+                  <InfoIcon size={14} />
+                </Tooltip>
+              )}
+            </Show>
+          </span>
+
           <input
             class={cn(
               "w-full outline-none transition placeholder:text-gray-300",

@@ -6,9 +6,11 @@ import CalendarIcon from "lucide-solid/icons/calendar";
 import ChevronLeftIcon from "lucide-solid/icons/chevron-left";
 import ChevronRightIcon from "lucide-solid/icons/chevron-right";
 import CircleAlertIcon from "lucide-solid/icons/circle-alert";
+import InfoIcon from "lucide-solid/icons/info";
 import { type Component, Index, Show } from "solid-js";
 import { Portal } from "solid-js/web";
 import { cn } from "@/lib/classname";
+import { Tooltip } from "./tooltip";
 
 export const DatePicker: Component<{
   class?: string;
@@ -17,6 +19,7 @@ export const DatePicker: Component<{
   value?: DateValue;
   error?: string;
   onChange: (value: DateValue) => void;
+  tooltip?: string;
 }> = (props) => {
   const currentLocale =
     typeof navigator !== "undefined" ? navigator.language : "en-GB";
@@ -54,11 +57,22 @@ export const DatePicker: Component<{
           />
           <div class="flex w-full min-w-0 flex-col px-3 py-2">
             <ArkDatePicker.Label
-              class={cn("text-gray-400 text-xs transition", {
-                "text-red-400": !!props.error,
-              })}
+              class={cn(
+                "inline-flex gap-1.5 text-gray-400 text-xs transition",
+                {
+                  "text-red-400": !!props.error,
+                },
+              )}
             >
-              {props.label}
+              <p>{props.label}</p>
+
+              <Show when={props.tooltip}>
+                {(tooltip) => (
+                  <Tooltip tooltip={tooltip()}>
+                    <InfoIcon size={14} />
+                  </Tooltip>
+                )}
+              </Show>
             </ArkDatePicker.Label>
 
             <div class="flex w-full items-center gap-2">

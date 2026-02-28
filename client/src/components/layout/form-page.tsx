@@ -1,5 +1,7 @@
+import InfoIcon from "lucide-solid/icons/info";
 import { type JSX, type ParentComponent, Show } from "solid-js";
 import { Checkbox } from "../ui/checkbox";
+import { Tooltip } from "../ui/tooltip";
 import { Container } from "./container";
 import { type Action, Page } from "./page";
 
@@ -25,6 +27,7 @@ type FormSectionProps = {
   title: string;
   enabled?: boolean;
   onToggle?: (enabled: boolean) => void;
+  tooltip?: string;
 };
 
 export const FormSection: ParentComponent<FormSectionProps> = (props) => {
@@ -34,7 +37,17 @@ export const FormSection: ParentComponent<FormSectionProps> = (props) => {
         <Show when={props.enabled !== undefined}>
           <Checkbox checked={props.enabled} onCheckedChange={props.onToggle} />
         </Show>
-        <h2 class="font-semibold">{props.title}</h2>
+        <h2 class="inline-flex justify-center gap-1.5 font-semibold">
+          <span>{props.title}</span>
+
+          <Show when={props.tooltip}>
+            {(tooltip) => (
+              <Tooltip tooltip={tooltip()}>
+                <InfoIcon size={16} />
+              </Tooltip>
+            )}
+          </Show>
+        </h2>
       </span>
 
       <Show when={props.enabled === undefined || props.enabled}>

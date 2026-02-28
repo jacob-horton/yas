@@ -16,6 +16,31 @@
   --default-border-width: 1.5px;
   --text-default: var(--color-gray-800);
   --border-default: var(--color-gray-800);
+
+  --animate-scale-in: scale-fade-in 0.08s ease-out forwards;
+  --animate-scale-out: scale-fade-out 0.08s ease-in forwards;
+
+  @keyframes scale-fade-in {
+    0% {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes scale-fade-out {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
 }
 
 .dark {
