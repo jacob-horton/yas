@@ -33,8 +33,8 @@ export const HomePage = () => {
       onSuccess: () => {
         setTimeLeft(WAIT_TIME);
         toast.success({
-          title: "Verified",
-          description: "Email successfully verified!",
+          title: "Sent",
+          description: "Email successfully sent!",
         });
       },
     });

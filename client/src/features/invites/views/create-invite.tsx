@@ -2,11 +2,15 @@ import { useNavigate } from "@solidjs/router";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { TagInput } from "@/components/ui/tag-input";
 import { useToast } from "@/context/toast-context";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { useZodForm } from "@/lib/zod/use-zod-form";
 import { useCreateInvite } from "../hooks/use-create-invite";
 import { createInviteSchema } from "../types/invite";
+
+const isEmail = (val: string) =>
+  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val);
 
 export const CreateInvite = () => {
   const group = useGroup();
@@ -18,6 +22,7 @@ export const CreateInvite = () => {
       name: "",
       expires_at: "",
       max_uses: "",
+      email_whitelist: [],
     },
   );
 
@@ -55,19 +60,20 @@ export const CreateInvite = () => {
         error={errors.name}
       />
       <Input
-        inputMode="numeric"
-        value={values.max_uses}
-        onChange={(val) => setField("max_uses", val)}
-        label="Max Uses"
-        placeholder="e.g. 10 (leave empty for no limit)"
-        error={errors.max_uses}
-      />
-      <Input
         type="datetime-local"
         value={values.expires_at}
         onChange={(val) => setField("expires_at", val)}
         label="Expires At"
         error={errors.expires_at}
+      />
+
+      <TagInput
+        label="Whitelisted Emails"
+        placeholder="Enter emails or paste a list..."
+        value={values.email_whitelist}
+        onChange={(val) => setField("email_whitelist", val)}
+        error={errors.email_whitelist}
+        validate={isEmail}
       />
 
       <span class="flex gap-4">

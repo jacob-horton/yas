@@ -10,9 +10,9 @@ export const useRemoveMember = () => {
     () => ({
       mutationFn: (data: { groupId: string; memberId: string }) =>
         groupsApi.group(data.groupId).member(data.memberId).delete(),
-      onSuccess: (_, variables) => {
+      onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: groupKeys.members(variables.groupId),
+          queryKey: groupKeys.all,
         });
       },
     }),

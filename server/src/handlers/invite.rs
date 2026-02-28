@@ -55,7 +55,7 @@ async fn get_invite(
     State(state): State<AppState>,
     user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let invite = services::invite::get_invite(&state, code).await?;
+    let invite = services::invite::get_invite(&state, code, &user.email).await?;
     let group = services::group::get_group_raw(&state, invite.group_id).await?;
 
     let in_group = state
@@ -85,7 +85,7 @@ async fn delete_invite(
 ) -> Result<impl IntoResponse, AppError> {
     let invite = state
         .invite_repo
-        .find_by_code_for_update(&state.pool, code)
+        .find_by_code(&state.pool, code)
         .await
         .map_err(InviteError::Database)?
         .ok_or(InviteError::NotFound)?;
@@ -108,9 +108,9 @@ async fn delete_invite(
 async fn accept_invite(
     Path(code): Path<Uuid>,
     State(state): State<AppState>,
-    user: Verified<AuthUser>,
+    Verified(AuthUser(user)): Verified<AuthUser>,
 ) -> Result<impl IntoResponse, AppError> {
-    services::invite::accept_invite(&state, user.id, code).await?;
+    services::invite::accept_invite(&state, user, code).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }

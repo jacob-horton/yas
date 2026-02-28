@@ -16,6 +16,8 @@ pub struct InviteDb {
     pub max_uses: Option<i32>,
     pub uses: i32,
 
+    pub email_whitelist: Vec<String>,
+
     pub created_at: DateTime<Utc>,
     pub expires_at: DateTime<Utc>,
 }
@@ -32,6 +34,8 @@ pub struct InviteWithCreatedByNameDb {
     pub max_uses: Option<i32>,
     pub uses: i32,
 
+    pub email_whitelist: Vec<String>,
+
     pub created_at: DateTime<Utc>,
     pub expires_at: DateTime<Utc>,
 }
@@ -44,6 +48,8 @@ pub struct InviteSummaryResponse {
 
     pub max_uses: Option<i32>,
     pub uses: i32,
+
+    pub email_whitelist: Vec<String>,
 
     pub created_at: DateTime<Utc>,
     pub expires_at: DateTime<Utc>,
@@ -58,6 +64,8 @@ impl From<InviteWithCreatedByNameDb> for InviteSummaryResponse {
 
             max_uses: invite.max_uses,
             uses: invite.uses,
+
+            email_whitelist: invite.email_whitelist,
 
             created_at: invite.created_at,
             expires_at: invite.expires_at,
@@ -74,6 +82,8 @@ pub struct InviteBasicResponse {
     pub max_uses: Option<i32>,
     pub uses: i32,
 
+    pub email_whitelist: Vec<String>,
+
     pub created_at: DateTime<Utc>,
     pub expires_at: DateTime<Utc>,
 }
@@ -87,6 +97,8 @@ impl From<InviteDb> for InviteBasicResponse {
 
             max_uses: invite.max_uses,
             uses: invite.uses,
+
+            email_whitelist: invite.email_whitelist,
 
             created_at: invite.created_at,
             expires_at: invite.expires_at,
@@ -106,6 +118,14 @@ pub struct InviteDetailResponse {
     pub is_current_user_member: bool,
 }
 
+// Hack to validate emails in a vec (validator doesn't support this yet https://github.com/Keats/validator/issues/353)
+#[derive(Debug, Deserialize, Validate)]
+#[serde(transparent)]
+pub struct ValidEmail {
+    #[validate(email(message = "Invalid email format"))]
+    pub address: String,
+}
+
 #[derive(Debug, Deserialize, Validate)]
 pub struct CreateInviteReq {
     #[validate(length(min = 3, max = 50, message = "Name must be between 3 and 50 chars"))]
@@ -116,4 +136,7 @@ pub struct CreateInviteReq {
 
     #[validate(range(min = 1, message = "Must be able to use an invite at least once"))]
     pub max_uses: Option<i32>,
+
+    #[validate(nested)]
+    pub email_whitelist: Vec<ValidEmail>,
 }

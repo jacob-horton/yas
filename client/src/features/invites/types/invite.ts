@@ -21,6 +21,7 @@ export type InviteSummary = {
   created_by_name: string;
   max_uses: number | null;
   uses: number;
+  email_whitelist: string[];
   created_at: string;
   expires_at: string;
 };
@@ -37,5 +38,12 @@ export const createInviteSchema = z.object({
   max_uses: nullableNumericStringSchema.pipe(
     z.number().min(1, "Must be able to use at least once").nullable(),
   ),
+
+  email_whitelist: z
+    .array(z.string())
+    .refine(
+      (emails) => emails.every((email) => z.email().safeParse(email).success),
+      { message: "All emails must be valid" },
+    ),
 });
 export type CreateInviteRequest = z.output<typeof createInviteSchema>;

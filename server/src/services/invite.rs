@@ -7,6 +7,7 @@ use crate::{
     models::{
         group::{GroupMemberDb, GroupMemberRole},
         invite::{CreateInviteReq, InviteDb, InviteWithCreatedByNameDb},
+        user::UserDb,
     },
     policies::GroupAction,
 };
@@ -39,6 +40,11 @@ pub async fn create_link(
             creator.user_id,
             payload.name,
             payload.max_uses,
+            payload
+                .email_whitelist
+                .into_iter()
+                .map(|e| e.address)
+                .collect(),
             Some(expires_at),
         )
         .await
@@ -47,7 +53,7 @@ pub async fn create_link(
 
 pub async fn accept_invite(
     state: &AppState,
-    user_id: Uuid,
+    user: UserDb,
     invite_code: Uuid,
 ) -> Result<(), AppError> {
     let mut tx = state.pool.begin().await?;
@@ -59,12 +65,12 @@ pub async fn accept_invite(
         .map_err(InviteError::Database)?
         .ok_or(InviteError::NotFound)?;
 
-    validate_invite(&invite)?;
+    validate_invite(&invite, &user.email)?;
 
     // Add user to group if they aren't already
     match state
         .group_repo
-        .add_member(&mut *tx, invite.group_id, user_id, GroupMemberRole::Member)
+        .add_member(&mut *tx, invite.group_id, user.id, GroupMemberRole::Member)
         .await
     {
         Ok(_) => {}
@@ -88,15 +94,16 @@ pub async fn accept_invite(
 pub async fn get_invite(
     state: &AppState,
     invite_code: Uuid,
+    user_email: &str,
 ) -> Result<InviteWithCreatedByNameDb, AppError> {
     let invite = state
         .invite_repo
-        .find_by_code_for_update(&state.pool, invite_code)
+        .find_by_code(&state.pool, invite_code)
         .await
         .map_err(InviteError::Database)?
         .ok_or(InviteError::NotFound)?;
 
-    validate_invite(&invite)?;
+    validate_invite(&invite, user_email)?;
 
     Ok(invite)
 }
@@ -111,7 +118,7 @@ pub async fn delete_invite(state: &AppState, invite_code: Uuid) -> Result<(), Ap
     Ok(())
 }
 
-pub fn validate_invite(invite: &InviteWithCreatedByNameDb) -> Result<(), AppError> {
+pub fn validate_invite(invite: &InviteWithCreatedByNameDb, email: &str) -> Result<(), AppError> {
     // If there is a max number of uses, and they've been used up, invite is no longer valid
     if let Some(max_uses) = invite.max_uses {
         if invite.uses >= max_uses {
@@ -122,6 +129,12 @@ pub fn validate_invite(invite: &InviteWithCreatedByNameDb) -> Result<(), AppErro
     // If the invite has expired, the invite is no longer valid
     if Utc::now() >= invite.expires_at {
         return Err(InviteError::Expired.into());
+    }
+
+    // If email not in whitelist, they aren't allowed to view/accept
+    // If whitelist is empty, all emails are allowed
+    if !invite.email_whitelist.is_empty() && !invite.email_whitelist.contains(&email.to_string()) {
+        return Err(InviteError::NotInWhitelist.into());
     }
 
     Ok(())

@@ -67,6 +67,9 @@ pub enum InviteError {
     #[error("Limit reached")]
     LimitReached,
 
+    #[error("Email address not in whitelist")]
+    NotInWhitelist,
+
     #[error(transparent)]
     Database(#[from] sqlx::Error),
 }
@@ -178,6 +181,7 @@ impl IntoResponse for AppError {
                 InviteError::NotFound => (StatusCode::NOT_FOUND, err.to_string()),
                 InviteError::Expired => (StatusCode::GONE, err.to_string()),
                 InviteError::LimitReached => (StatusCode::GONE, err.to_string()),
+                InviteError::NotInWhitelist => (StatusCode::FORBIDDEN, err.to_string()),
                 InviteError::Database(e) => {
                     eprintln!("Invite DB error: {:?}", e);
                     (

@@ -14,15 +14,17 @@ impl InviteRepo {
         created_by: Uuid,
         name: String,
         max_uses: Option<i32>,
+        email_whitelist: Vec<String>,
         expires_at: Option<DateTime<Utc>>,
     ) -> Result<InviteDb, sqlx::Error> {
         sqlx::query_as::<_, InviteDb>(
-            "INSERT INTO invites (group_id, created_by, name, max_uses, expires_at) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+            "INSERT INTO invites (group_id, created_by, name, max_uses, email_whitelist, expires_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
         )
         .bind(group_id)
         .bind(created_by)
         .bind(name)
         .bind(max_uses)
+        .bind(email_whitelist)
         .bind(expires_at)
         .fetch_one(executor)
         .await
@@ -35,6 +37,17 @@ impl InviteRepo {
         code: Uuid,
     ) -> Result<Option<InviteWithCreatedByNameDb>, sqlx::Error> {
         sqlx::query_as::<_, InviteWithCreatedByNameDb>("SELECT invites.*, users.name as created_by_name FROM invites JOIN users ON invites.created_by = users.id WHERE invites.id = $1 FOR UPDATE")
+            .bind(code)
+            .fetch_optional(executor)
+            .await
+    }
+
+    pub async fn find_by_code<'e>(
+        &self,
+        executor: impl PgExecutor<'e, Database = Postgres>,
+        code: Uuid,
+    ) -> Result<Option<InviteWithCreatedByNameDb>, sqlx::Error> {
+        sqlx::query_as::<_, InviteWithCreatedByNameDb>("SELECT invites.*, users.name as created_by_name FROM invites JOIN users ON invites.created_by = users.id WHERE invites.id = $1")
             .bind(code)
             .fetch_optional(executor)
             .await

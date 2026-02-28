@@ -1,4 +1,3 @@
-import { useNavigate } from "@solidjs/router";
 import { formatDistanceToNow } from "date-fns";
 import { type Component, For, Show, Suspense } from "solid-js";
 import LetterSvg from "@/assets/empty-states/letter.svg";
@@ -61,6 +60,7 @@ const TABLE_HEADINGS = [
   { label: "Created By" },
   { label: "Uses" },
   { label: "Created On" },
+  { label: "# Whitelisted Emails" },
   { label: "Expiry" },
   { label: "", class: "w-28" },
 ] as const satisfies Heading<string>[];
@@ -72,8 +72,6 @@ export const Invites = () => {
 
   const deleteInvite = useDeleteInvite(group.groupId);
   const toast = useToast();
-
-  const _navigate = useNavigate();
 
   const { showConfirm } = useConfirmation();
   const handleDelete = async (invite: InviteSummary) => {
@@ -147,6 +145,11 @@ export const Invites = () => {
                         <Show when={invite.max_uses}>{invite.max_uses}</Show>
                       </TableCell>
                       <TableCell>{formatDate(invite.created_at)}</TableCell>
+                      <TableCell>
+                        {invite.email_whitelist.length > 0
+                          ? invite.email_whitelist.length
+                          : "All emails allowed"}
+                      </TableCell>
                       <TableCell>
                         <ExpiryCell expiresAt={invite.expires_at} />
                       </TableCell>
