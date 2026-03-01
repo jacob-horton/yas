@@ -61,7 +61,7 @@ export const Sidebar: Component = () => {
         <button
           type="button"
           tabindex="-1"
-          class="fixed inset-0 z-40 h-full w-full cursor-default border-none bg-black/50 outline-none transition-opacity"
+          class="fixed inset-0 z-20 h-full w-full cursor-default border-none bg-black/50 outline-none transition-opacity"
           onClick={() => setIsOpen(false)}
           aria-label="Close sidebar overlay"
         />
@@ -72,7 +72,7 @@ export const Sidebar: Component = () => {
           // max-w-[calc(100vw-4rem)] to ensure room for the close button
           "flex h-full w-80 max-w-[calc(100vw-4rem)] shrink-0 flex-col gap-4 border-gray-200 border-r bg-white p-4 dark:border-gray-600 dark:bg-gray-900",
           "transition-transform duration-300 ease-in-out",
-          isDesktop() ? "static translate-x-0" : "fixed inset-y-0 left-0 z-50",
+          isDesktop() ? "static translate-x-0" : "fixed inset-y-0 left-0 z-30",
           !isDesktop() && !isOpen() && "-translate-x-full",
         )}
       >

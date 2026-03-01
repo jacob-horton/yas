@@ -98,7 +98,7 @@ export const Dropdown: Component<{
 
       <Portal>
         <Select.Positioner>
-          <Select.Content class="z-10 w-full overflow-y-auto rounded-md border bg-white shadow-lg outline-none dark:bg-gray-900">
+          <Select.Content class="z-40 w-full overflow-y-auto rounded-md border bg-white shadow-lg outline-none dark:bg-gray-900">
             <For each={collection().items}>
               {(item) => (
                 <Select.Item
