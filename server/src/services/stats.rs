@@ -10,7 +10,7 @@ use crate::{
         },
         user::UserDb,
     },
-    services::{game::fetch_game_guarded},
+    services::game::fetch_game_guarded,
 };
 use std::{cmp::Ordering, collections::HashMap};
 use uuid::Uuid;
@@ -22,21 +22,21 @@ fn get_comparator(order: OrderBy, a: &ScoreboardEntry, b: &ScoreboardEntry) -> O
         OrderBy::WinRate => a
             .win_rate
             .total_cmp(&b.win_rate)
-            .then_with(|| a.matches_played.cmp(&b.matches_played))
-            .then_with(|| a.average_score.total_cmp(&b.average_score)),
+            .then_with(|| a.average_score.total_cmp(&b.average_score))
+            .then_with(|| a.matches_played.cmp(&b.matches_played)),
 
         OrderBy::AverageScore => a
             .average_score
             .total_cmp(&b.average_score)
-            .then_with(|| a.matches_played.cmp(&b.matches_played))
-            .then_with(|| a.win_rate.total_cmp(&b.win_rate)),
+            .then_with(|| a.win_rate.total_cmp(&b.win_rate))
+            .then_with(|| a.matches_played.cmp(&b.matches_played)),
 
         OrderBy::Name => a
             .user_name
             .cmp(&b.user_name)
             .then_with(|| a.win_rate.total_cmp(&b.win_rate))
-            .then_with(|| a.matches_played.cmp(&b.matches_played))
-            .then_with(|| a.average_score.total_cmp(&b.average_score)),
+            .then_with(|| a.average_score.total_cmp(&b.average_score))
+            .then_with(|| a.matches_played.cmp(&b.matches_played)),
     }
     .then_with(|| a.user_name.cmp(&b.user_name))
     .reverse() // Default to descending
