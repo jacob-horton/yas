@@ -55,7 +55,7 @@ export const PodiumCard: Component<{
       >
         {ordinalSuffix(props.position)}
 
-        <div class="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-full flex size-16 sm:size-20 items-center justify-center rounded-full border bg-white p-2 md:top-full md:left-6 md:translate-x-0 dark:bg-gray-800">
+        <div class="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-full flex size-16 items-center justify-center rounded-full border bg-white p-2 sm:size-20 md:top-full md:left-6 md:translate-x-0 dark:bg-gray-800">
           <Show when={props.stats} fallback={<AvatarSkeleton />}>
             {(stats) => (
               <Avatar

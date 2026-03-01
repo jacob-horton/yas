@@ -54,8 +54,8 @@ export const Register: Component = () => {
   };
 
   return (
-    <main class="flex h-screen max-h-screen min-h-screen overflow-clip">
-      <div class="flex min-w-[600px] flex-col justify-center gap-10 px-32">
+    <main class="flex h-screen max-h-screen min-h-screen overflow-clip bg-white dark:bg-gray-900">
+      <div class="flex w-full flex-col items-center justify-center gap-8 px-8 sm:px-16 lg:w-[600px] lg:min-w-[600px] lg:gap-10 lg:px-32">
         <h1 class="font-semibold text-3xl">Register</h1>
         <form onSubmit={handleRegister} class="flex flex-col gap-4">
           <Input
@@ -89,11 +89,15 @@ export const Register: Component = () => {
             placeholder="●●●●●●●●●●●●"
           />
 
-          <Button type="submit" class="w-full">
+          <Button
+            type="submit"
+            class="mt-2 w-full"
+            loading={register.isPending}
+          >
             Register
           </Button>
 
-          <div class="text-center text-sm">
+          <div class="mt-2 text-center text-sm">
             <span class="text-gray-500">Already have an account? </span>
             <A
               href="/login"
@@ -104,7 +108,8 @@ export const Register: Component = () => {
           </div>
         </form>
       </div>
-      <div class="aurora-gradient flex flex-1 items-center justify-center px-16 font-semibold text-9xl text-white">
+
+      <div class="aurora-gradient hidden w-full items-center justify-center px-12 text-center font-semibold text-white lg:flex lg:text-6xl xl:text-8xl">
         Welcome!
       </div>
     </main>

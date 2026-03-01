@@ -9,10 +9,10 @@ import { RoleTag } from "@/components/ui/role-tag";
 import { TextSkeleton } from "@/components/ui/text.skeleton";
 import { useToast } from "@/context/toast-context";
 import { useAuth } from "@/features/auth/context/auth-provider";
+import { cn } from "@/lib/classname";
+import { RANK_BG_GRADIENTS } from "@/lib/rank-colours";
 import { useAcceptInvite } from "../hooks/use-accept-invite";
 import { useInvite } from "../hooks/use-invite";
-import { RANK_BG_GRADIENTS } from "@/lib/rank-colours";
-import { cn } from "@/lib/classname";
 
 export const AcceptInvite = () => {
   const params = useParams<{ inviteId: string }>();

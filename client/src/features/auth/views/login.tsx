@@ -45,8 +45,8 @@ export const Login: Component = () => {
   };
 
   return (
-    <main class="flex h-screen max-h-screen min-h-screen overflow-clip">
-      <div class="flex min-w-[600px] flex-col justify-center gap-10 px-32">
+    <main class="flex h-screen max-h-screen min-h-screen overflow-clip bg-white dark:bg-gray-900">
+      <div class="flex w-full flex-col items-center justify-center gap-8 px-8 sm:px-16 lg:w-[600px] lg:min-w-[600px] lg:gap-10 lg:px-32">
         <h1 class="font-semibold text-3xl">Login</h1>
         <form onSubmit={handleLogin} class="flex flex-col gap-4">
           <Input
@@ -65,11 +65,11 @@ export const Login: Component = () => {
             placeholder="●●●●●●●●●●●●"
           />
 
-          <Button type="submit" class="w-full">
+          <Button type="submit" class="w-full" loading={login.isPending}>
             Login
           </Button>
 
-          <div class="flex flex-col items-center gap-1 text-center text-sm">
+          <div class="mt-4 flex flex-col items-center gap-2 text-center text-sm">
             <span>
               <span class="text-gray-500">Don't have an account? </span>
               <A
@@ -89,7 +89,8 @@ export const Login: Component = () => {
           </div>
         </form>
       </div>
-      <div class="aurora-gradient flex w-full items-center justify-center px-16 font-semibold text-9xl text-white">
+
+      <div class="aurora-gradient hidden w-full items-center justify-center px-12 text-center font-semibold text-white lg:flex lg:text-6xl xl:text-8xl">
         Welcome Back!
       </div>
     </main>
