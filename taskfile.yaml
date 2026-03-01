@@ -2,6 +2,8 @@ version: '3'
 
 output: prefixed
 
+dotenv: ['.env.deploy']
+
 tasks:
   db_up:
     dir: 'db'
@@ -47,3 +49,26 @@ tasks:
 
   default:
     deps: [client, server]
+
+  build_client:
+    desc: Build the SolidJS frontend
+    dir: 'client'
+    cmds:
+      - pnpm i
+      - pnpm run build -- --mode production
+
+  build_server:
+    desc: Build the Rust backend for Linux
+    dir: 'server'
+    cmds:
+      - cargo build --release --target x86_64-unknown-linux-gnu
+
+  deploy:
+    desc: Build and push artifacts to the VPS
+    deps: [build_client, build_server]
+    cmds:
+      - ssh {{.VPS_USER}}@{{.VPS_IP}} "mkdir -p {{.VPS_DIR}}/client {{.VPS_DIR}}/server"
+      - rsync -avz --delete ./client/dist/ {{.VPS_USER}}@{{.VPS_IP}}:{{.VPS_DIR}}/client/
+      - rsync -avz ./server/target/x86_64-unknown-linux-gnu/release/server {{.VPS_USER}}@{{.VPS_IP}}:{{.VPS_DIR}}/server/yas
+      - ssh {{.VPS_USER}}@{{.VPS_IP}} "chmod +x {{.VPS_DIR}}/server/yas && sudo systemctl restart yas"
+      - echo "Deployment complete!"

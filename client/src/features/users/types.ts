@@ -10,7 +10,7 @@ export const createUserSchema = z
       .min(1, "Must be at least 1 character")
       .max(512, "Cannot exceed 512 characters"),
 
-    email: z.email(),
+    email: z.email("Must be a valid email address"),
 
     password: passwordSchema,
     confirm_password: z.string(),
@@ -24,7 +24,7 @@ export const createUserSchema = z
 export type CreateUserRequest = z.output<typeof createUserSchema>;
 
 export const loginSchema = z.object({
-  email: z.email(),
+  email: z.email("Must be a valid email address"),
   password: z.string().trim().nonempty("Must be at least 1 character"),
 });
 export type LoginRequest = z.output<typeof loginSchema>;

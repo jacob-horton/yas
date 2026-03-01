@@ -134,6 +134,7 @@ async fn main() {
             Method::PATCH,
             Method::PUT,
             Method::DELETE,
+            Method::OPTIONS,
         ])
         .allow_headers([CONTENT_TYPE, AUTHORIZATION, ACCEPT])
         .allow_credentials(true);
