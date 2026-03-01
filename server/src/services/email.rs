@@ -19,14 +19,8 @@ impl EmailService {
     ) -> Result<(), AppError> {
         let verification_link = get_verification_link(&token);
 
-        // TODO: switch to using `address` here for prod
-        // Maybe use env to determine what email to use?
-        let to = &format!(
-            "delivered+{}@resend.dev",
-            address.split_once("@").unwrap().0
-        );
-
-        let from = "onboarding@resend.dev";
+        let to = address;
+        let from = "welcome@thescoreboard.app";
         let subject = "Verify your email";
         let template = include_str!("../email_templates/invite.html");
 
@@ -51,14 +45,8 @@ impl EmailService {
     ) -> Result<(), AppError> {
         let reset_link = get_reset_link(&token);
 
-        // TODO: switch to using `address` here for prod
-        // Maybe use env to determine what email to use?
-        let to = &format!(
-            "delivered+{}@resend.dev",
-            address.split_once("@").unwrap().0
-        );
-
-        let from = "onboarding@resend.dev";
+        let to = address;
+        let from = "accounts@thescoreboard.app";
         let subject = "Reset your password";
         let template = include_str!("../email_templates/reset_password.html");
 
@@ -75,14 +63,8 @@ impl EmailService {
     }
 
     pub async fn send_password_reset_complete_email(&self, address: &str) -> Result<(), AppError> {
-        // TODO: switch to using `address` here for prod
-        // Maybe use env to determine what email to use?
-        let to = &format!(
-            "delivered+{}@resend.dev",
-            address.split_once("@").unwrap().0
-        );
-
-        let from = "onboarding@resend.dev";
+        let to = address;
+        let from = "accounts@thescoreboard.app";
         let subject = "Password has been reset";
         let html_body = include_str!("../email_templates/reset_password_complete.html");
 
