@@ -118,6 +118,7 @@ const EditGameForm: Component<Props> = (props) => {
       actions={[
         {
           text: "Delete",
+          icon: "delete",
           onAction: handleDelete,
           variant: "secondary",
           danger: true,

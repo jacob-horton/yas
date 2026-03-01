@@ -22,6 +22,7 @@ type BaseProps = {
   danger?: boolean;
   loading?: boolean;
   disabled?: boolean;
+  iconOnlyOnMobile?: boolean;
 };
 
 type AnchorProps = BaseProps & {
@@ -48,6 +49,7 @@ export const Button: ParentComponent<ButtonProps> = (props) => {
     "disabled",
     "danger",
     "icon",
+    "iconOnlyOnMobile",
   ]);
 
   const isDisabled = () => {
@@ -64,10 +66,13 @@ export const Button: ParentComponent<ButtonProps> = (props) => {
 
   const commonClasses = () =>
     cn(
-      "relative flex h-8 w-fit cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-5 py-1 font-semibold",
+      "relative flex h-8 w-fit cursor-pointer items-center justify-center whitespace-nowrap rounded-md py-1 font-semibold",
       COLOUR_MAP[local.variant ?? "primary"],
       {
         "p-1.5": local.icon && !local.children,
+        "px-2 sm:px-5": local.iconOnlyOnMobile && local.children,
+        "px-5": !local.iconOnlyOnMobile && !(!local.children && local.icon),
+
         "hover:bg-red-50 hover:text-red-600":
           local.danger && local.variant === "ghost",
         "border-red-700 text-red-700 hover:bg-red-100 dark:hover:bg-red-500/20":
@@ -104,7 +109,15 @@ export const Button: ParentComponent<ButtonProps> = (props) => {
         <Show when={local.icon}>
           {(iconName) => <Dynamic component={ICON_MAP[iconName()]} size={18} />}
         </Show>
-        {local.children}
+        <Show when={local.children}>
+          <span
+            class={cn({
+              "hidden sm:inline-block": local.iconOnlyOnMobile,
+            })}
+          >
+            {local.children}
+          </span>
+        </Show>
       </div>
     </Dynamic>
   );

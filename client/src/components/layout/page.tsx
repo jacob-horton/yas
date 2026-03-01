@@ -40,8 +40,8 @@ export const Page: ParentComponent<Props> = (props) => {
   return (
     <div class="flex h-full w-full flex-col gap-10 overflow-y-auto py-10">
       <Container narrow={props.narrow}>
-        <header class="flex items-center justify-between gap-4 whitespace-nowrap">
-          <h1 class="flex items-center gap-2 font-semibold text-3xl">
+        <header class="flex items-center justify-between gap-4 overflow-x-auto whitespace-nowrap">
+          <h1 class="flex items-center gap-2 font-semibold text-2xl sm:text-3xl">
             <Show when={sidebar && !props.showBack && !sidebar.isDesktop()}>
               <Button
                 variant="ghost"
@@ -58,7 +58,7 @@ export const Page: ParentComponent<Props> = (props) => {
             </Show>
             {props.title}
           </h1>
-          <div class="flex gap-4">
+          <div class="flex gap-2 sm:gap-4">
             <For each={props.actions ?? []}>
               {(action) => (
                 <Show
@@ -69,6 +69,7 @@ export const Page: ParentComponent<Props> = (props) => {
                       variant={action.variant}
                       danger={action.danger}
                       icon={action.icon}
+                      iconOnlyOnMobile={!!action.icon}
                     >
                       {action.text}
                     </Button>
@@ -79,6 +80,7 @@ export const Page: ParentComponent<Props> = (props) => {
                     variant={action.variant}
                     danger={action.danger}
                     icon={action.icon}
+                    iconOnlyOnMobile={!!action.icon}
                   >
                     {action.text}
                   </Button>
