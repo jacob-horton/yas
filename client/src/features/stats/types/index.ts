@@ -1,3 +1,4 @@
+import type { AvatarColour, AvatarIcon } from "@/components/ui/avatar";
 import type { Icon } from "@/lib/icons";
 import type { Colour } from "../constants";
 
@@ -8,13 +9,26 @@ export type MatchStats = {
   rank_in_match: number;
 };
 
+export type Player = {
+  id: string;
+  name: string;
+  avatar: AvatarIcon;
+  avatar_colour: AvatarColour;
+};
+
 export type PlayerStatsRouteParams = {
   gameId: string;
   playerId: string;
 };
 
 export type PlayerHighlightStats = {
+  player: Player;
   lifetime: HighlightStatsLifetime;
+};
+
+export type PlayerHistory = {
+  player: Player;
+  matches: MatchStats[];
 };
 
 export type HighlightStatsLifetime = {

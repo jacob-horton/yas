@@ -77,33 +77,6 @@ async fn get_current_user(
     Ok((StatusCode::OK, Json(response)))
 }
 
-// Gets public info about a user
-async fn get_user(
-    State(state): State<AppState>,
-    logged_in_user: AuthUser,
-    Path(user_id): Path<Uuid>,
-) -> Result<impl IntoResponse, AppError> {
-    // Check if logged in user shares a group with lookup user for privacy
-    let shares_group = state
-        .group_repo
-        .users_share_group(&state.pool, logged_in_user.id, user_id)
-        .await?;
-
-    if !shares_group {
-        return Err(GroupError::MemberNotFound.into());
-    }
-
-    let user = state
-        .user_repo
-        .find_by_id(&state.pool, &user_id)
-        .await
-        .map_err(UserError::Database)?
-        .ok_or(UserError::NotFound)?;
-
-    let response: PublicUserDetailsResponse = user.into();
-    Ok((StatusCode::OK, Json(response)))
-}
-
 async fn get_current_user_groups(
     State(state): State<AppState>,
     user: AuthUser,
@@ -210,7 +183,6 @@ pub fn router() -> Router<AppState> {
                 .route_layer(Extension(create_ip_limiter(5, 3600))),
         )
         .route("/users/me/groups", get(get_current_user_groups))
-        .route("/users/{id}", get(get_user))
         .route(
             "/resend-verification",
             post(resend_verification)

@@ -11,7 +11,7 @@ use crate::{
     AppState,
     errors::AppError,
     extractors::auth_user::AuthUser,
-    models::stats::{PlayerHighlightsResponse, PlayerMatchResponse},
+    models::stats::{PlayerHighlightsResponse, PlayerHistoryResponse},
     services,
 };
 
@@ -20,9 +20,13 @@ pub async fn get_user_history(
     Path((game_id, player_id)): Path<(Uuid, Uuid)>,
     user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let stats = services::stats::get_player_history(&state, user.id, game_id, player_id).await?;
+    let (stats, player) =
+        services::stats::get_player_history(&state, user.id, game_id, player_id).await?;
 
-    let response: Vec<PlayerMatchResponse> = stats.into_iter().map(|s| s.into()).collect();
+    let response = PlayerHistoryResponse {
+        player: player.into(),
+        matches: stats.into_iter().map(|s| s.into()).collect(),
+    };
 
     Ok((StatusCode::OK, Json(response)))
 }

@@ -12,7 +12,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TableRowSkeleton } from "@/components/ui/table.skeleton";
-import { useUser } from "@/features/users/hooks/use-user";
 import { cn } from "@/lib/classname";
 import { formatDate } from "@/lib/format-date";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
@@ -23,6 +22,7 @@ import { LIFETIME_STATS } from "../constants";
 import { usePlayerHighlights } from "../hooks/use-player-highlights";
 import { usePlayerHistory } from "../hooks/use-player-history";
 import type { PlayerStatsRouteParams } from "../types";
+import { isAxiosError } from "axios";
 
 const TABLE_HEADINGS = [
   { label: "Date" },
@@ -42,18 +42,29 @@ export const PlayerStats = () => {
     () => params.playerId,
   );
 
-  const player = useUser(() => params.playerId);
-
   return (
     <Page
-      title={`Stats for ${player.data?.name ?? "Loading"}`}
+      title={`Stats for ${history.data?.player.name ?? highlights.data?.player.name ?? "Loading..."}`}
       showBack
       class="flex flex-col gap-8"
     >
       <Show
         when={!highlights.isError}
         fallback={
-          <ErrorMessage title="Error" details="Couldn't player highlights" />
+          // NOTE: Only shows error message when it's not "not enough data"
+          <Show
+            when={
+              !(
+                isAxiosError(highlights.error) &&
+                highlights.error.response?.status === 422
+              )
+            }
+          >
+            <ErrorMessage
+              title="Error"
+              details="Couldn't load player highlights"
+            />
+          </Show>
         }
       >
         <div class="no-scrollbar flex w-full overflow-x-auto px-6 py-6">
@@ -78,11 +89,11 @@ export const PlayerStats = () => {
       <Show
         when={!history.isError}
         fallback={
-          <ErrorMessage title="Error" details="Couldn't player history" />
+          <ErrorMessage title="Error" details="Couldn't load player history" />
         }
       >
         <Show
-          when={history.isLoading || (history.data?.length ?? 0) > 2}
+          when={history.isLoading || (history.data?.matches.length ?? 0) > 2}
           fallback={
             <EmptyState title="Not enough data" img={VisualiseDataSvg}>
               Record more matches to see your match history
@@ -92,15 +103,15 @@ export const PlayerStats = () => {
           <Container class="flex flex-col gap-8">
             <PlayerHistoryChart
               data={
-                history.data
-                  ?.map((s) => ({ score: s.score, rank: s.rank_in_match }))
+                history.data?.matches
+                  .map((s) => ({ score: s.score, rank: s.rank_in_match }))
                   .toReversed() ?? []
               }
             />
 
             <Table headings={TABLE_HEADINGS} caption="Match history">
               <Suspense fallback={<TableRowSkeleton numCols={3} />}>
-                <Show when={history.data}>
+                <Show when={history.data?.matches}>
                   {(data) =>
                     data().map((s) => (
                       <TableRow>

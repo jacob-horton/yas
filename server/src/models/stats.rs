@@ -5,7 +5,8 @@ use uuid::Uuid;
 
 use crate::models::{
     game::{GameDb, GameResponse, OrderBy},
-    user::{Avatar, AvatarColour},
+    group::GroupMemberDb,
+    user::{Avatar, AvatarColour, UserDb},
 };
 
 #[derive(sqlx::FromRow, Debug)]
@@ -26,6 +27,20 @@ pub struct PlayerMatchDb {
     pub score: i32,
     pub played_at: chrono::DateTime<chrono::Utc>,
     pub rank_in_match: i64,
+}
+
+#[derive(Debug, Serialize)]
+pub struct PlayerResponse {
+    pub id: Uuid,
+    pub name: String,
+    pub avatar: Avatar,
+    pub avatar_colour: AvatarColour,
+}
+
+#[derive(Debug, Serialize)]
+pub struct PlayerHistoryResponse {
+    pub player: PlayerResponse,
+    pub matches: Vec<PlayerMatchResponse>,
 }
 
 #[derive(Debug, Serialize)]
@@ -168,7 +183,16 @@ impl From<Scoreboard> for ScoreboardResponse {
 }
 
 #[derive(Debug)]
+pub struct Player {
+    pub id: Uuid,
+    pub name: String,
+    pub avatar: Avatar,
+    pub avatar_colour: AvatarColour,
+}
+
+#[derive(Debug)]
 pub struct PlayerHighlightStats {
+    pub player: Player,
     pub lifetime: StatsLifetime,
 }
 
@@ -183,6 +207,7 @@ pub struct StatsLifetime {
 
 #[derive(Serialize)]
 pub struct PlayerHighlightsResponse {
+    pub player: PlayerResponse,
     pub lifetime: HighlightsLifetimeResponse,
 }
 
@@ -207,9 +232,32 @@ impl From<StatsLifetime> for HighlightsLifetimeResponse {
     }
 }
 
+impl From<Player> for PlayerResponse {
+    fn from(value: Player) -> Self {
+        Self {
+            id: value.id,
+            name: value.name,
+            avatar: value.avatar,
+            avatar_colour: value.avatar_colour,
+        }
+    }
+}
+
+impl From<UserDb> for PlayerResponse {
+    fn from(value: UserDb) -> Self {
+        Self {
+            id: value.id,
+            name: value.name,
+            avatar: value.avatar,
+            avatar_colour: value.avatar_colour,
+        }
+    }
+}
+
 impl From<PlayerHighlightStats> for PlayerHighlightsResponse {
     fn from(value: PlayerHighlightStats) -> Self {
         Self {
+            player: value.player.into(),
             lifetime: value.lifetime.into(),
         }
     }

@@ -1,15 +1,17 @@
 use crate::{
     AppState,
-    errors::{AppError, GroupError, StatsError},
+    errors::{AppError, GroupError, StatsError, UserError},
     models::{
         game::{GameDb, OrderBy},
+        group::GroupMemberDb,
         stats::{
-            Distribution, DistributionWithMaxMin, HighlightsResponse, OrderDir,
+            Distribution, DistributionWithMaxMin, HighlightsResponse, OrderDir, Player,
             PlayerHighlightStats, PlayerMatchDb, RawMatchStats, Scoreboard, ScoreboardEntry,
             StatsLifetime,
         },
+        user::UserDb,
     },
-    services::game::fetch_game_guarded,
+    services::{self, game::fetch_game_guarded},
 };
 use std::{cmp::Ordering, collections::HashMap};
 use uuid::Uuid;
@@ -291,15 +293,33 @@ pub async fn get_player_history(
     user_id: Uuid,
     game_id: Uuid,
     player_id: Uuid,
-) -> Result<Vec<PlayerMatchDb>, AppError> {
+) -> Result<(Vec<PlayerMatchDb>, UserDb), AppError> {
+    // Checks user is a member of the group
     let (game, _) = fetch_game_guarded(state, game_id, user_id).await?;
+
+    // Check if logged in user shares a group with lookup user for privacy
+    let shares_group = state
+        .group_repo
+        .users_share_group(&state.pool, user_id, player_id)
+        .await?;
+
+    if !shares_group {
+        return Err(GroupError::MemberNotFound.into());
+    }
 
     let player_history = state
         .stats_repo
         .get_player_history(&state.pool, game.id, player_id)
         .await?;
 
-    Ok(player_history)
+    // TODO: check above will error if user not found
+    let player = state
+        .user_repo
+        .find_by_id(&state.pool, &player_id)
+        .await?
+        .ok_or(UserError::NotFound)?;
+
+    Ok((player_history, player))
 }
 
 pub async fn get_player_highlights(
@@ -325,9 +345,15 @@ pub async fn get_player_highlights(
         .iter()
         .enumerate()
         .find(|(_, entry)| entry.user_id == player_id)
-        .ok_or_else(|| GroupError::MemberNotFound)?;
+        .ok_or_else(|| StatsError::NotEnoughData)?;
 
     let stats = PlayerHighlightStats {
+        player: Player {
+            id: entry.user_id,
+            name: entry.user_name.clone(),
+            avatar: entry.user_avatar.clone(),
+            avatar_colour: entry.user_avatar_colour.clone(),
+        },
         lifetime: StatsLifetime {
             win_rate: entry.win_rate,
             average_score: entry.average_score,

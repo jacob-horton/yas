@@ -3,12 +3,12 @@ import type { Scoreboard } from "@/features/games/types/scoreboard";
 import { api } from "@/lib/api";
 import type {
   DistributionData,
-  MatchStats,
   PlayerHighlightStats,
+  PlayerHistory,
 } from "../types";
 
 export interface StatsApiContract {
-  getPlayerHistory(playerId: string): Promise<MatchStats[]>;
+  getPlayerHistory(playerId: string): Promise<PlayerHistory>;
   getPlayerHighlights(playerId: string): Promise<PlayerHighlightStats>;
   getDistributions(): Promise<DistributionData>;
   getScoreboard<T extends string>(sort?: Sort<T>): Promise<Scoreboard>;
@@ -18,7 +18,7 @@ export class StatsApi implements StatsApiContract {
   constructor(private gameId: string) {}
 
   // TODO: player stats into separate contract
-  public async getPlayerHistory(playerId: string): Promise<MatchStats[]> {
+  public async getPlayerHistory(playerId: string): Promise<PlayerHistory> {
     return api
       .get(`/games/${this.gameId}/players/${playerId}/history`)
       .then((resp) => resp.data);
