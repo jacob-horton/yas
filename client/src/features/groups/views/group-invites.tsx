@@ -164,11 +164,26 @@ export const Invites = () => {
                             icon="copy"
                             variant="ghost"
                             class="text-gray-400"
-                            onClick={() =>
-                              navigator.clipboard.writeText(
-                                getInviteLink(invite.id),
-                              )
-                            }
+                            onClick={async () => {
+                              try {
+                                await navigator.clipboard.writeText(
+                                  getInviteLink(invite.id),
+                                );
+                              } catch {
+                                toast.error({
+                                  title: "Error",
+                                  description:
+                                    "Something went wrong when copying to clipboard",
+                                });
+                                return;
+                              }
+
+                              toast.success({
+                                title: "Copied",
+                                description:
+                                  "Invite link successfully copied to clipboard",
+                              });
+                            }}
                           />
                           <Authorised
                             minRole="admin"

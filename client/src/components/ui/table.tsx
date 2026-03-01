@@ -69,7 +69,7 @@ export function Table<T extends string>(props: TableProps<T>) {
   const captionId = createUniqueId();
 
   return (
-    <table class="w-full overflow-clip" aria-labelledby={captionId}>
+    <table class="w-full" aria-labelledby={captionId}>
       <caption id={captionId} class="sr-only">
         {props.caption}
       </caption>
