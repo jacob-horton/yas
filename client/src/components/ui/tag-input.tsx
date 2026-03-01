@@ -78,7 +78,7 @@ export const TagInput: Component<{
                         value={item}
                         data-invalid={isInvalid ? "" : undefined}
                         class={cn(
-                          "flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 font-medium text-sm transition",
+                          "flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 font-semibold text-sm transition",
                           "data-[invalid]:bg-red-200 data-[invalid]:text-red-900",
                           { "bg-white/50": !!props.error },
                         )}

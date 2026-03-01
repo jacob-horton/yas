@@ -40,7 +40,7 @@ export const Page: ParentComponent<Props> = (props) => {
   return (
     <div class="flex h-full w-full flex-col gap-10 overflow-y-auto py-10">
       <Container narrow={props.narrow}>
-        <header class="flex items-center justify-between gap-4 overflow-x-auto whitespace-nowrap">
+        <header class="flex items-center justify-between gap-4 overflow-x-auto overflow-y-clip whitespace-nowrap">
           <h1 class="flex items-center gap-2 font-semibold text-2xl sm:text-3xl">
             <Show when={sidebar && !props.showBack && !sidebar.isDesktop()}>
               <Button
