@@ -1,3 +1,5 @@
+use std::env;
+
 use resend_rs::{Resend, types::CreateEmailBaseOptions};
 use uuid::Uuid;
 
@@ -96,11 +98,11 @@ impl EmailService {
 }
 
 fn get_verification_link(token: &Uuid) -> String {
-    // TODO: get from env
-    format!("http://localhost:3000/verify-email/{}", token)
+    let frontend_base = env::var("FRONTEND_URL").expect("FRONTEND_URL must be set");
+    format!("{}/verify-email/{}", frontend_base, token)
 }
 
 fn get_reset_link(token: &Uuid) -> String {
-    // TODO: get from env
-    format!("http://localhost:3000/reset-password/{}", token)
+    let frontend_base = env::var("FRONTEND_URL").expect("FRONTEND_URL must be set");
+    format!("{}/reset-password/{}", frontend_base, token)
 }

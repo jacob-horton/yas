@@ -51,9 +51,8 @@ const ExpiryCell: Component<ExpiryCellProps> = (props) => {
 };
 
 function getInviteLink(id: string) {
-  // TODO: use .env
-  const site = "http://localhost:3000";
-  return `${site}/invites/${id}/accept`;
+  const origin = window.location.origin;
+  return `${origin}/invites/${id}/accept`;
 }
 
 const TABLE_HEADINGS = [

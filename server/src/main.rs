@@ -85,6 +85,9 @@ async fn main() {
     dotenvy::dotenv().ok();
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
+    // Ensure frontend url is provided, as we use it at runtime
+    std::env::var("FRONTEND_URL").expect("Missing FRONTEND_URL");
+
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect(&db_url)
@@ -119,7 +122,12 @@ async fn main() {
         .with_signed(key);
 
     let cors_layer = CorsLayer::new()
-        .allow_origin("http://localhost:3000".parse::<HeaderValue>().unwrap())
+        .allow_origin(
+            env::var("CORS_ALLOWED_ORIGIN")
+                .expect("CORS_ALLOWED_ORIGIN must be set")
+                .parse::<HeaderValue>()
+                .unwrap(),
+        )
         .allow_methods([
             Method::GET,
             Method::POST,
@@ -174,7 +182,13 @@ async fn main() {
         .layer(cors_layer)
         .with_state(app_state);
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
+    let addr = SocketAddr::from((
+        [127, 0, 0, 1],
+        env::var("PORT")
+            .expect("PORT must be set")
+            .parse()
+            .expect("PORT must be a number"),
+    ));
     println!("Listening on {}", addr);
 
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
