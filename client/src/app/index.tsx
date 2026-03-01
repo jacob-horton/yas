@@ -4,6 +4,7 @@ import { isAxiosError } from "axios";
 import type { ParentComponent } from "solid-js";
 import { Sidebar } from "@/components/layout/sidebar";
 import { ConfirmationProvider } from "@/context/confirmation-context";
+import { SidebarProvider } from "@/context/sidebar-context";
 import { ToastProvider } from "@/context/toast-context";
 import { requireRole } from "@/features/auth/components/authorised-route";
 import { ProtectedRoute } from "@/features/auth/components/protected-route";
@@ -55,8 +56,10 @@ const WithSidebar: ParentComponent = (props) => {
   return (
     <div class="flex h-full">
       <GroupProvider>
-        <Sidebar />
-        <main class="h-full min-w-0 flex-1">{props.children}</main>
+        <SidebarProvider>
+          <Sidebar />
+          <main class="h-full min-w-0 flex-1">{props.children}</main>
+        </SidebarProvider>
       </GroupProvider>
     </div>
   );

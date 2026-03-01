@@ -1,5 +1,6 @@
 import { useNavigate } from "@solidjs/router";
 import { For, type ParentComponent, Show } from "solid-js";
+import { useOptionalSidebar } from "@/context/sidebar-context";
 import { cn } from "@/lib/classname";
 import type { Icon } from "@/lib/icons";
 import { Button, type Variant } from "../ui/button";
@@ -34,12 +35,20 @@ type Props = {
 
 export const Page: ParentComponent<Props> = (props) => {
   const navigate = useNavigate();
+  const sidebar = useOptionalSidebar();
 
   return (
     <div class="flex h-full w-full flex-col gap-10 overflow-y-auto py-10">
       <Container narrow={props.narrow}>
         <header class="flex items-center justify-between gap-4 whitespace-nowrap">
           <h1 class="flex items-center gap-2 font-semibold text-3xl">
+            <Show when={sidebar && !props.showBack && !sidebar.isDesktop()}>
+              <Button
+                variant="ghost"
+                onClick={() => sidebar?.setIsOpen(true)}
+                icon="menu"
+              />
+            </Show>
             <Show when={props.showBack}>
               <Button
                 variant="ghost"
