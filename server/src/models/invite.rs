@@ -1,4 +1,4 @@
-use crate::models::trim_string;
+use crate::models::{group::GroupMemberRole, trim_string};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
@@ -17,6 +17,7 @@ pub struct InviteDb {
     pub uses: i32,
 
     pub email_whitelist: Vec<String>,
+    pub role: GroupMemberRole,
 
     pub created_at: DateTime<Utc>,
     pub expires_at: DateTime<Utc>,
@@ -35,6 +36,7 @@ pub struct InviteWithCreatedByNameDb {
     pub uses: i32,
 
     pub email_whitelist: Vec<String>,
+    pub role: GroupMemberRole,
 
     pub created_at: DateTime<Utc>,
     pub expires_at: DateTime<Utc>,
@@ -50,6 +52,7 @@ pub struct InviteSummaryResponse {
     pub uses: i32,
 
     pub email_whitelist: Vec<String>,
+    pub role: GroupMemberRole,
 
     pub created_at: DateTime<Utc>,
     pub expires_at: DateTime<Utc>,
@@ -66,6 +69,7 @@ impl From<InviteWithCreatedByNameDb> for InviteSummaryResponse {
             uses: invite.uses,
 
             email_whitelist: invite.email_whitelist,
+            role: invite.role,
 
             created_at: invite.created_at,
             expires_at: invite.expires_at,
@@ -83,6 +87,7 @@ pub struct InviteBasicResponse {
     pub uses: i32,
 
     pub email_whitelist: Vec<String>,
+    pub role: GroupMemberRole,
 
     pub created_at: DateTime<Utc>,
     pub expires_at: DateTime<Utc>,
@@ -99,6 +104,7 @@ impl From<InviteDb> for InviteBasicResponse {
             uses: invite.uses,
 
             email_whitelist: invite.email_whitelist,
+            role: invite.role,
 
             created_at: invite.created_at,
             expires_at: invite.expires_at,
@@ -114,6 +120,7 @@ pub struct InviteDetailResponse {
 
     pub group_id: Uuid,
     pub group_name: String,
+    pub role: GroupMemberRole,
 
     pub is_current_user_member: bool,
 }
@@ -136,6 +143,8 @@ pub struct CreateInviteReq {
 
     #[validate(range(min = 1, message = "Must be able to use an invite at least once"))]
     pub max_uses: Option<i32>,
+
+    pub role: GroupMemberRole,
 
     #[validate(nested)]
     pub email_whitelist: Vec<ValidEmail>,

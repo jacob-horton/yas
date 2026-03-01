@@ -1,10 +1,10 @@
 import { Menu } from "@ark-ui/solid";
 import CheckIcon from "lucide-solid/icons/check";
-import ChevronDownIcon from "lucide-solid/icons/chevron-down";
 import { createMemo, Show } from "solid-js";
 import { Portal } from "solid-js/web";
 import type { MemberRole } from "@/features/groups/types";
 import { cn } from "@/lib/classname";
+import { RoleTag } from "./role-tag";
 
 type RolePickerProps = {
   possibleRoles: MemberRole[];
@@ -13,47 +13,23 @@ type RolePickerProps = {
   disabled?: boolean;
 };
 
-const ROLE_CONFIG: Record<MemberRole, { label: string; colour: string }> = {
-  viewer: {
-    label: "Viewer",
-    colour: "bg-gray-100 text-gray-700 border-gray-200",
-  },
-  member: {
-    label: "Member",
-    colour: "bg-gray-100 text-gray-700 border-gray-200",
-  },
-  admin: {
-    label: "Admin",
-    colour: "bg-blue-100 text-blue-700 border-blue-200",
-  },
-  owner: {
-    label: "Owner",
-    colour: "bg-violet-100 text-violet-700 border-violet-200",
-  },
-};
-
 export const RolePicker = (props: RolePickerProps) => {
-  // Hide dropdown if marked as disabled, or there's ony one possible option
   const disabled = createMemo(
     () => props.disabled || props.possibleRoles.length <= 1,
   );
 
   return (
     <Menu.Root onSelect={(item) => props.onChange(item.value as MemberRole)}>
-      <Menu.Trigger
-        disabled={disabled()}
-        class={cn(
-          "flex items-center gap-1.5 rounded-full border px-3 py-0.5 text-sm transition-colors",
-          ROLE_CONFIG[props.currentRole].colour,
-          disabled()
-            ? "cursor-default opacity-100"
-            : "cursor-pointer hover:opacity-80",
-        )}
-      >
-        {ROLE_CONFIG[props.currentRole].label}
-        <Show when={!props.disabled}>
-          <ChevronDownIcon size={12} />
-        </Show>
+      <Menu.Trigger disabled={disabled()} class="focus-visible:outline-none">
+        <RoleTag
+          role={props.currentRole}
+          showChevron={!props.disabled}
+          class={cn(
+            disabled()
+              ? "cursor-default opacity-100"
+              : "cursor-pointer hover:opacity-80",
+          )}
+        />
       </Menu.Trigger>
 
       <Portal>
@@ -64,14 +40,10 @@ export const RolePicker = (props: RolePickerProps) => {
                 value={role}
                 class="flex cursor-pointer items-center justify-between rounded px-2 py-1.5 text-sm data-[highlighted]:bg-gray-100"
               >
-                <Menu.ItemText
-                  class={cn(
-                    "rounded-full border px-2 py-0.5 text-sm",
-                    ROLE_CONFIG[role].colour,
-                  )}
-                >
-                  {ROLE_CONFIG[role].label}
+                <Menu.ItemText>
+                  <RoleTag role={role} class="px-2" />
                 </Menu.ItemText>
+
                 <Show when={props.currentRole === role}>
                   <CheckIcon size={14} />
                 </Show>

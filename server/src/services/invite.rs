@@ -39,6 +39,7 @@ pub async fn create_link(
             creator.group_id,
             creator.user_id,
             payload.name,
+            payload.role,
             payload.max_uses,
             payload
                 .email_whitelist
@@ -70,7 +71,7 @@ pub async fn accept_invite(
     // Add user to group if they aren't already
     match state
         .group_repo
-        .add_member(&mut *tx, invite.group_id, user.id, GroupMemberRole::Member)
+        .add_member(&mut *tx, invite.group_id, user.id, invite.role)
         .await
     {
         Ok(_) => {}

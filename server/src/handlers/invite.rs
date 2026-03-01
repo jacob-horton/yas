@@ -71,6 +71,7 @@ async fn get_invite(
 
         group_id: group.id,
         group_name: group.name,
+        role: invite.role,
 
         is_current_user_member: in_group,
     };

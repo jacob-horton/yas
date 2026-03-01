@@ -1,4 +1,5 @@
 import { useParams } from "@solidjs/router";
+import { isAxiosError } from "axios";
 import { For, Show, Suspense } from "solid-js";
 import VisualiseDataSvg from "@/assets/empty-states/visualise-data.svg";
 import { Container } from "@/components/layout/container";
@@ -22,7 +23,6 @@ import { LIFETIME_STATS } from "../constants";
 import { usePlayerHighlights } from "../hooks/use-player-highlights";
 import { usePlayerHistory } from "../hooks/use-player-history";
 import type { PlayerStatsRouteParams } from "../types";
-import { isAxiosError } from "axios";
 
 const TABLE_HEADINGS = [
   { label: "Date" },

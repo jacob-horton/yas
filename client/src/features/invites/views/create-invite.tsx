@@ -2,10 +2,13 @@ import { useNavigate } from "@solidjs/router";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
+import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
+import { ROLE_CONFIG } from "@/components/ui/role-tag";
 import { TagInput } from "@/components/ui/tag-input";
 import { useToast } from "@/context/toast-context";
 import { useGroup } from "@/features/groups/context/group-provider";
+import type { MemberRole } from "@/features/groups/types";
 import { useZodForm } from "@/lib/zod/use-zod-form";
 import { useCreateInvite } from "../hooks/use-create-invite";
 import { createInviteSchema } from "../types/invite";
@@ -24,6 +27,7 @@ export const CreateInvite = () => {
       expires_at: undefined,
       max_uses: "",
       email_whitelist: [],
+      role: "member" satisfies MemberRole,
     },
   );
 
@@ -59,6 +63,20 @@ export const CreateInvite = () => {
         label="Name"
         placeholder="e.g. Friends"
         error={errors.name}
+      />
+
+      <Dropdown
+        label="Assigned Role"
+        tooltip="The role the user will be assigned when they join"
+        value={values.role}
+        onChange={(val) => setField("role", val)}
+        error={errors.role}
+        options={Object.entries(ROLE_CONFIG)
+          .filter(([role]) => role !== "owner")
+          .map(([role, { label }]) => ({
+            label,
+            value: role,
+          }))}
       />
 
       <DatePicker

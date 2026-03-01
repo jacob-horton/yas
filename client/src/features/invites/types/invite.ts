@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MEMBER_ROLES, type MemberRole } from "@/features/groups/types";
 import {
   nullableFutureDateSchema,
   nullableNumericStringSchema,
@@ -11,6 +12,7 @@ export type InviteDetail = {
 
   group_id: string;
   group_name: string;
+  role: MemberRole;
 
   is_current_user_member: boolean;
 };
@@ -21,6 +23,7 @@ export type InviteSummary = {
   created_by_name: string;
   max_uses: number | null;
   uses: number;
+  role: MemberRole;
   email_whitelist: string[];
   created_at: string;
   expires_at: string;
@@ -38,6 +41,8 @@ export const createInviteSchema = z.object({
   max_uses: nullableNumericStringSchema.pipe(
     z.number().min(1, "Must be able to use at least once").nullable(),
   ),
+
+  role: z.string().pipe(z.enum(MEMBER_ROLES)),
 
   email_whitelist: z
     .array(z.string())

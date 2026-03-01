@@ -2,7 +2,10 @@ use chrono::{DateTime, Utc};
 use sqlx::{PgExecutor, Postgres};
 use uuid::Uuid;
 
-use crate::models::invite::{InviteDb, InviteWithCreatedByNameDb};
+use crate::models::{
+    group::GroupMemberRole,
+    invite::{InviteDb, InviteWithCreatedByNameDb},
+};
 
 pub struct InviteRepo {}
 
@@ -13,16 +16,18 @@ impl InviteRepo {
         group_id: Uuid,
         created_by: Uuid,
         name: String,
+        role: GroupMemberRole,
         max_uses: Option<i32>,
         email_whitelist: Vec<String>,
         expires_at: Option<DateTime<Utc>>,
     ) -> Result<InviteDb, sqlx::Error> {
         sqlx::query_as::<_, InviteDb>(
-            "INSERT INTO invites (group_id, created_by, name, max_uses, email_whitelist, expires_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+            "INSERT INTO invites (group_id, created_by, name, role, max_uses, email_whitelist, expires_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
         )
         .bind(group_id)
         .bind(created_by)
         .bind(name)
+        .bind(role)
         .bind(max_uses)
         .bind(email_whitelist)
         .bind(expires_at)

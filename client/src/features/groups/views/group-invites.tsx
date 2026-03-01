@@ -6,6 +6,7 @@ import { Page } from "@/components/layout/page";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorMessage } from "@/components/ui/error-message";
+import { RoleTag } from "@/components/ui/role-tag";
 import {
   type Heading,
   Table,
@@ -57,10 +58,11 @@ function getInviteLink(id: string) {
 
 const TABLE_HEADINGS = [
   { label: "Name" },
-  { label: "Created By" },
   { label: "Uses" },
-  { label: "Created On" },
+  { label: "Role" },
   { label: "# Whitelisted Emails" },
+  { label: "Created By" },
+  { label: "Created On" },
   { label: "Expiry" },
   { label: "", class: "w-28" },
 ] as const satisfies Heading<string>[];
@@ -130,67 +132,72 @@ export const Invites = () => {
               </EmptyState>
             }
           >
-            <Table
-              headings={TABLE_HEADINGS}
-              caption="All invites for this group"
-            >
-              <Suspense fallback={<TableRowSkeleton numCols={5} />}>
-                <For each={invites.data}>
-                  {(invite) => (
-                    <TableRow>
-                      <TableCell>{invite.name}</TableCell>
-                      <TableCell>{invite.created_by_name}</TableCell>
-                      <TableCell>
-                        {invite.uses}
-                        <Show when={invite.max_uses}>{invite.max_uses}</Show>
-                      </TableCell>
-                      <TableCell>{formatDate(invite.created_at)}</TableCell>
-                      <TableCell>
-                        {invite.email_whitelist.length > 0
-                          ? invite.email_whitelist.length
-                          : "All emails allowed"}
-                      </TableCell>
-                      <TableCell>
-                        <ExpiryCell expiresAt={invite.expires_at} />
-                      </TableCell>
-                      <TableCell>
-                        <div class="flex gap-1">
-                          <Button
-                            icon="copy"
-                            variant="ghost"
-                            class="text-gray-400"
-                            onClick={() =>
-                              navigator.clipboard.writeText(
-                                getInviteLink(invite.id),
-                              )
-                            }
-                          />
-                          <Authorised
-                            minRole="admin"
-                            fallback={
-                              <Button
-                                class="text-gray-200"
-                                variant="ghost"
-                                icon="delete"
-                                disabled
-                              />
-                            }
-                          >
+            <div class="overflow-x-auto">
+              <Table
+                headings={TABLE_HEADINGS}
+                caption="All invites for this group"
+              >
+                <Suspense fallback={<TableRowSkeleton numCols={5} />}>
+                  <For each={invites.data}>
+                    {(invite) => (
+                      <TableRow>
+                        <TableCell>{invite.name}</TableCell>
+                        <TableCell>
+                          {invite.uses}
+                          <Show when={invite.max_uses}>{invite.max_uses}</Show>
+                        </TableCell>
+                        <TableCell>
+                          <RoleTag role={invite.role} />
+                        </TableCell>
+                        <TableCell>
+                          {invite.email_whitelist.length > 0
+                            ? invite.email_whitelist.length
+                            : "All emails allowed"}
+                        </TableCell>
+                        <TableCell>{invite.created_by_name}</TableCell>
+                        <TableCell>{formatDate(invite.created_at)}</TableCell>
+                        <TableCell>
+                          <ExpiryCell expiresAt={invite.expires_at} />
+                        </TableCell>
+                        <TableCell>
+                          <div class="flex gap-1">
                             <Button
-                              danger
-                              icon="delete"
+                              icon="copy"
                               variant="ghost"
                               class="text-gray-400"
-                              onClick={() => handleDelete(invite)}
+                              onClick={() =>
+                                navigator.clipboard.writeText(
+                                  getInviteLink(invite.id),
+                                )
+                              }
                             />
-                          </Authorised>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </For>
-              </Suspense>
-            </Table>
+                            <Authorised
+                              minRole="admin"
+                              fallback={
+                                <Button
+                                  class="text-gray-200"
+                                  variant="ghost"
+                                  icon="delete"
+                                  disabled
+                                />
+                              }
+                            >
+                              <Button
+                                danger
+                                icon="delete"
+                                variant="ghost"
+                                class="text-gray-400"
+                                onClick={() => handleDelete(invite)}
+                              />
+                            </Authorised>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </For>
+                </Suspense>
+              </Table>
+            </div>
           </Show>
         </Show>
       </Container>
