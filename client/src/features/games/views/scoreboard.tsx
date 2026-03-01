@@ -140,18 +140,7 @@ export const Scoreboard = () => {
     };
   };
 
-  const podiumOrder = () => {
-    if (scoreboardData.data?.podium.length === 1) {
-      return [0];
-    }
-
-    if (scoreboardData.data?.podium.length === 2) {
-      return [0, 1];
-    }
-
-    // 2nd, 1st, 3rd
-    return [1, 0, 2];
-  };
+  const podiumTotal = () => scoreboardData.data?.podium.length || 0;
 
   // TODO: proper loading for scoreboard name
   return (
@@ -175,10 +164,14 @@ export const Scoreboard = () => {
           }
         >
           <div class="no-scrollbar flex snap-x overflow-x-auto px-6">
-            <div class="mx-auto flex w-full flex-col flex-nowrap items-end gap-4 md:flex-row">
-              <For each={podiumOrder()}>
+            <div class="mx-auto flex w-full flex-col flex-nowrap gap-4 md:flex-row md:items-end md:justify-center">
+              <For each={[0, 1, 2].slice(0, podiumTotal())}>
                 {(index) => (
-                  <PodiumCard stats={getStats(index)} position={index + 1} />
+                  <PodiumCard
+                    stats={getStats(index)}
+                    position={index + 1}
+                    total={podiumTotal()}
+                  />
                 )}
               </For>
             </div>

@@ -11,6 +11,21 @@ import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_BG_GRADIENTS } from "@/lib/rank-colours";
 import { RANK_PODIUM_SIZES } from "../constants";
 
+const getResponsiveOrder = (position: number, total: number) => {
+  if (total === 2) {
+    return {
+      1: "order-1 md:order-1",
+      2: "order-2 md:order-2",
+    }[position];
+  }
+
+  return {
+    1: "order-1 md:order-2",
+    2: "order-2 md:order-1",
+    3: "order-3 md:order-3",
+  }[position];
+};
+
 type PodiumStats = {
   avatar: AvatarIcon;
   avatarColour: AvatarColour;
@@ -21,6 +36,7 @@ type PodiumStats = {
 
 export const PodiumCard: Component<{
   position: number;
+  total: number;
   stats?: PodiumStats;
 }> = (props) => {
   return (
@@ -28,6 +44,7 @@ export const PodiumCard: Component<{
       class={cn(
         "flex h-32 w-full flex-row overflow-clip rounded-md border bg-white md:w-76 md:flex-col md:pb-8 dark:bg-gray-800",
         RANK_PODIUM_SIZES[props.position],
+        getResponsiveOrder(props.position, props.total),
       )}
     >
       <div
