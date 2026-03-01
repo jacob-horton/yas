@@ -37,7 +37,7 @@ export const COLOUR_MAP = {
 } as const;
 
 export const RANK_PODIUM_SIZES: Record<number, string> = {
-  1: "md:h-80 text-xl md:text-4xl",
-  2: "md:h-72 text-lg md:text-3xl",
-  3: "md:h-68 text-md md:text-2xl",
+  1: "md:h-80 text-2xl md:text-4xl",
+  2: "md:h-72 text-xl md:text-3xl",
+  3: "md:h-68 text-lg md:text-2xl",
 };

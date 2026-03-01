@@ -55,11 +55,11 @@ export const PodiumCard: Component<{
       >
         {ordinalSuffix(props.position)}
 
-        <div class="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-full flex size-20 items-center justify-center rounded-full border bg-white p-2 md:top-full md:left-6 md:translate-x-0 dark:bg-gray-800">
+        <div class="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-full flex size-16 sm:size-20 items-center justify-center rounded-full border bg-white p-2 md:top-full md:left-6 md:translate-x-0 dark:bg-gray-800">
           <Show when={props.stats} fallback={<AvatarSkeleton />}>
             {(stats) => (
               <Avatar
-                class="size-14"
+                class="size-10 sm:size-14"
                 colour={stats().avatarColour}
                 avatar={stats().avatar}
               />
@@ -85,7 +85,7 @@ export const PodiumCard: Component<{
                 </p>
               )}
             </Show>
-            <p class="font-normal text-gray-400 text-xs dark:text-gray-500">
+            <p class="font-normal text-2xs text-gray-400 sm:text-xs dark:text-gray-500">
               WIN RATE
             </p>
           </div>
@@ -101,7 +101,7 @@ export const PodiumCard: Component<{
                 </p>
               )}
             </Show>
-            <p class="font-normal text-gray-400 text-xs dark:text-gray-500">
+            <p class="font-normal text-2xs text-gray-400 sm:text-xs dark:text-gray-500">
               POINTS/GAME
             </p>
           </div>

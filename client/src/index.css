@@ -17,6 +17,9 @@
   --text-default: var(--color-gray-800);
   --border-default: var(--color-gray-800);
 
+  --text-2xs: 0.625rem;
+  --text-2xs--line-height: 0.875rem;
+
   --animate-scale-in: scale-fade-in 0.08s ease-out forwards;
   --animate-scale-out: scale-fade-out 0.08s ease-in forwards;
 
