@@ -66,7 +66,7 @@ export const Register: Component = () => {
             placeholder="User"
           />
           <Input
-            label="Email address"
+            label="Email Address"
             error={errors.email}
             value={values.email}
             onChange={(value) => setField("email", value)}

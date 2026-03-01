@@ -50,7 +50,7 @@ export const Login: Component = () => {
         <h1 class="font-semibold text-3xl">Login</h1>
         <form onSubmit={handleLogin} class="flex flex-col gap-4">
           <Input
-            label="Email address"
+            label="Email Address"
             error={errors.email}
             value={values.email}
             onChange={(value) => setField("email", value)}
