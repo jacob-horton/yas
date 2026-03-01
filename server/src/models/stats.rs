@@ -5,7 +5,6 @@ use uuid::Uuid;
 
 use crate::models::{
     game::{GameDb, GameResponse, OrderBy},
-    group::GroupMemberDb,
     user::{Avatar, AvatarColour, UserDb},
 };
 

@@ -3,7 +3,6 @@ use crate::{
     errors::{AppError, GroupError, StatsError, UserError},
     models::{
         game::{GameDb, OrderBy},
-        group::GroupMemberDb,
         stats::{
             Distribution, DistributionWithMaxMin, HighlightsResponse, OrderDir, Player,
             PlayerHighlightStats, PlayerMatchDb, RawMatchStats, Scoreboard, ScoreboardEntry,
@@ -11,7 +10,7 @@ use crate::{
         },
         user::UserDb,
     },
-    services::{self, game::fetch_game_guarded},
+    services::{game::fetch_game_guarded},
 };
 use std::{cmp::Ordering, collections::HashMap};
 use uuid::Uuid;
@@ -345,7 +344,7 @@ pub async fn get_player_highlights(
         .iter()
         .enumerate()
         .find(|(_, entry)| entry.user_id == player_id)
-        .ok_or_else(|| StatsError::NotEnoughData)?;
+        .ok_or(StatsError::NotEnoughData)?;
 
     let stats = PlayerHighlightStats {
         player: Player {

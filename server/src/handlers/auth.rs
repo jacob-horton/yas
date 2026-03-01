@@ -3,7 +3,6 @@ use crate::{
     constants::{SESSION_USER_KEY, SESSION_VERSION_KEY},
     errors::{AppError, AuthError},
     extractors::{
-        auth_user::AuthUser,
         rate_limiting::{
             ip::{create_ip_limiter, ip_limit_mw},
             payload::{RateLimitedPayload, create_payload_limiter},
@@ -22,7 +21,7 @@ use axum::{
     http::StatusCode,
     middleware,
     response::IntoResponse,
-    routing::{delete, get, post},
+    routing::{delete, post},
 };
 use tower_sessions::Session;
 

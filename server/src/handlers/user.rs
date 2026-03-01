@@ -1,13 +1,12 @@
 use axum::{
     Extension, Json, Router,
-    extract::{Path, State},
+    extract::State,
     http::StatusCode,
     middleware,
     response::IntoResponse,
     routing::{get, patch, post, put},
 };
 use tower_sessions::Session;
-use uuid::Uuid;
 
 use crate::{
     AppState,
@@ -25,7 +24,7 @@ use crate::{
     models::{
         group::GroupResponse,
         user::{
-            CreateUserReq, PublicUserDetailsResponse, UpdateEmailReq, UpdatePasswordReq,
+            CreateUserReq, UpdateEmailReq, UpdatePasswordReq,
             UpdateUserReq, UserResponse,
         },
     },

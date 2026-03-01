@@ -5,7 +5,7 @@ use crate::{
     AppState,
     errors::{AppError, GroupError, InviteError},
     models::{
-        group::{GroupMemberDb, GroupMemberRole},
+        group::GroupMemberDb,
         invite::{CreateInviteReq, InviteDb, InviteWithCreatedByNameDb},
         user::UserDb,
     },
