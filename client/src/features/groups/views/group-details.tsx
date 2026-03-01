@@ -29,7 +29,7 @@ type DetailCardProps = {
 
 const DetailCard: ParentComponent<DetailCardProps> = (props) => {
   return (
-    <div class="flex min-h-32 min-w-76 flex-1 flex-col justify-between gap-6 whitespace-nowrap rounded-md border px-6 py-4">
+    <div class="flex h-42 min-h-42 min-w-76 flex-1 flex-col justify-between gap-6 whitespace-nowrap rounded-md border px-6 py-4">
       <div class="flex items-center justify-between gap-2">
         <p class="font-semibold text-2xl">{props.title}</p>
         <Dynamic component={ICON_MAP[props.icon]} size={32} />
@@ -129,7 +129,7 @@ export const GroupDetails = () => {
       actions={actions()}
     >
       <div class="no-scrollbar flex snap-x overflow-x-auto px-6">
-        <div class="flex w-full flex-nowrap gap-4">
+        <div class="flex w-full flex-col flex-nowrap gap-4 md:flex-row">
           <Show
             when={!members.isError && !group.groupQuery.isError}
             fallback={

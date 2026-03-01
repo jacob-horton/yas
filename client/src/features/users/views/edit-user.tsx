@@ -62,7 +62,7 @@ export const EditUser = () => {
         placeholder="User"
       />
 
-      <div class="flex flex-wrap gap-2">
+      <div class="flex flex-wrap justify-center gap-2 sm:justify-start">
         <For each={COLOURS}>
           {(col) => (
             <button
@@ -78,7 +78,7 @@ export const EditUser = () => {
         </For>
       </div>
 
-      <div class="flex flex-wrap gap-2">
+      <div class="flex flex-wrap justify-center gap-2 sm:justify-start">
         <For each={AVATARS}>
           {(a) => (
             <button
@@ -89,7 +89,7 @@ export const EditUser = () => {
                 { "border-transparent": a !== avatar() },
               )}
             >
-              <Avatar avatar={a} colour={colour()} class="size-20" />
+              <Avatar avatar={a} colour={colour()} class="size-16 sm:size-20" />
             </button>
           )}
         </For>

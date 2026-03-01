@@ -175,7 +175,7 @@ export const Scoreboard = () => {
           }
         >
           <div class="no-scrollbar flex snap-x overflow-x-auto px-6">
-            <div class="mx-auto flex flex-nowrap items-end gap-4">
+            <div class="mx-auto flex w-full flex-col flex-nowrap items-end gap-4 md:flex-row">
               <For each={podiumOrder()}>
                 {(index) => (
                   <PodiumCard stats={getStats(index)} position={index + 1} />
@@ -252,7 +252,7 @@ export const Scoreboard = () => {
             </div>
           </div>
 
-          <Container>
+          <Container class="w-full overflow-x-auto">
             <Table
               sortedBy={effectiveSort()}
               onSort={setSort}

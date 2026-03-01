@@ -112,7 +112,7 @@ export const GroupMembers = () => {
 
   return (
     <Page title="Group Members">
-      <Container class="h-full">
+      <Container class="h-full overflow-x-auto">
         <Show
           when={!members.isError}
           fallback={

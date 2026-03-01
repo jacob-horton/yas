@@ -57,6 +57,11 @@ export const Button: ParentComponent<ButtonProps> = (props) => {
   const isA = () => !!local.href;
   const Tag = () => (isA() ? A : "button");
 
+  const buttonType = () => {
+    if (isA()) return undefined;
+    return (others as ButtonElementProps).type ?? "button";
+  };
+
   const commonClasses = () =>
     cn(
       "relative flex h-8 w-fit cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-5 py-1 font-semibold",
@@ -86,6 +91,7 @@ export const Button: ParentComponent<ButtonProps> = (props) => {
       class={commonClasses()}
       disabled={isA() ? undefined : isDisabled()}
       tabIndex={isA() && isDisabled() ? -1 : undefined}
+      type={buttonType()}
       {...others}
     >
       <Show when={local.loading}>

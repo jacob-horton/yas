@@ -176,7 +176,7 @@ export const ChartComponent: Component<ChartProps> = (props) => {
   });
 
   return (
-    <div class="relative h-[500px] w-full">
+    <div class="relative h-[200px] w-full md:h-[500px]">
       <canvas ref={setCanvas} class="h-full! w-full!" />
     </div>
   );

@@ -26,18 +26,19 @@ export const PodiumCard: Component<{
   return (
     <div
       class={cn(
-        "flex w-76 flex-col justify-between overflow-clip rounded-md border bg-white pb-8 dark:bg-gray-800",
+        "flex h-32 w-full flex-row overflow-clip rounded-md border bg-white md:w-76 md:flex-col md:pb-8 dark:bg-gray-800",
         RANK_PODIUM_SIZES[props.position],
       )}
     >
       <div
         class={cn(
-          "relative border-b bg-gradient-to-br px-6 py-4 text-end font-semibold text-4xl text-white",
+          "relative flex w-26 shrink-0 items-center border-r bg-gradient-to-br px-5 py-4 font-semibold text-white md:block md:w-auto md:border-r-0 md:border-b md:px-4 md:px-6 md:text-end",
           RANK_BG_GRADIENTS[props.position],
         )}
       >
         {ordinalSuffix(props.position)}
-        <div class="-translate-y-1/2 absolute top-full flex size-20 items-center justify-center rounded-full border bg-white p-2 dark:bg-gray-800">
+
+        <div class="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-full flex size-20 items-center justify-center rounded-full border bg-white p-2 md:top-full md:left-6 md:translate-x-0 dark:bg-gray-800">
           <Show when={props.stats} fallback={<AvatarSkeleton />}>
             {(stats) => (
               <Avatar
@@ -50,12 +51,12 @@ export const PodiumCard: Component<{
         </div>
       </div>
 
-      <div class="flex h-full flex-col justify-between gap-4 px-6 pt-14">
+      <div class="flex flex-1 flex-col justify-center gap-2 py-4 pr-4 pl-12 md:justify-between md:gap-4 md:px-6 md:py-0 md:pt-14">
         <Show when={props.stats} fallback={<TextSkeleton class="w-2/3" />}>
           {(stats) => <p class="font-semibold">{stats().name}</p>}
         </Show>
 
-        <div class="flex">
+        <div class="flex gap-2">
           <div class="w-full font-semibold">
             <Show
               when={props.stats}

@@ -117,7 +117,7 @@ export const Invites = () => {
           : []
       }
     >
-      <Container>
+      <Container class="overflow-x-auto">
         <Show
           when={!invites.isError}
           fallback={
@@ -132,72 +132,70 @@ export const Invites = () => {
               </EmptyState>
             }
           >
-            <div class="overflow-x-auto">
-              <Table
-                headings={TABLE_HEADINGS}
-                caption="All invites for this group"
-              >
-                <Suspense fallback={<TableRowSkeleton numCols={5} />}>
-                  <For each={invites.data}>
-                    {(invite) => (
-                      <TableRow>
-                        <TableCell>{invite.name}</TableCell>
-                        <TableCell>
-                          {invite.uses}
-                          <Show when={invite.max_uses}>{invite.max_uses}</Show>
-                        </TableCell>
-                        <TableCell>
-                          <RoleTag role={invite.role} />
-                        </TableCell>
-                        <TableCell>
-                          {invite.email_whitelist.length > 0
-                            ? invite.email_whitelist.length
-                            : "All emails allowed"}
-                        </TableCell>
-                        <TableCell>{invite.created_by_name}</TableCell>
-                        <TableCell>{formatDate(invite.created_at)}</TableCell>
-                        <TableCell>
-                          <ExpiryCell expiresAt={invite.expires_at} />
-                        </TableCell>
-                        <TableCell>
-                          <div class="flex gap-1">
+            <Table
+              headings={TABLE_HEADINGS}
+              caption="All invites for this group"
+            >
+              <Suspense fallback={<TableRowSkeleton numCols={5} />}>
+                <For each={invites.data}>
+                  {(invite) => (
+                    <TableRow>
+                      <TableCell>{invite.name}</TableCell>
+                      <TableCell>
+                        {invite.uses}
+                        <Show when={invite.max_uses}>{invite.max_uses}</Show>
+                      </TableCell>
+                      <TableCell>
+                        <RoleTag role={invite.role} />
+                      </TableCell>
+                      <TableCell>
+                        {invite.email_whitelist.length > 0
+                          ? invite.email_whitelist.length
+                          : "All emails allowed"}
+                      </TableCell>
+                      <TableCell>{invite.created_by_name}</TableCell>
+                      <TableCell>{formatDate(invite.created_at)}</TableCell>
+                      <TableCell>
+                        <ExpiryCell expiresAt={invite.expires_at} />
+                      </TableCell>
+                      <TableCell>
+                        <div class="flex gap-1">
+                          <Button
+                            icon="copy"
+                            variant="ghost"
+                            class="text-gray-400"
+                            onClick={() =>
+                              navigator.clipboard.writeText(
+                                getInviteLink(invite.id),
+                              )
+                            }
+                          />
+                          <Authorised
+                            minRole="admin"
+                            fallback={
+                              <Button
+                                class="text-gray-200"
+                                variant="ghost"
+                                icon="delete"
+                                disabled
+                              />
+                            }
+                          >
                             <Button
-                              icon="copy"
+                              danger
+                              icon="delete"
                               variant="ghost"
                               class="text-gray-400"
-                              onClick={() =>
-                                navigator.clipboard.writeText(
-                                  getInviteLink(invite.id),
-                                )
-                              }
+                              onClick={() => handleDelete(invite)}
                             />
-                            <Authorised
-                              minRole="admin"
-                              fallback={
-                                <Button
-                                  class="text-gray-200"
-                                  variant="ghost"
-                                  icon="delete"
-                                  disabled
-                                />
-                              }
-                            >
-                              <Button
-                                danger
-                                icon="delete"
-                                variant="ghost"
-                                class="text-gray-400"
-                                onClick={() => handleDelete(invite)}
-                              />
-                            </Authorised>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </For>
-                </Suspense>
-              </Table>
-            </div>
+                          </Authorised>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </For>
+              </Suspense>
+            </Table>
           </Show>
         </Show>
       </Container>
