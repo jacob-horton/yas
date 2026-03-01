@@ -70,11 +70,6 @@ async fn delete_session(session: Session) -> impl IntoResponse {
     (StatusCode::OK, "Logged out")
 }
 
-// Get current user
-async fn get_session(user: AuthUser) -> Result<impl IntoResponse, AppError> {
-    Ok(Json(serde_json::json!({ "user_id": user.id.to_string() })))
-}
-
 async fn verify_email(
     State(state): State<AppState>,
     Json(payload): Json<VerifyEmailReq>,
@@ -133,7 +128,6 @@ pub fn router() -> Router<AppState> {
                 .route_layer(Extension(create_payload_limiter(5, 60 * 15))),
         )
         .route("/sessions", delete(delete_session))
-        .route("/sessions", get(get_session))
         .route(
             "/verify-email",
             post(verify_email)

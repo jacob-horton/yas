@@ -94,10 +94,15 @@ pub async fn get_group_raw(state: &AppState, group_id: Uuid) -> Result<GroupDb, 
 }
 
 pub async fn delete_group(state: &AppState, member: GroupMemberDb) -> Result<(), AppError> {
+    if !member.role.can_perform(GroupAction::DeleteGroup) {
+        return Err(GroupError::Forbidden.into());
+    }
+
     state
         .group_repo
         .delete(&state.pool, member.group_id)
         .await?;
+
     Ok(())
 }
 
@@ -134,16 +139,10 @@ pub async fn remove_group_member(
         .await?
         .ok_or(GroupError::MemberNotFound)?;
 
-    // Can remove if it's yourself, or someone lower rank
-    if member_to_remove_id != member.user_id
-        && !member
-            .role
-            .can_perform(GroupAction::RemoveMember(member_to_be_deleted.role))
-    {
-        return Err(GroupError::Forbidden.into());
-    }
+    let is_self = member.user_id == member_to_remove_id;
 
-    if member.user_id == member_to_remove_id {
+    // Can remove if it's yourself, or someone lower rank
+    if is_self {
         // Leaving group - allow unless owner
         if member.role == GroupMemberRole::Owner {
             return Err(GroupError::Forbidden.into());
