@@ -26,7 +26,7 @@ const EditGameForm: Component<Props> = (props) => {
   const group = useGroup();
 
   const deleteGame = useDeleteGame(group.groupId);
-  const updateGame = useUpdateGame();
+  const updateGame = useUpdateGame(group.groupId);
   const toast = useToast();
 
   const { values, errors, setField, validate } = useZodForm(updateGameSchema, {
@@ -69,7 +69,7 @@ const EditGameForm: Component<Props> = (props) => {
     if (!validData) return;
 
     updateGame.mutate(
-      { groupId: props.initialData.id, payload: validData },
+      { gameId: props.initialData.id, payload: validData },
       {
         onSuccess: () => {
           toast.success({
