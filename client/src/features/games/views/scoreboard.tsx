@@ -32,16 +32,23 @@ import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams, ScoringMetric } from "../types/game";
 import { MEDAL_MAP } from "./create-game";
+import { Tooltip } from "@/components/ui/tooltip";
 
 const TABLE_CAPTION = "Stats of all players playing this game";
 
-const Medal: Component<{ medal: string; count: number }> = (props) => {
+const Medal: Component<{ medal: string; count: number; threshold: number }> = (
+  props,
+) => {
   return (
     <Show when={props.count > 0}>
-      <span>
-        {props.count}
-        {props.medal}
-      </span>
+      <Tooltip
+        tooltip={`Number of games with at least ${props.threshold} points`}
+      >
+        <span>
+          {props.count}
+          {props.medal}
+        </span>
+      </Tooltip>
     </Show>
   );
 };
@@ -289,22 +296,50 @@ export const Scoreboard = () => {
                       <Show when={hasMedals()}>
                         <TableCell>
                           <span class="flex gap-3">
-                            <Medal
-                              count={score.star_medals}
-                              medal={MEDAL_MAP.star}
-                            />
-                            <Medal
-                              count={score.gold_medals}
-                              medal={MEDAL_MAP.gold}
-                            />
-                            <Medal
-                              count={score.silver_medals}
-                              medal={MEDAL_MAP.silver}
-                            />
-                            <Medal
-                              count={score.bronze_medals}
-                              medal={MEDAL_MAP.bronze}
-                            />
+                            <Show
+                              when={scoreboardData.data?.game.star_threshold}
+                            >
+                              {(threshold) => (
+                                <Medal
+                                  count={score.star_medals}
+                                  medal={MEDAL_MAP.star}
+                                  threshold={threshold()}
+                                />
+                              )}
+                            </Show>
+                            <Show
+                              when={scoreboardData.data?.game.gold_threshold}
+                            >
+                              {(threshold) => (
+                                <Medal
+                                  count={score.gold_medals}
+                                  medal={MEDAL_MAP.gold}
+                                  threshold={threshold()}
+                                />
+                              )}
+                            </Show>
+                            <Show
+                              when={scoreboardData.data?.game.silver_threshold}
+                            >
+                              {(threshold) => (
+                                <Medal
+                                  count={score.silver_medals}
+                                  medal={MEDAL_MAP.silver}
+                                  threshold={threshold()}
+                                />
+                              )}
+                            </Show>
+                            <Show
+                              when={scoreboardData.data?.game.bronze_threshold}
+                            >
+                              {(threshold) => (
+                                <Medal
+                                  count={score.bronze_medals}
+                                  medal={MEDAL_MAP.bronze}
+                                  threshold={threshold()}
+                                />
+                              )}
+                            </Show>
                           </span>
                         </TableCell>
                       </Show>
