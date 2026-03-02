@@ -103,11 +103,19 @@ export const Sidebar: Component = () => {
               </Show>
             </Suspense>
           </div>
-          <div class="flex flex-col">
-            <p class="font-semibold text-xl leading-tight">{user()?.name}</p>
-            <p class="font-semibold text-gray-300 text-xs leading-tight">
-              {user()?.email}
+          <div class="flex min-w-0 flex-col">
+            <p class="truncate font-semibold text-lg leading-tight">
+              {user()?.name}
             </p>
+            <span class="inline-flex min-w-0 max-w-full items-center font-semibold text-gray-300 text-xs leading-tight">
+              <span class="min-w-0 max-w-max flex-1 truncate">
+                {user()?.email?.split("@")[0]}
+              </span>
+              <span class="flex-none">@</span>
+              <span class="min-w-0 max-w-max flex-1 truncate">
+                {user()?.email?.split("@")[1]}
+              </span>
+            </span>
           </div>
           <A
             href="/settings"
