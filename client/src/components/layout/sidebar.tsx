@@ -149,7 +149,9 @@ export const Sidebar: Component = () => {
 
             <NavItem name="Details" href="" icon={NotebookTextIcon} end />
             <NavItem name="Members" href="members" icon={UsersIcon} />
-            <NavItem name="Invites" href="invites" icon={MailPlusIcon} />
+            <Authorised minRole="admin">
+              <NavItem name="Invites" href="invites" icon={MailPlusIcon} />
+            </Authorised>
           </div>
 
           <div class="flex flex-col gap-1 overflow-clip whitespace-nowrap">

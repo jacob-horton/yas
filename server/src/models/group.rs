@@ -68,6 +68,7 @@ impl GroupMemberRole {
             // Admin only actions
             (GroupMemberRole::Admin, GroupAction::CreateInvite) => true,
             (GroupMemberRole::Admin, GroupAction::DeleteInvite) => true,
+            (GroupMemberRole::Admin, GroupAction::ViewInvites) => true,
             (GroupMemberRole::Admin, GroupAction::CreateMatch) => true,
             (GroupMemberRole::Admin, GroupAction::CreateGame) => true,
             (GroupMemberRole::Admin, GroupAction::UpdateGame) => true,

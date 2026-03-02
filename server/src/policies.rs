@@ -3,6 +3,7 @@ use crate::models::group::GroupMemberRole;
 pub enum GroupAction {
     CreateInvite,
     DeleteInvite,
+    ViewInvites,
     CreateGame,
     UpdateGame,
     DeleteGame,

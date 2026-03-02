@@ -145,6 +145,10 @@ pub async fn get_group_invites(
     state: &AppState,
     member: GroupMemberDb,
 ) -> Result<Vec<InviteWithCreatedByNameDb>, AppError> {
+    if !member.role.can_perform(GroupAction::ViewInvites) {
+        return Err(GroupError::Forbidden.into());
+    }
+
     let group = state
         .invite_repo
         .get_invites_for_group(&state.pool, member.group_id)
