@@ -1,5 +1,6 @@
 import { Tooltip as ArkTooltip } from "@ark-ui/solid/tooltip";
 import type { ParentComponent } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import { Portal } from "solid-js/web";
 
 type Props = {
@@ -7,8 +8,19 @@ type Props = {
 };
 
 export const Tooltip: ParentComponent<Props> = (props) => {
+  const [open, setOpen] = createSignal(false);
+  const [isTouch, setIsTouch] = createSignal(false);
+
+  onMount(() => {
+    if (window.matchMedia("(pointer: coarse)").matches) {
+      setIsTouch(true);
+    }
+  });
+
   return (
     <ArkTooltip.Root
+      open={isTouch() ? open() : undefined}
+      onOpenChange={(e) => setOpen(e.open)}
       openDelay={0}
       closeDelay={100}
       positioning={{
@@ -16,7 +28,16 @@ export const Tooltip: ParentComponent<Props> = (props) => {
         offset: { mainAxis: 10 },
       }}
     >
-      <ArkTooltip.Trigger type="button" class="cursor-default outline-none">
+      <ArkTooltip.Trigger
+        type="button"
+        class="cursor-default outline-none"
+        onClick={(e) => {
+          if (isTouch()) {
+            e.stopPropagation();
+            setOpen((o) => !o);
+          }
+        }}
+      >
         {props.children}
       </ArkTooltip.Trigger>
 
