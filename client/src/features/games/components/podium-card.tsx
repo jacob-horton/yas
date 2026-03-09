@@ -70,7 +70,9 @@ export const PodiumCard: Component<{
 
       <div class="flex flex-1 flex-col justify-center gap-2 py-4 pr-4 pl-12 md:justify-between md:gap-4 md:px-6 md:py-0 md:pt-14">
         <Show when={props.stats} fallback={<TextSkeleton class="w-2/3" />}>
-          {(stats) => <p class="truncate font-semibold">{stats().name}</p>}
+          {(stats) => (
+            <p class="truncate font-semibold leading-normal">{stats().name}</p>
+          )}
         </Show>
 
         <div class="flex gap-2">
