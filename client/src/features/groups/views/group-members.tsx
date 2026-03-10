@@ -5,6 +5,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ErrorMessage } from "@/components/ui/error-message";
 import { RolePicker } from "@/components/ui/role-picker";
+import { SmartDate } from "@/components/ui/smart-date";
 import {
   type Heading,
   type Sort,
@@ -18,7 +19,6 @@ import { useToast } from "@/context/toast-context";
 import { Authorised } from "@/features/auth/components/authorised";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { cn } from "@/lib/classname";
-import { formatDate } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
 import { useRemoveMember } from "../hooks/use-remove-member";
@@ -171,7 +171,9 @@ export const GroupMembers = () => {
                         }
                       />
                     </TableCell>
-                    <TableCell>{formatDate(member.joined_at)}</TableCell>
+                    <TableCell>
+                      <SmartDate date={member.joined_at} />
+                    </TableCell>
                     <TableCell class="w-14">
                       <Authorised
                         strictlyAbove={member.role}

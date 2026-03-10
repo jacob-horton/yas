@@ -6,6 +6,7 @@ import { Container } from "@/components/layout/container";
 import { Page } from "@/components/layout/page";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorMessage } from "@/components/ui/error-message";
+import { SmartDate } from "@/components/ui/smart-date";
 import {
   type Heading,
   Table,
@@ -14,7 +15,6 @@ import {
 } from "@/components/ui/table";
 import { TableRowSkeleton } from "@/components/ui/table.skeleton";
 import { cn } from "@/lib/classname";
-import { formatDate } from "@/lib/format-date";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_TEXT_COLOURS } from "@/lib/rank-colours";
 import { PlayerHistoryChart } from "../components/player-history-chart";
@@ -115,7 +115,9 @@ export const PlayerStats = () => {
                   {(data) =>
                     data().map((s) => (
                       <TableRow>
-                        <TableCell>{formatDate(s.played_at)}</TableCell>
+                        <TableCell>
+                          <SmartDate date={s.played_at} />
+                        </TableCell>
                         <TableCell>
                           <span
                             class={cn(

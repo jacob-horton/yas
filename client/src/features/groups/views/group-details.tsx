@@ -11,11 +11,11 @@ import { Dynamic } from "solid-js/web";
 import { type Action, Page } from "@/components/layout/page";
 import { Avatar } from "@/components/ui/avatar";
 import { ErrorMessage } from "@/components/ui/error-message";
+import { SmartDate } from "@/components/ui/smart-date";
 import { useConfirmation } from "@/context/confirmation-context";
 import { useToast } from "@/context/toast-context";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { LS_LAST_GROUP_ID } from "@/features/home/constants";
-import { formatDate } from "@/lib/format-date";
 import { ICON_MAP, type Icon } from "@/lib/icons";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
@@ -144,7 +144,9 @@ export const GroupDetails = () => {
             </DetailCard>
             <DetailCard icon="calendar" title="Created On">
               <Suspense>
-                {formatDate(group.groupQuery.data?.created_at ?? "")}
+                <Show when={group.groupQuery.data?.created_at}>
+                  {(createdAt) => <SmartDate date={createdAt()} />}
+                </Show>
               </Suspense>
             </DetailCard>
             <DetailCard icon="userStar" title="Created By">

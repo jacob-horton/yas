@@ -5,10 +5,8 @@
 
 @import "tailwindcss";
 
-/* biome-ignore lint/suspicious/noUnknownAtRules: Supported by tailwind */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* biome-ignore lint/suspicious/noUnknownAtRules: Supported by tailwind */
 @theme {
   --font-sans: "Poppins", sans-serif;
   --font-mono-nums: "Inter", "Poppins", sans-serif; /* Monospaced numbers */
@@ -68,9 +66,7 @@
   }
 }
 
-/* biome-ignore lint/suspicious/noUnknownAtRules: Supported by tailwind */
 @utility no-scrollbar {
-  /* biome-ignore lint/suspicious/noUnknownAtRules: Supported by tailwind */
   @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
 }
 

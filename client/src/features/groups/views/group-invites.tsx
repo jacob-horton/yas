@@ -1,4 +1,3 @@
-import { formatDistanceToNow } from "date-fns";
 import { type Component, For, Show, Suspense } from "solid-js";
 import LetterSvg from "@/assets/empty-states/letter.svg";
 import { Container } from "@/components/layout/container";
@@ -7,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorMessage } from "@/components/ui/error-message";
 import { RoleTag } from "@/components/ui/role-tag";
+import { SmartDate } from "@/components/ui/smart-date";
 import {
   type Heading,
   Table,
@@ -22,7 +22,6 @@ import { useDeleteInvite } from "@/features/invites/hooks/use-delete-invite";
 import type { InviteSummary } from "@/features/invites/types/invite";
 import { cn } from "@/lib/classname";
 import { isExpired } from "@/lib/expiry";
-import { formatDate } from "@/lib/format-date";
 import { useGroup } from "../context/group-provider";
 import { useGroupInvites } from "../hooks/use-group-invites";
 import { hasPermission } from "../types";
@@ -32,21 +31,8 @@ type ExpiryCellProps = { expiresAt: string };
 const ExpiryCell: Component<ExpiryCellProps> = (props) => {
   const expired = isExpired(props.expiresAt);
 
-  // TODO: show "in 10 days", tooltip for exact time
   return (
-    <div class="flex flex-col">
-      <span class={cn({ "text-red-500": expired })}>
-        {formatDate(props.expiresAt)}
-      </span>
-      <span
-        class={cn("text-sm", {
-          "text-gray-400": !expired,
-          "text-red-400": expired,
-        })}
-      >
-        {formatDistanceToNow(props.expiresAt, { addSuffix: true })}
-      </span>
-    </div>
+    <SmartDate date={props.expiresAt} class={cn({ "text-red-500": expired })} />
   );
 };
 
@@ -153,7 +139,9 @@ export const Invites = () => {
                           : "All emails allowed"}
                       </TableCell>
                       <TableCell>{invite.created_by_name}</TableCell>
-                      <TableCell>{formatDate(invite.created_at)}</TableCell>
+                      <TableCell>
+                        <SmartDate date={invite.created_at} />
+                      </TableCell>
                       <TableCell>
                         <ExpiryCell expiresAt={invite.expires_at} />
                       </TableCell>

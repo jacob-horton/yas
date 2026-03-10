@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TableRowSkeleton } from "@/components/ui/table.skeleton";
+import { Tooltip } from "@/components/ui/tooltip";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { hasPermission } from "@/features/groups/types";
@@ -32,7 +33,6 @@ import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams, ScoringMetric } from "../types/game";
 import { MEDAL_MAP } from "./create-game";
-import { Tooltip } from "@/components/ui/tooltip";
 
 const TABLE_CAPTION = "Stats of all players playing this game";
 
