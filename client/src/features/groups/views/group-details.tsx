@@ -162,7 +162,7 @@ export const GroupDetails = () => {
                             class="size-12"
                           />
                         </div>
-                        {createdBy().name}
+                        <p class="truncate">{createdBy().name}</p>
                       </div>
                     );
                   }}

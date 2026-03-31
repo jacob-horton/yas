@@ -19,7 +19,7 @@ export const HighlightStatCard: Component<Props> = (props) => {
   return (
     <div
       class={cn(
-        "flex h-28 w-80 min-w-80 items-center gap-4 rounded-md border px-4 py-2",
+        "flex h-28 w-80 min-w-80 max-w-80 items-center gap-4 rounded-md border px-4 py-2",
         COLOUR_MAP[props.colour].bg,
         COLOUR_MAP[props.colour].text,
         COLOUR_MAP[props.colour].border,
@@ -29,7 +29,7 @@ export const HighlightStatCard: Component<Props> = (props) => {
         <Dynamic component={ICON_MAP[props.icon]} size={40} />
       </div>
 
-      <div class="flex w-full flex-col items-stretch justify-center gap-2">
+      <div class="flex w-full min-w-0 flex-col items-stretch justify-center gap-2">
         <div>
           <p class="whitespace-nowrap font-semibold text-xl leading-5">
             {props.label}
@@ -44,7 +44,7 @@ export const HighlightStatCard: Component<Props> = (props) => {
           </p>
         </div>
 
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between gap-2">
           {props.loading ? (
             <>
               <TextSkeleton class="w-18" />
@@ -52,7 +52,7 @@ export const HighlightStatCard: Component<Props> = (props) => {
             </>
           ) : (
             <>
-              <p class="font-semibold">{props.userName}</p>
+              <p class="truncate font-semibold">{props.userName}</p>
               <p>{props.value}</p>
             </>
           )}
