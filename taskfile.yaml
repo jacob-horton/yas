@@ -61,7 +61,7 @@ tasks:
     desc: Build the Rust backend for Linux
     dir: 'server'
     cmds:
-      - cargo build --release --target x86_64-unknown-linux-gnu
+      - cargo build --release --target x86_64-unknown-linux-gnu --features production
 
   deploy:
     desc: Build and push artifacts to the VPS

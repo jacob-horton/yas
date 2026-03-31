@@ -15,13 +15,18 @@ use axum::{
     },
     middleware,
 };
-use resend_rs::Resend;
 use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::{env, net::SocketAddr, sync::Arc};
 use tower_http::cors::CorsLayer;
 use tower_sessions::{ExpiredDeletion, cookie::Key};
 use tower_sessions::{Expiry, SessionManagerLayer, cookie::SameSite};
 use tower_sessions_sqlx_store::PostgresStore;
+
+#[cfg(feature = "production")]
+use crate::services::email::ResendProvider;
+
+#[cfg(not(feature = "production"))]
+use crate::services::email::ConsoleProvider;
 
 use crate::{
     extractors::rate_limiting::ip::{create_ip_limiter, ip_limit_mw},
@@ -59,9 +64,7 @@ impl AppState {
         let stats_repo = Arc::new(StatsRepo {});
         let verification_repo = Arc::new(VerificationRepo {});
         let password_resets_repo = Arc::new(PasswordResetsRepo {});
-
-        let resend_client = Resend::new(&env::var("RESEND_KEY").expect("RESEND_KEY must be set"));
-        let email_service = Arc::new(EmailService { resend_client });
+        let email_service = Arc::new(Self::get_email_service());
 
         Self {
             pool: pool.clone(),
@@ -77,6 +80,20 @@ impl AppState {
             match_repo,
             stats_repo,
         }
+    }
+
+    fn get_email_service() -> EmailService {
+        #[cfg(feature = "production")]
+        let provider = ResendProvider {
+            client: resend_rs::Resend::new(
+                &std::env::var("RESEND_KEY").expect("RESEND_KEY must be set"),
+            ),
+        };
+
+        #[cfg(not(feature = "production"))]
+        let provider = ConsoleProvider;
+
+        EmailService::new(provider)
     }
 }
 
