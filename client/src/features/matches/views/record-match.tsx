@@ -84,6 +84,29 @@ export const RecordMatchForm = (props: {
     );
   };
 
+  const handlePlayerSelected = (playerId: string, dropdownIdx: number) => {
+    // Check if player already selected in another dropdown
+    const existingRowIndex = values.scores.findIndex(
+      (s, idx) => s?.user_id === playerId && idx !== dropdownIdx,
+    );
+
+    // Player not already selected in another dropdown - set the value of this dropdown normally
+    if (existingRowIndex === -1) {
+      setField("scores", dropdownIdx, "user_id", playerId);
+      return;
+    }
+
+    // Otherwise, we need to swap this value with the other dropdown
+    const currentPlayerId = values.scores[dropdownIdx].user_id;
+    setField("scores", existingRowIndex, "user_id", currentPlayerId);
+    setField("scores", dropdownIdx, "user_id", playerId);
+
+    toast.success({
+      title: "Players swapped",
+      description: "Swapped positions to avoid duplicates",
+    });
+  };
+
   return (
     <FormPage title="Record Match" onSubmit={handleSubmit}>
       <header>
@@ -98,14 +121,11 @@ export const RecordMatchForm = (props: {
             <Dropdown
               class="w-full flex-1 sm:min-w-64"
               value={row.user_id}
-              onChange={(val) => setField("scores", i(), "user_id", val)}
+              onChange={(playerId) => handlePlayerSelected(playerId, i())}
               error={errors[`scores.${i()}.user_id`]}
               options={props.members.map((m) => ({
                 label: m.name,
                 value: m.id,
-                disabled:
-                  values.scores.some((s) => s?.user_id === m.id) &&
-                  m.id !== row.user_id,
               }))}
               label={`Player ${i() + 1}`}
             />
