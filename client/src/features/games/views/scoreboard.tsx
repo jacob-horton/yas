@@ -147,7 +147,7 @@ export const Scoreboard = () => {
     };
   };
 
-  const podiumTotal = () => scoreboardData.data?.podium.length || 0;
+  const podiumTotal = () => scoreboardData.data?.podium.length || 3;
 
   // TODO: proper loading for scoreboard name
   return (
