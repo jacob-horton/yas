@@ -53,7 +53,7 @@ pub async fn create_match(
 
     let game_match = state
         .match_repo
-        .create(&mut tx, game_id, scores)
+        .create(&mut tx, game_id, user_id, scores)
         .await
         .map_err(MatchError::Database)?;
 
