@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
+    "build:analyze": "vite build --analyze",
     "dev": "vite",
     "format": "biome format --write",
     "lint": "biome lint",
