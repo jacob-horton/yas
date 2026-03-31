@@ -28,7 +28,8 @@ export const CreateGame = () => {
 
   const { values, errors, setField, validate } = useZodForm(createGameSchema, {
     name: "",
-    players_per_match: "",
+    min_players_per_match: "",
+    max_players_per_match: "",
     metric: scoringMetrics[0],
     medal_scores: undefined,
   });
@@ -79,14 +80,22 @@ export const CreateGame = () => {
           error={errors.name}
         />
 
-        {/* TODO: tooltips to explain these inputs */}
         <Input
-          label="# of players per match"
-          tooltip="This will determine how many player scores you can enter for a match"
-          value={values.players_per_match}
-          onChange={(val) => setField("players_per_match", val)}
+          label="Minimum # of players per match"
+          tooltip="This will determine the minimum number of player scores that must be entered when recording a match"
+          value={values.min_players_per_match}
+          onChange={(val) => setField("min_players_per_match", val)}
           placeholder="e.g. 4"
-          error={errors.players_per_match}
+          error={errors.min_players_per_match}
+        />
+
+        <Input
+          label="Maximum # of players per match"
+          tooltip="This will determine the maximum number of player scores that must be entered when recording a match"
+          value={values.max_players_per_match}
+          onChange={(val) => setField("max_players_per_match", val)}
+          placeholder="e.g. 4"
+          error={errors.max_players_per_match}
         />
 
         <Dropdown

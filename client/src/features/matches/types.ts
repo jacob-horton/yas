@@ -7,10 +7,17 @@ export const matchScoreSchema = z.object({
 });
 export type MatchScore = z.output<typeof matchScoreSchema>;
 
-export const createMatchSchema = z.object({
-  scores: z.array(matchScoreSchema).nonempty(),
-});
-export type CreateMatchRequest = z.output<typeof createMatchSchema>;
+export const createMatchSchema = (
+  minPlayersPerMatch: number,
+  maxPlayersPerMatch: number,
+) =>
+  z.object({
+    scores: z
+      .array(matchScoreSchema)
+      .min(minPlayersPerMatch)
+      .max(maxPlayersPerMatch),
+  });
+export type CreateMatchRequest = z.output<ReturnType<typeof createMatchSchema>>;
 
 export type Match = {
   id: string;

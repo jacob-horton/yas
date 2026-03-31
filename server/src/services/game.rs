@@ -15,13 +15,18 @@ pub async fn create_game(
         return Err(GroupError::Forbidden.into());
     }
 
+    if payload.min_players_per_match > payload.max_players_per_match {
+        return Err(GameError::MaxLessThanMin.into());
+    }
+
     let game = state
         .game_repo
         .create(
             &state.pool,
             member.group_id,
             &payload.name,
-            payload.players_per_match,
+            payload.min_players_per_match,
+            payload.max_players_per_match,
             payload.metric,
             payload.medal_scores.and_then(|s| s.star),
             payload.medal_scores.and_then(|s| s.gold),
@@ -51,7 +56,8 @@ pub async fn update_game(
             &state.pool,
             game.id,
             &payload.name,
-            payload.players_per_match,
+            payload.min_players_per_match,
+            payload.max_players_per_match,
             payload.metric,
             payload.medal_scores.and_then(|s| s.star),
             payload.medal_scores.and_then(|s| s.gold),

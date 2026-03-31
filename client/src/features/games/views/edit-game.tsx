@@ -31,7 +31,8 @@ const EditGameForm: Component<Props> = (props) => {
 
   const { values, errors, setField, validate } = useZodForm(updateGameSchema, {
     name: props.initialData.name,
-    players_per_match: props.initialData.players_per_match.toString(),
+    min_players_per_match: props.initialData.min_players_per_match.toString(),
+    max_players_per_match: props.initialData.max_players_per_match.toString(),
     metric: props.initialData.metric,
 
     medal_scores:
@@ -134,13 +135,22 @@ const EditGameForm: Component<Props> = (props) => {
           error={errors.name}
         />
 
-        {/* TODO: tooltips to explain these inputs */}
         <Input
-          label="# of players per match"
-          value={values.players_per_match}
-          onChange={(val) => setField("players_per_match", val)}
+          label="Minimum # of players per match"
+          tooltip="This will determine the minimum number of player scores that must be entered when recording a match"
+          value={values.min_players_per_match}
+          onChange={(val) => setField("min_players_per_match", val)}
           placeholder="e.g. 4"
-          error={errors.players_per_match}
+          error={errors.min_players_per_match}
+        />
+
+        <Input
+          label="Maximum # of players per match"
+          tooltip="This will determine the maximum number of player scores that must be entered when recording a match"
+          value={values.max_players_per_match}
+          onChange={(val) => setField("max_players_per_match", val)}
+          placeholder="e.g. 4"
+          error={errors.max_players_per_match}
         />
 
         <Dropdown

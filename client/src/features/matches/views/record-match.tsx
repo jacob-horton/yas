@@ -24,20 +24,46 @@ export const RecordMatchForm = (props: {
   const recordMatch = useRecordMatch();
   const navigate = useNavigate();
 
-  const initialScores = Array.from({
-    length: props.game.players_per_match,
-  }).map((_, i) => ({
-    // Load players from last match, or fall back to first n players
-    user_id:
-      props.history.length > 0
-        ? props.history[i]
-        : (props.members[i]?.id ?? ""),
-    score: "",
-  }));
+  // Load history, but ensure we are between the min and max requirements
+  const getInitialScores = () => {
+    const min = props.game.min_players_per_match;
+    const max = props.game.max_players_per_match;
 
-  const { values, errors, setField, validate } = useZodForm(createMatchSchema, {
-    scores: initialScores,
-  });
+    // Initial number of players is the number from the previous match, capped between min and max players
+    const rowCount = Math.min(Math.max(props.history.length, min), max);
+
+    return Array.from({ length: rowCount }).map((_, i) => ({
+      user_id: props.history[i] ?? "", // Fallback to empty if history is shorter than min
+      score: "",
+    }));
+  };
+
+  const { values, errors, setField, validate, clearErrors } = useZodForm(
+    createMatchSchema(
+      props.game.min_players_per_match,
+      props.game.max_players_per_match,
+    ),
+    { scores: getInitialScores() },
+  );
+
+  const addPlayer = () => {
+    if (values.scores.length < props.game.max_players_per_match) {
+      setField("scores", (s) => [...s, { user_id: "", score: "" }]);
+      clearErrors();
+    }
+  };
+
+  const removePlayer = (index: number) => {
+    if (values.scores.length > props.game.min_players_per_match) {
+      setField("scores", (s) => s.filter((_, i) => i !== index));
+      clearErrors();
+    } else {
+      toast.error({
+        title: "Cannot remove player",
+        description: `This game requires at least ${props.game.min_players_per_match} players.`,
+      });
+    }
+  };
 
   const handleSubmit = (e: Event) => {
     e.preventDefault();
@@ -52,7 +78,6 @@ export const RecordMatchForm = (props: {
             title: "Match recorded",
             description: "Match recorded successfully",
           });
-
           navigate(-1);
         },
       },
@@ -61,9 +86,11 @@ export const RecordMatchForm = (props: {
 
   return (
     <FormPage title="Record Match" onSubmit={handleSubmit}>
-      <p>
-        Recording match for <b>{props.game.name}</b>
-      </p>
+      <header>
+        <p>
+          Recording match for <b>{props.game.name}</b>
+        </p>
+      </header>
 
       <For each={values.scores}>
         {(row, i) => (
@@ -82,6 +109,7 @@ export const RecordMatchForm = (props: {
               }))}
               label={`Player ${i() + 1}`}
             />
+
             <Input
               class="w-24 min-w-24 max-w-24 sm:w-32 sm:min-w-32 sm:max-w-32"
               inputMode="numeric"
@@ -91,11 +119,37 @@ export const RecordMatchForm = (props: {
               label="Points"
               placeholder="e.g. 50"
             />
+
+            <Show
+              when={
+                props.game.max_players_per_match >
+                props.game.min_players_per_match
+              }
+            >
+              <div class="flex h-16 items-center">
+                <Button
+                  variant="ghost"
+                  icon="delete"
+                  onClick={() => removePlayer(i())}
+                  disabled={
+                    values.scores.length <= props.game.min_players_per_match
+                  }
+                  aria-label="Remove player"
+                  danger
+                />
+              </div>
+            </Show>
           </div>
         )}
       </For>
 
-      <span class="flex gap-4">
+      <Show when={values.scores.length < props.game.max_players_per_match}>
+        <Button variant="ghost" onClick={addPlayer}>
+          + Add Player
+        </Button>
+      </Show>
+
+      <div class="flex gap-4">
         <Button type="submit" loading={recordMatch.isPending}>
           Submit
         </Button>
@@ -106,10 +160,11 @@ export const RecordMatchForm = (props: {
         >
           Cancel
         </Button>
-      </span>
+      </div>
     </FormPage>
   );
 };
+
 export const RecordMatch = () => {
   const params = useParams<GameRouteParams>();
   const game = useGame(() => params.gameId);

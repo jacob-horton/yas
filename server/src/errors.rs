@@ -79,6 +79,9 @@ pub enum GameError {
     #[error("Game not found")]
     NotFound,
 
+    #[error("Max players cannot be less than min players")]
+    MaxLessThanMin,
+
     #[error(transparent)]
     Database(#[from] sqlx::Error),
 }
@@ -193,6 +196,7 @@ impl IntoResponse for AppError {
 
             AppError::Game(err) => match err {
                 GameError::NotFound => (StatusCode::NOT_FOUND, err.to_string()),
+                GameError::MaxLessThanMin => (StatusCode::BAD_REQUEST, err.to_string()),
                 GameError::Database(e) => {
                     eprintln!("Game DB error: {:?}", e);
                     (

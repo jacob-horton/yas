@@ -74,9 +74,9 @@ export const Button: ParentComponent<ButtonProps> = (props) => {
         "px-5": !local.iconOnlyOnMobile && !(!local.children && local.icon),
 
         "hover:bg-red-50 hover:text-red-600":
-          local.danger && local.variant === "ghost",
+          !local.disabled && local.danger && local.variant === "ghost",
         "border-red-700 text-red-700 hover:bg-red-100 dark:hover:bg-red-500/20":
-          local.danger && local.variant === "secondary",
+          !local.disabled && local.danger && local.variant === "secondary",
 
         "cursor-not-allowed bg-gray-300 hover:bg-gray-300": isDisabled(),
         "bg-transparent text-gray-400 hover:bg-transparent dark:text-gray-700 dark:hover:bg-transparent":

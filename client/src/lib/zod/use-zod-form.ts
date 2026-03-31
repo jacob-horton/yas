@@ -1,4 +1,4 @@
-import { createStore, type SetStoreFunction } from "solid-js/store";
+import { createStore, reconcile, type SetStoreFunction } from "solid-js/store";
 import type { z } from "zod";
 
 // Helper function to get string path from nested object (used for error paths)
@@ -57,14 +57,15 @@ export function useZodForm<T extends z.ZodType>(
         newErrors[path] = issue.message;
       });
 
-      setErrors({});
-      setErrors(newErrors);
+      setErrors(reconcile(newErrors));
       return null;
     }
 
-    setErrors({});
+    setErrors(reconcile({}));
     return result.data;
   };
 
-  return { values, errors, setField, setError, validate };
+  const clearErrors = () => setErrors(reconcile({}));
+
+  return { values, errors, setField, setError, validate, clearErrors };
 }

@@ -11,7 +11,8 @@ pub struct GameDb {
     pub group_id: Uuid,
     pub name: String,
     pub created_at: DateTime<Utc>,
-    pub players_per_match: i32,
+    pub min_players_per_match: i32,
+    pub max_players_per_match: i32,
     pub metric: ScoringMetric,
 
     pub star_threshold: Option<i32>,
@@ -26,7 +27,8 @@ pub struct GameResponse {
     pub name: String,
     pub group_id: Uuid,
     pub created_at: DateTime<Utc>,
-    pub players_per_match: i32,
+    pub min_players_per_match: i32,
+    pub max_players_per_match: i32,
     pub metric: ScoringMetric,
 
     pub star_threshold: Option<i32>,
@@ -42,7 +44,8 @@ impl From<GameDb> for GameResponse {
             group_id: game.group_id,
             name: game.name,
             created_at: game.created_at,
-            players_per_match: game.players_per_match,
+            min_players_per_match: game.min_players_per_match,
+            max_players_per_match: game.max_players_per_match,
             metric: game.metric,
 
             star_threshold: game.star_threshold,
@@ -96,9 +99,16 @@ pub struct CreateGameReq {
     #[validate(range(
         min = 1,
         max = 50,
-        message = "Number of players per match must be between 1 and 50"
+        message = "Min number of players per match must be between 1 and 50"
     ))]
-    pub players_per_match: i32,
+    pub min_players_per_match: i32,
+
+    #[validate(range(
+        min = 1,
+        max = 50,
+        message = "Max number of players per match must be between 1 and 50"
+    ))]
+    pub max_players_per_match: i32,
 
     pub metric: ScoringMetric,
     pub medal_scores: Option<GameMedals>,
@@ -113,9 +123,16 @@ pub struct UpdateGameReq {
     #[validate(range(
         min = 1,
         max = 50,
-        message = "Number of players per match must be between 1 and 50"
+        message = "Min number of players per match must be between 1 and 50"
     ))]
-    pub players_per_match: i32,
+    pub min_players_per_match: i32,
+
+    #[validate(range(
+        min = 1,
+        max = 50,
+        message = "Max number of players per match must be between 1 and 50"
+    ))]
+    pub max_players_per_match: i32,
 
     pub metric: ScoringMetric,
     pub medal_scores: Option<GameMedals>,

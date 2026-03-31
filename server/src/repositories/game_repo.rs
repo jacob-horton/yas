@@ -11,7 +11,8 @@ impl GameRepo {
         executor: impl PgExecutor<'e, Database = Postgres>,
         group_id: Uuid,
         name: &str,
-        players_per_match: i32,
+        min_players_per_match: i32,
+        max_players_per_match: i32,
         metric: ScoringMetric,
         star_threshold: Option<i32>,
         gold_threshold: Option<i32>,
@@ -19,11 +20,12 @@ impl GameRepo {
         bronze_threshold: Option<i32>,
     ) -> Result<GameDb, sqlx::Error> {
         sqlx::query_as::<_, GameDb>(
-            "INSERT INTO games (group_id, name, players_per_match, metric, star_threshold, gold_threshold, silver_threshold, bronze_threshold) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
+            "INSERT INTO games (group_id, name, min_players_per_match, max_players_per_match, metric, star_threshold, gold_threshold, silver_threshold, bronze_threshold) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
         )
         .bind(group_id)
         .bind(name)
-        .bind(players_per_match)
+        .bind(min_players_per_match)
+        .bind(max_players_per_match)
         .bind(metric)
         .bind(star_threshold)
         .bind(gold_threshold)
@@ -38,7 +40,8 @@ impl GameRepo {
         executor: impl PgExecutor<'e, Database = Postgres>,
         game_id: Uuid,
         name: &str,
-        players_per_match: i32,
+        min_players_per_match: i32,
+        max_players_per_match: i32,
         metric: ScoringMetric,
         star_threshold: Option<i32>,
         gold_threshold: Option<i32>,
@@ -46,10 +49,11 @@ impl GameRepo {
         bronze_threshold: Option<i32>,
     ) -> Result<GameDb, sqlx::Error> {
         sqlx::query_as::<_, GameDb>(
-            "UPDATE games SET name = $1, players_per_match = $2, metric = $3, star_threshold = $4, gold_threshold = $5, silver_threshold = $6, bronze_threshold = $7 WHERE id = $8 RETURNING *",
+            "UPDATE games SET name = $1, min_players_per_match = $2, max_players_per_match = $3, metric = $4, star_threshold = $5, gold_threshold = $6, silver_threshold = $7, bronze_threshold = $8 WHERE id = $9 RETURNING *",
         )
         .bind(name)
-        .bind(players_per_match)
+        .bind(min_players_per_match)
+        .bind(max_players_per_match)
         .bind(metric)
         .bind(star_threshold)
         .bind(gold_threshold)

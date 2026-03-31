@@ -15,7 +15,8 @@ export type Game = {
   id: string;
   name: string;
   created_at: string;
-  players_per_match: number;
+  min_players_per_match: number;
+  max_players_per_match: number;
   metric: ScoringMetric;
 
   star_threshold: number | null;
@@ -33,49 +34,73 @@ const medalScoresSchema = z
   })
   .optional();
 
-export const createGameSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(3, "Must be at least 3 characters")
-    .max(50, "Cannot exceed 50 characters"),
+export const createGameSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(3, "Must be at least 3 characters")
+      .max(50, "Cannot exceed 50 characters"),
 
-  players_per_match: numericStringSchema.pipe(
-    z
-      .number()
-      .min(1, "Must have at least 1 player")
-      .max(50, "Cannot exceed 50 players"),
-  ),
+    min_players_per_match: numericStringSchema.pipe(
+      z
+        .number()
+        .min(1, "Must have at least 1 player")
+        .max(50, "Cannot exceed 50 players"),
+    ),
 
-  metric: z.string().pipe(z.enum(scoringMetrics)),
+    max_players_per_match: numericStringSchema.pipe(
+      z
+        .number()
+        .min(1, "Must have at least 1 player")
+        .max(50, "Cannot exceed 50 players"),
+    ),
 
-  medal_scores: medalScoresSchema,
-});
+    metric: z.string().pipe(z.enum(scoringMetrics)),
+
+    medal_scores: medalScoresSchema,
+  })
+  .refine((data) => data.min_players_per_match <= data.max_players_per_match, {
+    message: "Max players cannot be less than min players",
+    path: ["max_players_per_match"],
+  });
 export type CreateGameRequest = z.output<typeof createGameSchema>;
 
-export const updateGameSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(3, "Must be at least 3 characters")
-    .max(50, "Cannot exceed 50 characters"),
+export const updateGameSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(3, "Must be at least 3 characters")
+      .max(50, "Cannot exceed 50 characters"),
 
-  players_per_match: numericStringSchema.pipe(
-    z
-      .number()
-      .min(1, "Must have at least 1 player")
-      .max(50, "Cannot exceed 50 players"),
-  ),
+    min_players_per_match: numericStringSchema.pipe(
+      z
+        .number()
+        .min(1, "Must have at least 1 player")
+        .max(50, "Cannot exceed 50 players"),
+    ),
 
-  metric: z.string().pipe(z.enum(scoringMetrics)),
+    max_players_per_match: numericStringSchema.pipe(
+      z
+        .number()
+        .min(1, "Must have at least 1 player")
+        .max(50, "Cannot exceed 50 players"),
+    ),
 
-  medal_scores: z
-    .object({
-      star: nullableNumericStringSchema,
-      gold: nullableNumericStringSchema,
-      silver: nullableNumericStringSchema,
-      bronze: nullableNumericStringSchema,
-    })
-    .optional(),
-});
+    metric: z.string().pipe(z.enum(scoringMetrics)),
+
+    medal_scores: z
+      .object({
+        star: nullableNumericStringSchema,
+        gold: nullableNumericStringSchema,
+        silver: nullableNumericStringSchema,
+        bronze: nullableNumericStringSchema,
+      })
+      .optional(),
+  })
+  .refine((data) => data.min_players_per_match <= data.max_players_per_match, {
+    message: "Max players cannot be less than min players",
+    path: ["max_players_per_match"],
+  });
 export type UpdateGameRequest = z.output<typeof updateGameSchema>;

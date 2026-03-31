@@ -18,7 +18,9 @@ pub async fn create_match(
         return Err(GroupError::Forbidden.into());
     }
 
-    if payload.scores.len() != game.players_per_match as usize {
+    if payload.scores.len() < game.min_players_per_match as usize
+        || payload.scores.len() > game.max_players_per_match as usize
+    {
         return Err(MatchError::IncorrectNumberOfScores.into());
     }
 
