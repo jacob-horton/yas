@@ -32,7 +32,7 @@ export const RecordMatchForm = (props: {
       props.history.length > 0
         ? props.history[i]
         : (props.members[i]?.id ?? ""),
-    score: "0",
+    score: "",
   }));
 
   const { values, errors, setField, validate } = useZodForm(createMatchSchema, {
@@ -89,6 +89,7 @@ export const RecordMatchForm = (props: {
               onChange={(val) => setField("scores", i(), "score", val)}
               error={errors[`scores.${i()}.score`]}
               label="Points"
+              placeholder="e.g. 50"
             />
           </div>
         )}
