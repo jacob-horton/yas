@@ -1,7 +1,7 @@
 import { Route, Router } from "@solidjs/router";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { isAxiosError } from "axios";
-import type { ParentComponent } from "solid-js";
+import { lazy, type ParentComponent } from "solid-js";
 import { Sidebar } from "@/components/layout/sidebar";
 import { ConfirmationProvider } from "@/context/confirmation-context";
 import { SidebarProvider } from "@/context/sidebar-context";
@@ -9,29 +9,125 @@ import { ToastProvider } from "@/context/toast-context";
 import { requireRole } from "@/features/auth/components/authorised-route";
 import { ProtectedRoute } from "@/features/auth/components/protected-route";
 import { AuthProvider } from "@/features/auth/context/auth-provider";
-import { ForgotPassword } from "@/features/auth/views/forgot-password";
-import { Login } from "@/features/auth/views/login";
-import { Register } from "@/features/auth/views/register";
-import { ResetPassword } from "@/features/auth/views/reset-password";
-import { VerifyEmail } from "@/features/auth/views/verify-email";
-import { CreateGame } from "@/features/games/views/create-game";
-import { EditGame } from "@/features/games/views/edit-game";
-import { Scoreboard } from "@/features/games/views/scoreboard";
 import { GroupProvider } from "@/features/groups/context/group-provider";
-import { CreateGroup } from "@/features/groups/views/create-group";
-import { EditGroup } from "@/features/groups/views/edit-group";
-import { GroupDetails } from "@/features/groups/views/group-details";
-import { Invites } from "@/features/groups/views/group-invites";
-import { GroupMembers } from "@/features/groups/views/group-members";
-import { HomePage } from "@/features/home/views/home-page";
-import { AcceptInvite } from "@/features/invites/views/accept-invite";
-import { CreateInvite } from "@/features/invites/views/create-invite";
-import { RecordMatch } from "@/features/matches/views/record-match";
-import { PlayerStats } from "@/features/stats/views/player-stats";
-import { EditEmail } from "@/features/users/views/edit-email";
-import { EditPassword } from "@/features/users/views/edit-password";
-import { EditUser } from "@/features/users/views/edit-user";
-import { UserSettings } from "@/features/users/views/settings";
+
+// Auth Views
+const ForgotPassword = lazy(() =>
+  import("@/features/auth/views/forgot-password").then((m) => ({
+    default: m.ForgotPassword,
+  })),
+);
+const Login = lazy(() =>
+  import("@/features/auth/views/login").then((m) => ({ default: m.Login })),
+);
+const Register = lazy(() =>
+  import("@/features/auth/views/register").then((m) => ({
+    default: m.Register,
+  })),
+);
+const ResetPassword = lazy(() =>
+  import("@/features/auth/views/reset-password").then((m) => ({
+    default: m.ResetPassword,
+  })),
+);
+const VerifyEmail = lazy(() =>
+  import("@/features/auth/views/verify-email").then((m) => ({
+    default: m.VerifyEmail,
+  })),
+);
+
+// Game Views
+const CreateGame = lazy(() =>
+  import("@/features/games/views/create-game").then((m) => ({
+    default: m.CreateGame,
+  })),
+);
+const EditGame = lazy(() =>
+  import("@/features/games/views/edit-game").then((m) => ({
+    default: m.EditGame,
+  })),
+);
+const Scoreboard = lazy(() =>
+  import("@/features/games/views/scoreboard").then((m) => ({
+    default: m.Scoreboard,
+  })),
+);
+
+// Group Views
+const CreateGroup = lazy(() =>
+  import("@/features/groups/views/create-group").then((m) => ({
+    default: m.CreateGroup,
+  })),
+);
+const EditGroup = lazy(() =>
+  import("@/features/groups/views/edit-group").then((m) => ({
+    default: m.EditGroup,
+  })),
+);
+const GroupDetails = lazy(() =>
+  import("@/features/groups/views/group-details").then((m) => ({
+    default: m.GroupDetails,
+  })),
+);
+const Invites = lazy(() =>
+  import("@/features/groups/views/group-invites").then((m) => ({
+    default: m.Invites,
+  })),
+);
+const GroupMembers = lazy(() =>
+  import("@/features/groups/views/group-members").then((m) => ({
+    default: m.GroupMembers,
+  })),
+);
+
+// Home & Invites
+const HomePage = lazy(() =>
+  import("@/features/home/views/home-page").then((m) => ({
+    default: m.HomePage,
+  })),
+);
+const AcceptInvite = lazy(() =>
+  import("@/features/invites/views/accept-invite").then((m) => ({
+    default: m.AcceptInvite,
+  })),
+);
+const CreateInvite = lazy(() =>
+  import("@/features/invites/views/create-invite").then((m) => ({
+    default: m.CreateInvite,
+  })),
+);
+
+// Matches, Stats, Users
+const RecordMatch = lazy(() =>
+  import("@/features/matches/views/record-match").then((m) => ({
+    default: m.RecordMatch,
+  })),
+);
+const PlayerStats = lazy(() =>
+  import("@/features/stats/views/player-stats").then((m) => ({
+    default: m.PlayerStats,
+  })),
+);
+const EditEmail = lazy(() =>
+  import("@/features/users/views/edit-email").then((m) => ({
+    default: m.EditEmail,
+  })),
+);
+const EditPassword = lazy(() =>
+  import("@/features/users/views/edit-password").then((m) => ({
+    default: m.EditPassword,
+  })),
+);
+const EditUser = lazy(() =>
+  import("@/features/users/views/edit-user").then((m) => ({
+    default: m.EditUser,
+  })),
+);
+const UserSettings = lazy(() =>
+  import("@/features/users/views/settings").then((m) => ({
+    default: m.UserSettings,
+  })),
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
