@@ -31,7 +31,7 @@ import {
 } from "../types";
 
 type SortProp = "name" | "email" | "role" | "joined_at";
-const DEFAULT_SORT: Sort<SortProp> = {
+export const DEFAULT_MEMBERS_SORT: Sort<SortProp> = {
   property: "name",
   direction: "ascending",
 };
@@ -48,7 +48,7 @@ export const GroupMembers = () => {
   const auth = useAuth();
   const group = useGroup();
 
-  const [sort, setSort] = createSignal<Sort<SortProp>>(DEFAULT_SORT);
+  const [sort, setSort] = createSignal<Sort<SortProp>>(DEFAULT_MEMBERS_SORT);
   const members = useGroupMembers(group.groupId, sort);
 
   const removeMember = useRemoveMember();

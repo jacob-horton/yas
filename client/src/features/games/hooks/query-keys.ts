@@ -5,7 +5,7 @@ export const gameKeys = {
 
   game: (gameId: string) => [...gameKeys.all, gameId] as const,
 
-  lastPLayers: (gameId: string) =>
+  lastPlayers: (gameId: string) =>
     [...gameKeys.game(gameId), "last_players"] as const,
 
   scoreboard: <T extends string>(gameId: string, sort?: Sort<T>) => {

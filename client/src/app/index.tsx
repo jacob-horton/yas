@@ -1,6 +1,5 @@
 import { Route, Router } from "@solidjs/router";
-import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
-import { isAxiosError } from "axios";
+import { QueryClientProvider } from "@tanstack/solid-query";
 import { lazy, type ParentComponent } from "solid-js";
 import { Sidebar } from "@/components/layout/sidebar";
 import { ConfirmationProvider } from "@/context/confirmation-context";
@@ -9,7 +8,17 @@ import { ToastProvider } from "@/context/toast-context";
 import { requireRole } from "@/features/auth/components/authorised-route";
 import { ProtectedRoute } from "@/features/auth/components/protected-route";
 import { AuthProvider } from "@/features/auth/context/auth-provider";
+import { preloadEditGame, preloadScoreboard } from "@/features/games/preloads";
 import { GroupProvider } from "@/features/groups/context/group-provider";
+import {
+  preloadGroupDetails,
+  preloadGroupInvites,
+  preloadGroupMembers,
+} from "@/features/groups/preloads";
+import { preloadHomePage } from "@/features/home/preloads";
+import { preloadRecordMatch } from "@/features/matches/preloads";
+import { preloadPlayerStats } from "@/features/stats/preloads";
+import { queryClient } from "@/lib/query-client";
 
 // Auth Views
 const ForgotPassword = lazy(() =>
@@ -129,25 +138,6 @@ const UserSettings = lazy(() =>
   })),
 );
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: (failureCount, error) => {
-        // Don't retry for client errors (4xx)
-        if (isAxiosError(error)) {
-          const status = error.response?.status;
-          if (status && status >= 400 && status < 500) {
-            return false;
-          }
-        }
-
-        // Otherwise, retry up to 3 times for 5xx or network errors
-        return failureCount < 3;
-      },
-    },
-  },
-});
-
 const WithSidebar: ParentComponent = (props) => {
   return (
     <div class="flex h-full">
@@ -172,20 +162,41 @@ export default function App() {
                 {/* Protected routes - must be logged in */}
                 <Route path="/" component={ProtectedRoute}>
                   <Route path="/groups/:groupId" component={WithSidebar}>
-                    <Route path="/" component={GroupDetails} />
-                    <Route path="/members" component={GroupMembers} />
-                    <Route path="/invites" component={Invites} />
-                    <Route path="/games/:gameId" component={Scoreboard} />
+                    <Route
+                      path="/"
+                      component={GroupDetails}
+                      preload={preloadGroupDetails}
+                    />
+                    <Route
+                      path="/members"
+                      component={GroupMembers}
+                      preload={preloadGroupMembers}
+                    />
+                    <Route
+                      path="/invites"
+                      component={Invites}
+                      preload={preloadGroupInvites}
+                    />
+                    <Route
+                      path="/games/:gameId"
+                      component={Scoreboard}
+                      preload={preloadScoreboard}
+                    />
                     <Route
                       path="/games/:gameId/player/:playerId"
                       component={PlayerStats}
+                      preload={preloadPlayerStats}
                     />
 
                     {/* Admin routes */}
                     <Route component={requireRole("admin")}>
                       <Route path="/edit" component={EditGroup} />
                       <Route path="/games/create" component={CreateGame} />
-                      <Route path="/games/:gameId/edit" component={EditGame} />
+                      <Route
+                        path="/games/:gameId/edit"
+                        component={EditGame}
+                        preload={preloadEditGame}
+                      />
                       <Route path="/invites/create" component={CreateInvite} />
                     </Route>
 
@@ -194,11 +205,16 @@ export default function App() {
                       <Route
                         path="/games/:gameId/record"
                         component={RecordMatch}
+                        preload={preloadRecordMatch}
                       />
                     </Route>
                   </Route>
 
-                  <Route path="/" component={HomePage} />
+                  <Route
+                    path="/"
+                    component={HomePage}
+                    preload={preloadHomePage}
+                  />
                   <Route path="/settings" component={UserSettings} />
 
                   <Route path="/groups/create" component={CreateGroup} />

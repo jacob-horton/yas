@@ -37,6 +37,7 @@ export type TableProps<T extends string> = ParentProps<{
 
 export type TableRowProps = {
   onClick?: () => void;
+  onPreload?: () => void;
   class?: string;
 };
 
@@ -147,6 +148,8 @@ export const TableRow: ParentComponent<TableRowProps> = (props) => {
         props.class,
       )}
       onClick={props.onClick}
+      onMouseEnter={props.onPreload}
+      onTouchStart={props.onPreload}
     >
       {props.children}
     </tr>

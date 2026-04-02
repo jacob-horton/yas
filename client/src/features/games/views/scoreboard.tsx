@@ -33,6 +33,7 @@ import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams, ScoringMetric } from "../types/game";
 import { MEDAL_MAP } from "./create-game";
+import { preloadPlayerStats } from "@/features/stats/preloads";
 
 const TABLE_CAPTION = "Stats of all players playing this game";
 
@@ -263,6 +264,14 @@ export const Scoreboard = () => {
                   {(score) => (
                     <TableRow
                       onClick={() => navigate(`player/${score.user_id}`)}
+                      onPreload={() =>
+                        preloadPlayerStats({
+                          params: {
+                            gameId: params.gameId,
+                            playerId: score.user_id,
+                          },
+                        })
+                      }
                       class={cn({
                         "font-semibold": score.user_id === userId(),
                       })}

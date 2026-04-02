@@ -5,7 +5,7 @@ import { gameKeys } from "./query-keys";
 
 export const useLastPlayers = (gameId: Accessor<string>) => {
   return useQuery(() => ({
-    queryKey: gameKeys.lastPLayers(gameId()),
+    queryKey: gameKeys.lastPlayers(gameId()),
     queryFn: () => gamesApi.game(gameId()).lastPlayers(),
     enabled: !!gameId(),
     staleTime: 1000 * 60, // Cache for 1 minute
