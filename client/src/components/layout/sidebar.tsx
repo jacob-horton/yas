@@ -29,6 +29,7 @@ import { Button } from "../ui/button";
 import { Dropdown } from "../ui/dropdown";
 import { NavItem } from "../ui/nav-item";
 import { NavItemSkeleton } from "../ui/nav-item.skeleton";
+import { PreloadLink } from "../ui/preload-link";
 
 export const Sidebar: Component = () => {
   const { user } = useAuth();
@@ -117,12 +118,12 @@ export const Sidebar: Component = () => {
               </span>
             </span>
           </div>
-          <A
+          <PreloadLink
             href="/settings"
             class="ml-auto rounded-md p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-500 dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-400"
           >
             <SettingsIcon />
-          </A>
+          </PreloadLink>
         </div>
 
         <div class="flex shrink-0 items-center gap-2 overflow-clip">

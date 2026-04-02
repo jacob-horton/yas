@@ -7,6 +7,7 @@ import { loginSchema } from "@/features/users/types";
 import { useZodForm } from "@/lib/zod/use-zod-form";
 import { useAuth } from "../context/auth-provider";
 import { useLogin } from "../hooks/use-login";
+import { PreloadLink } from "@/components/ui/preload-link";
 
 export const Login: Component = () => {
   const { values, errors, setField, validate } = useZodForm(loginSchema, {
@@ -72,20 +73,20 @@ export const Login: Component = () => {
           <div class="mt-4 flex flex-col items-center gap-2 text-center text-sm">
             <span>
               <span class="text-gray-500">Don't have an account? </span>
-              <A
+              <PreloadLink
                 href="/register"
                 class="font-semibold text-violet-600 hover:underline"
               >
                 Sign up
-              </A>
+              </PreloadLink>
             </span>
 
-            <A
+            <PreloadLink
               href="/forgot-password"
               class="text-violet-600 text-xs hover:underline"
             >
               Forgotten password?
-            </A>
+            </PreloadLink>
           </div>
         </form>
       </div>

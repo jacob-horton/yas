@@ -8,6 +8,7 @@ import { createUserSchema } from "@/features/users/types";
 import { useZodForm } from "@/lib/zod/use-zod-form";
 import { useAuth } from "../context/auth-provider";
 import { useRegister } from "../hooks/use-register";
+import { PreloadLink } from "@/components/ui/preload-link";
 
 export const Register: Component = () => {
   const { values, errors, setField, setError, validate } = useZodForm(
@@ -99,12 +100,12 @@ export const Register: Component = () => {
 
           <div class="mt-2 text-center text-sm">
             <span class="text-gray-500">Already have an account? </span>
-            <A
+            <PreloadLink
               href="/login"
               class="font-semibold text-violet-600 hover:underline"
             >
               Log in
-            </A>
+            </PreloadLink>
           </div>
         </form>
       </div>

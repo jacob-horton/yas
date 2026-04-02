@@ -1,10 +1,10 @@
-import { A } from "@solidjs/router";
 import LoaderCircleIcon from "lucide-solid/icons/loader-circle";
 import type { ParentComponent } from "solid-js";
 import { Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { cn } from "@/lib/classname";
 import { ICON_MAP, type Icon } from "@/lib/icons";
+import { PreloadLink } from "./preload-link";
 
 export type Variant = "primary" | "secondary" | "ghost";
 
@@ -57,7 +57,7 @@ export const Button: ParentComponent<ButtonProps> = (props) => {
   };
 
   const isA = () => !!local.href;
-  const Tag = () => (isA() ? A : "button");
+  const Tag = () => (isA() ? PreloadLink : "button");
 
   const buttonType = () => {
     if (isA()) return undefined;
