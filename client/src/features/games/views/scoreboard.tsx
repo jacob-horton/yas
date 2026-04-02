@@ -58,14 +58,13 @@ export const Scoreboard = () => {
   const navigate = useNavigate();
   const auth = useAuth();
 
-  const userId = () => auth.user()?.id;
-  const group = useGroup();
-
   const [sort, setSort] = createSignal<
     Sort<ScoringMetric | "name"> | undefined
   >(undefined);
-
   const scoreboardData = useScoreboardData(() => params.gameId, sort);
+
+  const userId = () => auth.user()?.id;
+  const group = useGroup();
 
   // User/front-end sort, fall back to default sort metric
   const effectiveSort = () => {

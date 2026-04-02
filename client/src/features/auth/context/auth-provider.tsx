@@ -12,6 +12,12 @@ import { userKeys } from "@/features/users/hooks/query-keys";
 import type { User } from "@/features/users/types";
 import { setupAxiosInterceptors } from "@/lib/api";
 
+declare global {
+  interface Window {
+    _PRELOADED_USER?: Promise<User | null>;
+  }
+}
+
 export type AuthContextValue = {
   user: Accessor<User | null | undefined>;
   loading: Accessor<boolean>;
@@ -27,6 +33,16 @@ export const AuthProvider: ParentComponent = (props) => {
   const meQuery = useQuery(() => ({
     queryKey: userKeys.me(),
     queryFn: async () => {
+      if (window._PRELOADED_USER) {
+        console.log("using preloaded user");
+        const promise = window._PRELOADED_USER;
+        delete window._PRELOADED_USER;
+
+        const data = await promise;
+        if (data) return data;
+      }
+
+      console.log("hitting api");
       try {
         return await usersApi.me();
       } catch (_err) {
