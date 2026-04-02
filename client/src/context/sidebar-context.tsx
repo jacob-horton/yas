@@ -12,7 +12,7 @@ import {
 type SidebarContextType = {
   isOpen: Accessor<boolean>;
   setIsOpen: Setter<boolean>;
-  isDesktop: Accessor<boolean>; // Expose the breakpoint state
+  isDesktop: Accessor<boolean>;
 };
 
 const SidebarContext = createContext<SidebarContextType>();

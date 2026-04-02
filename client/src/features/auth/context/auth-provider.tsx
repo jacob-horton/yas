@@ -34,7 +34,6 @@ export const AuthProvider: ParentComponent = (props) => {
     queryKey: userKeys.me(),
     queryFn: async () => {
       if (window._PRELOADED_USER) {
-        console.log("using preloaded user");
         const promise = window._PRELOADED_USER;
         delete window._PRELOADED_USER;
 
@@ -42,7 +41,6 @@ export const AuthProvider: ParentComponent = (props) => {
         if (data) return data;
       }
 
-      console.log("hitting api");
       try {
         return await usersApi.me();
       } catch (_err) {
