@@ -122,7 +122,7 @@ export const PlayerStats = () => {
                           <span
                             class={cn(
                               {
-                                "font-bold":
+                                "font-semibold":
                                   !!RANK_TEXT_COLOURS[s.rank_in_match],
                               },
                               RANK_TEXT_COLOURS[s.rank_in_match] ??

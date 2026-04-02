@@ -272,7 +272,7 @@ export const Scoreboard = () => {
                           class={cn(
                             "flex items-center gap-2",
                             score.user_id === userId()
-                              ? "font-bold text-gray-600"
+                              ? "font-semibold text-gray-600"
                               : "text-gray-400",
                           )}
                         >

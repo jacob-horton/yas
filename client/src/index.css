@@ -16,28 +16,31 @@
   font-display: swap;
 }
 
+/* Inter has only nums and symbols (for monospaced numbers) */
 @font-face {
-  font-family: "Poppins";
-  src: url("/fonts/Poppins-Bold.woff2") format("woff2");
-  font-weight: 700;
+  font-family: "Inter-NumsOnly";
+  src: url("/fonts/Inter-NumsOnly-Regular.woff2") format("woff2");
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0030-0039, U+0024, U+0025, U+002C, U+002E, U+002B, U+002D;
 }
 
 @font-face {
-  font-family: "Inter-Subset";
-  src: url("/fonts/Inter-Subset.woff2") format("woff2");
-  /* Covers the full variable range if your source was Inter Variable */
-  font-weight: 400 900;
+  font-family: "Inter-NumsOnly";
+  src: url("/fonts/Inter-NumsOnly-SemiBold.woff2") format("woff2");
+  font-weight: 600;
   font-style: normal;
   font-display: swap;
+  unicode-range: U+0030-0039, U+0024, U+0025, U+002C, U+002E, U+002B, U+002D;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --font-sans: "Poppins", sans-serif;
-  --font-mono-nums: "Inter", "Poppins", sans-serif; /* Monospaced numbers */
+  --font-mono-nums:
+    "Inter-NumsOnly", "Poppins", sans-serif; /* Monospaced numbers */
 
   --default-border-width: 1.5px;
   --text-default: var(--color-gray-800);

@@ -41,7 +41,7 @@ export const VerifyEmail: Component = () => {
 
       <Show when={!loading() && !error()}>
         <div class="text-center text-green-600">
-          <h2 class="font-bold text-2xl">Success!</h2>
+          <h2 class="font-semibold text-2xl">Success!</h2>
           <p>Your email has been verified. Redirecting you home...</p>
         </div>
       </Show>
@@ -49,7 +49,9 @@ export const VerifyEmail: Component = () => {
       <Show when={error()}>
         <div class="flex flex-col items-center gap-4 text-center">
           <div>
-            <h2 class="font-bold text-2xl text-red-600">Verification Failed</h2>
+            <h2 class="font-semibold text-2xl text-red-600">
+              Verification Failed
+            </h2>
             <p class="mt-2 text-gray-700">{error()}</p>
           </div>
 
