@@ -3,6 +3,7 @@ import { type ColourKey, TAILWIND_COLOUR_MAP } from "../constants";
 import { useDistributions } from "../hooks/use-distributions";
 import { gammaDistributionPoints } from "../lib/distribution-data-points";
 import { ChartComponent } from "./chart";
+import { ChartTooltip } from "./chart-tooltip";
 
 type User = {
   id: string;
@@ -43,10 +44,7 @@ export const DistributionCart: Component<Props> = (props) => {
 
   return (
     <ChartComponent
-      formatTooltipTitle={() => ""}
-      formatTooltipLabel={(item) => item.dataset.label || ""}
-      interactionMode="nearest"
-      interactionIntersect={false}
+      ariaLabel="Distribution charts for each player's scores"
       datasets={distributionPoints().map(([id, data]) => {
         return {
           data,
@@ -54,6 +52,11 @@ export const DistributionCart: Component<Props> = (props) => {
           label: userMap().get(id)?.name ?? "",
         };
       })}
+      renderTooltip={(chartProps) => (
+        <ChartTooltip anchorPos={chartProps.anchorPos}>
+          <div class="text-sm">{chartProps.activePoint.datasetLabel}</div>
+        </ChartTooltip>
+      )}
     />
   );
 };

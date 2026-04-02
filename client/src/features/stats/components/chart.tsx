@@ -1,183 +1,240 @@
-import Chart, {
-  type InteractionMode,
-  type ScriptableContext,
-  type TooltipItem,
-} from "chart.js/auto";
 import {
   type Component,
-  createEffect,
   createMemo,
   createSignal,
-  onCleanup,
-  onMount,
+  For,
+  type JSX,
+  Show,
 } from "solid-js";
 
-function getBackgroundGradient(baseColor: string) {
-  return (context: ScriptableContext<"line">) => {
-    const chart = context.chart;
-    const { ctx, chartArea } = chart;
-
-    if (!chartArea) {
-      return `oklch(from ${baseColor} l c h / 0.8)`;
-    }
-
-    const gradient = ctx.createLinearGradient(
-      0,
-      chartArea.top,
-      0,
-      chartArea.bottom,
-    );
-
-    gradient.addColorStop(0, `oklch(from ${baseColor} l c h / 0.8)`);
-    gradient.addColorStop(1, `oklch(from ${baseColor} l c h / 0)`);
-
-    return gradient;
-  };
-}
-
-type DataPoint = { x: number; y: number };
-type LineChart = Chart<"line", DataPoint[]>;
-type Dataset = {
-  label?: string;
-  data: DataPoint[];
-  colour: string;
+export type DataPoint = { x: number; y: number } & Record<string, any>;
+export type Dataset = { label?: string; data: DataPoint[]; colour: string };
+export type ActivePoint = DataPoint & {
+  datasetLabel?: string;
+  datasetColor: string;
 };
 
 export type ChartProps = {
+  ariaLabel?: string;
   datasets: Dataset[];
+  renderTooltip?: (props: {
+    activePoint: ActivePoint;
+    anchorPos: { left: string; top: string };
+  }) => JSX.Element;
+};
 
-  formatTooltipTitle?: (
-    tooltipItems: TooltipItem<"line">[],
-  ) => string | string[];
-  formatTooltipLabel?: (tooltipItem: TooltipItem<"line">) => string | string[];
+const getSafeMax = (vals: number[], fallback = 100) => {
+  const max = Math.max(...vals, 0);
+  return max > 0 ? max : fallback;
+};
 
-  interactionMode?: InteractionMode;
-  interactionIntersect?: boolean;
+const getNiceScale = (rawMax: number) => {
+  // If data is all 0, default to 1 so we have a visible coordinate space
+  const val = rawMax <= 0 ? 1 : rawMax;
+
+  // Find the magnitude (e.g., 0.1, 1, 10, 100)
+  const exponent = Math.floor(Math.log10(val));
+  const magnitude = 10 ** exponent;
+  const fraction = val / magnitude;
+
+  // Pick a clean "step" multiplier
+  let stepMultiplier: number;
+  if (fraction <= 1.5)
+    stepMultiplier = 0.2; // Steps of 0.2, 0.4...
+  else if (fraction <= 3)
+    stepMultiplier = 0.5; // Steps of 0.5, 1.0...
+  else if (fraction <= 7)
+    stepMultiplier = 1; // Steps of 1, 2...
+  else stepMultiplier = 2; // Steps of 2, 4...
+
+  const step = stepMultiplier * magnitude;
+
+  // Find the totalMax by taking the smallest multiple of 'step'
+  // that is >= val AND results in at least 5 ticks.
+  // To keep exactly 5 intervals (6 lines), we do:
+  const totalMax = Math.ceil(val / (step * 5)) * (step * 5);
+
+  return {
+    totalMax,
+    step: totalMax / 5,
+  };
 };
 
 export const ChartComponent: Component<ChartProps> = (props) => {
-  const [canvas, setCanvas] = createSignal<HTMLCanvasElement | undefined>(
-    undefined,
+  const [active, setActive] = createSignal<{
+    point: ActivePoint;
+    pos: { left: string; top: string };
+  } | null>(null);
+
+  const scale = createMemo(() => {
+    const rawMax = Math.max(
+      ...props.datasets.flatMap((d) => d.data.map((p) => p.y)),
+      0,
+    );
+    return getNiceScale(rawMax);
+  });
+
+  const maxY = () => scale().totalMax;
+  const maxX = createMemo(() =>
+    getSafeMax(
+      props.datasets.map((d) => d.data.length - 1),
+      1,
+    ),
   );
-  const [chart, setChart] = createSignal<LineChart | null>(null);
 
-  const datasets = createMemo(() => {
-    return props.datasets.map((dataset) => ({
-      label: dataset.label,
-      data: dataset.data,
-      backgroundColor: getBackgroundGradient(dataset.colour),
-      borderColor: dataset.colour,
-      fill: true,
-      borderWidth: 5,
-      pointRadius: 8,
-      pointHoverRadius: 8,
-      pointBackgroundColor: "rgba(0, 0, 0, 0)",
-      pointBorderColor: "rgba(0, 0, 0, 0)",
-      pointHoverBackgroundColor: "#fff",
-      pointHoverBorderColor: dataset.colour,
-      pointHoverBorderWidth: 3,
-    }));
+  const yTicks = createMemo(() => {
+    const { step } = scale();
+    return Array.from({ length: 6 }, (_, i) => i * step);
   });
 
-  onMount(() => {
-    const ctx = canvas()?.getContext("2d");
-    if (!ctx) return;
+  const chartPaths = createMemo(() =>
+    props.datasets.map((ds) => {
+      const points = ds.data.map(
+        (p, i) => `${(i / maxX()) * 100},${100 - (p.y / maxY()) * 100}`,
+      );
+      const line = `M ${points.join(" L ")}`;
+      return {
+        ...ds,
+        line,
+        area: points.length ? `${line} V 100 H 0 Z` : "",
+      };
+    }),
+  );
 
-    const newChart = new Chart(ctx, {
-      type: "line",
-      data: { datasets: datasets() },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animations: {
-          y: {
-            duration: 750,
-            easing: "easeOutQuart",
-            from: (ctx) => {
-              if (ctx.type === "data") {
-                if (ctx.chart.scales.y) {
-                  return ctx.chart.scales.y.getPixelForValue(0);
-                }
-                return ctx.chart.height;
-              }
-            },
-          },
-          x: {
-            duration: 0,
-          },
-        },
-        interaction: {
-          mode: props.interactionMode || "index",
-          intersect: props.interactionIntersect ?? false,
-        },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: "rgba(255, 255, 255, 0.9)",
-            titleColor: "#000",
-            bodyColor: "#000",
-            borderColor: "#f0f0f0",
-            borderWidth: 1,
-            displayColors: false,
-            padding: 10,
+  const onPointerMove = (e: PointerEvent) => {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const xPct = (e.clientX - rect.left) / rect.width;
+    const index = Math.round(xPct * maxX());
 
-            bodyFont: {
-              family: "Poppins",
-              size: 14,
-              weight: "bold",
-            },
+    let bestMatch: ActivePoint | null = null;
+    let minHoverDist = Infinity;
+    let finalTop = "0%";
 
-            callbacks: {
-              title: props.formatTooltipTitle,
-              label: props.formatTooltipLabel,
-            },
-          },
-        },
-        scales: {
-          x: { display: false },
-          y: {
-            beginAtZero: true,
-            border: { display: false },
-            grid: { color: "#eee" },
-            ticks: {
-              color: "#777",
-              font: { family: "Poppins" },
-              padding: 10,
-              maxTicksLimit: 10,
-            },
-          },
-        },
-      },
-    });
+    for (const ds of props.datasets) {
+      const point = ds.data[index];
+      if (!point) continue;
 
-    setChart(newChart);
-  });
+      const yPct = 100 - (point.y / maxY()) * 100;
+      const mouseRelY = ((e.clientY - rect.top) / rect.height) * 100;
+      const dist = Math.abs(yPct - mouseRelY);
 
-  createEffect(() => {
-    const activeChart = chart();
-    const currentDatasets = datasets();
-
-    if (activeChart && currentDatasets.length > 0) {
-      activeChart.data.datasets = currentDatasets;
-
-      const maxPoints = Math.max(...currentDatasets.map((d) => d.data.length));
-
-      activeChart.data.labels = Array.from({ length: maxPoints }, (_, i) => i);
-
-      activeChart.update();
+      if (dist < minHoverDist) {
+        minHoverDist = dist;
+        bestMatch = {
+          ...point,
+          datasetLabel: ds.label,
+          datasetColor: ds.colour,
+        };
+        finalTop = `${yPct}%`;
+      }
     }
-  });
 
-  onCleanup(() => {
-    const activeChart = chart();
-    if (activeChart) {
-      activeChart.destroy();
+    if (bestMatch) {
+      setActive({
+        point: bestMatch,
+        pos: {
+          left: `${(index / maxX()) * 100}%`,
+          top: finalTop,
+        },
+      });
     }
-  });
+  };
 
   return (
-    <div class="relative h-[200px] w-full md:h-[500px]">
-      <canvas ref={setCanvas} class="h-full! w-full!" />
+    <div class="flex h-[200px] w-full select-none font-sans md:h-[500px]">
+      <div class="relative w-10 shrink-0">
+        <For each={yTicks()}>
+          {(tick) => (
+            <span
+              class="absolute right-2 translate-y-1/2 text-gray-400 text-xs"
+              style={{ bottom: `${(tick / maxY()) * 100}%` }}
+            >
+              {tick}
+            </span>
+          )}
+        </For>
+      </div>
+
+      {/* Chart Canvas */}
+      <div
+        class="relative flex-1 touch-none"
+        onPointerMove={onPointerMove}
+        onPointerLeave={() => setActive(null)}
+      >
+        {/* Grid */}
+        <div class="pointer-events-none absolute inset-0">
+          <For each={yTicks()}>
+            {(tick) => (
+              <div
+                class="absolute w-full border-gray-100 border-b"
+                style={{ bottom: `${(tick / maxY()) * 100}%` }}
+              />
+            )}
+          </For>
+        </div>
+
+        {/* Chart Line */}
+        <svg
+          class="absolute inset-0 h-full w-full overflow-visible"
+          preserveAspectRatio="none"
+          viewBox="0 0 100 100"
+          role="img"
+          aria-label={props.ariaLabel ?? "Data visualization chart"}
+        >
+          <For each={chartPaths()}>
+            {(ds, i) => (
+              <g class="transition-opacity duration-300">
+                <defs>
+                  <linearGradient id={`g-${i()}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop
+                      offset="0%"
+                      stop-color={ds.colour}
+                      stop-opacity="0.8"
+                    />
+                    <stop
+                      offset="100%"
+                      stop-color={ds.colour}
+                      stop-opacity="0"
+                    />
+                  </linearGradient>
+                </defs>
+                <path d={ds.area} fill={`url(#g-${i()})`} />
+                <path
+                  d={ds.line}
+                  fill="none"
+                  stroke={ds.colour}
+                  stroke-width="5"
+                  vector-effect="non-scaling-stroke"
+                />
+              </g>
+            )}
+          </For>
+        </svg>
+
+        {/* Hover dot and tooltip */}
+        <Show when={active()}>
+          {(state) => (
+            <>
+              <div
+                class="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute size-5 rounded-full border-[4px] bg-white transition-all duration-75 ease-out"
+                style={{
+                  left: state().pos.left,
+                  top: state().pos.top,
+                  "border-color": state().point.datasetColor,
+                }}
+              />
+              {props.renderTooltip?.({
+                get activePoint() {
+                  return state().point;
+                },
+                get anchorPos() {
+                  return state().pos;
+                },
+              })}
+            </>
+          )}
+        </Show>
+      </div>
     </div>
   );
 };

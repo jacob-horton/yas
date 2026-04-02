@@ -7,6 +7,9 @@ type Props = {
   tooltip: string;
 };
 
+export const TOOLTIP_CONTENT_CLASSES =
+  "rounded-md border bg-white px-3 py-2 text-center font-semibold text-xs";
+
 export const Tooltip: ParentComponent<Props> = (props) => {
   const [open, setOpen] = createSignal(false);
   const [isTouch, setIsTouch] = createSignal(false);
@@ -55,7 +58,7 @@ export const Tooltip: ParentComponent<Props> = (props) => {
               <ArkTooltip.ArrowTip class="border-t border-l bg-white" />
             </ArkTooltip.Arrow>
 
-            <div class="rounded-md border bg-white px-3 py-2 text-center font-semibold text-xs">
+            <div class={TOOLTIP_CONTENT_CLASSES}>
               <span class="font-normal">{props.tooltip}</span>
             </div>
           </ArkTooltip.Content>
