@@ -23,10 +23,7 @@ use crate::{
     },
     models::{
         group::GroupResponse,
-        user::{
-            CreateUserReq, UpdateEmailReq, UpdatePasswordReq,
-            UpdateUserReq, UserResponse,
-        },
+        user::{CreateUserReq, UpdateEmailReq, UpdatePasswordReq, UpdateUserReq, UserResponse},
     },
     services,
 };
@@ -61,18 +58,8 @@ async fn create_user(
     Ok((StatusCode::CREATED, Json(response)))
 }
 
-async fn get_current_user(
-    State(state): State<AppState>,
-    user: AuthUser,
-) -> Result<impl IntoResponse, AppError> {
-    let user = state
-        .user_repo
-        .find_by_id(&state.pool, &user.id)
-        .await
-        .map_err(UserError::Database)?
-        .ok_or(UserError::NotFound)?;
-
-    let response: UserResponse = user.into();
+async fn get_current_user(user: AuthUser) -> Result<impl IntoResponse, AppError> {
+    let response: UserResponse = user.0.into();
     Ok((StatusCode::OK, Json(response)))
 }
 

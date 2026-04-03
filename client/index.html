@@ -4,7 +4,6 @@
     <!-- Pre-load the user to prevent double waterfall -->
     <script>
       const baseURL = "%VITE_API_URL%";
-
       window._PRELOADED_USER = fetch(`${baseURL}/users/me`, { credentials: 'include', priority: 'high' }).then(r => r.json());
     </script>
 
