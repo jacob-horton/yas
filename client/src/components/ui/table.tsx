@@ -38,6 +38,7 @@ export type TableProps<T extends string> = ParentProps<{
 export type TableRowProps = {
   onClick?: () => void;
   onPreload?: () => void;
+  preloadCooldown?: number;
   class?: string;
 };
 
@@ -138,6 +139,18 @@ export function Table<T extends string>(props: TableProps<T>) {
 }
 
 export const TableRow: ParentComponent<TableRowProps> = (props) => {
+  let lastPreloadTime = 0;
+
+  const handlePreload = () => {
+    const now = Date.now();
+    const cooldown = props.preloadCooldown ?? 2000;
+
+    if (now - lastPreloadTime > cooldown) {
+      lastPreloadTime = now;
+      props.onPreload?.();
+    }
+  };
+
   return (
     <tr
       class={cn(
@@ -148,8 +161,8 @@ export const TableRow: ParentComponent<TableRowProps> = (props) => {
         props.class,
       )}
       onClick={props.onClick}
-      onMouseEnter={props.onPreload}
-      onTouchStart={props.onPreload}
+      onMouseEnter={handlePreload}
+      onTouchStart={handlePreload}
     >
       {props.children}
     </tr>
