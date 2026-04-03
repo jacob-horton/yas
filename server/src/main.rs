@@ -35,7 +35,14 @@ use crate::{
         password_resets_repo::PasswordResetsRepo, stats_repo::StatsRepo, user_repo::UserRepo,
         verification_repo::VerificationRepo,
     },
-    services::email::EmailService,
+    services::{
+        email::EmailService,
+        stats::{
+            CacheInvalidator, StatsProvider,
+            cache::{RedisCacheInvalidator, RedisCachedStatsProvider},
+            db::DbStatsProvider,
+        },
+    },
 };
 
 #[derive(Clone)]
@@ -43,6 +50,8 @@ pub struct AppState {
     pub pool: PgPool,
 
     pub email_service: Arc<EmailService>,
+    pub stats_service: Arc<dyn StatsProvider>,
+    pub stats_cache_invalidator: Arc<dyn CacheInvalidator>,
 
     pub password_resets_repo: Arc<PasswordResetsRepo>,
     pub verification_repo: Arc<VerificationRepo>,
@@ -55,7 +64,7 @@ pub struct AppState {
 }
 
 impl AppState {
-    fn new(pool: PgPool) -> Self {
+    async fn new(pool: PgPool) -> Self {
         let user_repo = Arc::new(UserRepo {});
         let group_repo = Arc::new(GroupRepo {});
         let invite_repo = Arc::new(InviteRepo {});
@@ -64,12 +73,36 @@ impl AppState {
         let stats_repo = Arc::new(StatsRepo {});
         let verification_repo = Arc::new(VerificationRepo {});
         let password_resets_repo = Arc::new(PasswordResetsRepo {});
+
         let email_service = Arc::new(Self::get_email_service());
+
+        let redis_url =
+            std::env::var("REDIS_URL").unwrap_or_else(|_| "redis://127.0.0.1/".to_string());
+
+        let redis_ttl: u64 = std::env::var("REDIS_TTL_SECONDS")
+            .unwrap_or_else(|_| "3600".to_string())
+            .parse()
+            .expect("REDIS_TTL_SECONDS must be a valid number");
+
+        let redis_cfg = deadpool_redis::Config::from_url(redis_url);
+        let redis_pool = redis_cfg
+            .create_pool(Some(deadpool_redis::Runtime::Tokio1))
+            .expect("Failed to create Redis pool");
+
+        let raw_stats_service = DbStatsProvider;
+        let cached_stats_service =
+            RedisCachedStatsProvider::new(raw_stats_service, redis_pool.clone(), redis_ttl);
+
+        let stats_service = Arc::new(cached_stats_service);
+        let stats_cache_invalidator = Arc::new(RedisCacheInvalidator { pool: redis_pool });
 
         Self {
             pool: pool.clone(),
 
             email_service,
+
+            stats_service,
+            stats_cache_invalidator,
 
             password_resets_repo,
             verification_repo,
@@ -156,7 +189,7 @@ async fn main() {
         .allow_headers([CONTENT_TYPE, AUTHORIZATION, ACCEPT])
         .allow_credentials(true);
 
-    let app_state = AppState::new(pool.clone());
+    let app_state = AppState::new(pool.clone()).await;
 
     // Clean up expired tokens each hour
     let cleanup_pool = app_state.pool.clone();

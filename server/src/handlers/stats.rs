@@ -12,7 +12,6 @@ use crate::{
     errors::AppError,
     extractors::auth_user::AuthUser,
     models::stats::{PlayerHighlightsResponse, PlayerHistoryResponse},
-    services,
 };
 
 pub async fn get_user_history(
@@ -20,8 +19,10 @@ pub async fn get_user_history(
     Path((game_id, player_id)): Path<(Uuid, Uuid)>,
     user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let (stats, player) =
-        services::stats::get_player_history(&state, user.id, game_id, player_id).await?;
+    let (stats, player) = state
+        .stats_service
+        .get_player_history(&state, user.id, game_id, player_id)
+        .await?;
 
     let response = PlayerHistoryResponse {
         player: player.into(),
@@ -36,7 +37,10 @@ pub async fn get_player_highlights(
     Path((game_id, player_id)): Path<(Uuid, Uuid)>,
     user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let stats = services::stats::get_player_highlights(&state, user.id, game_id, player_id).await?;
+    let stats = state
+        .stats_service
+        .get_player_highlights(&state, user.id, game_id, player_id)
+        .await?;
 
     let response: PlayerHighlightsResponse = stats.into();
 
@@ -48,7 +52,10 @@ pub async fn get_distributions(
     Path(game_id): Path<Uuid>,
     user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let distribution = services::stats::get_distributions(&state, user.id, game_id).await?;
+    let distribution = state
+        .stats_service
+        .get_distributions(&state, user.id, game_id)
+        .await?;
 
     Ok((StatusCode::OK, Json(distribution)))
 }

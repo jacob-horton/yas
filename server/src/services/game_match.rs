@@ -61,5 +61,11 @@ pub async fn create_match(
 
     tx.commit().await?;
 
+    // Invalidate cache
+    state
+        .stats_cache_invalidator
+        .invalidate_game_stats(game_id)
+        .await?;
+
     Ok(game_match)
 }

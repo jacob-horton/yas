@@ -135,6 +135,9 @@ pub enum AppError {
     #[error(transparent)]
     Database(#[from] sqlx::Error),
 
+    #[error(transparent)]
+    Redis(#[from] deadpool_redis::PoolError),
+
     #[error("Internal server error")]
     InternalServerError(String),
 
@@ -233,6 +236,14 @@ impl IntoResponse for AppError {
 
             AppError::Database(e) => {
                 eprintln!("Unknown DB Error: {:?}", e);
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Internal server error".to_string(),
+                )
+            }
+
+            AppError::Redis(e) => {
+                eprintln!("Unknown Redis Error: {:?}", e);
                 (
                     StatusCode::INTERNAL_SERVER_ERROR,
                     "Internal server error".to_string(),

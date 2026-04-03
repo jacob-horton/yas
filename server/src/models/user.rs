@@ -62,7 +62,7 @@ pub enum AvatarColour {
     Slate,
 }
 
-#[derive(Debug, FromRow)]
+#[derive(Debug, FromRow, Serialize, Deserialize)]
 pub struct UserDb {
     pub id: Uuid,
     pub name: String,

@@ -5,13 +5,13 @@ output: prefixed
 dotenv: ['.env.deploy']
 
 tasks:
-  db_up:
-    dir: 'db'
+  infra_up:
+    dir: 'infra'
     cmds:
       - docker compose up -d
 
-  db_down:
-    dir: 'db'
+  infra_down:
+    dir: 'infra'
     cmds:
       - docker compose down
 
@@ -27,8 +27,8 @@ tasks:
     cmds:
       - cargo run
     preconditions:
-      - sh: cd ../db && sh ./is-running.sh
-        msg: Database needs to be running. Run `task db_up`
+      - sh: cd ../infra && sh ./is-running.sh
+        msg: Database needs to be running. Run `task infra_up`
 
   server_watch:
     dir: 'server'
@@ -36,8 +36,8 @@ tasks:
     cmds:
       - cargo watch -x run
     preconditions:
-      - sh: cd ../db && sh ./is-running.sh
-        msg: Database needs to be running. Run `task db_up`
+      - sh: cd ../infra && sh ./is-running.sh
+        msg: Database needs to be running. Run `task infra_up`
 
   run_migrations:
     dir: 'server'

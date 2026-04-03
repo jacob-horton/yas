@@ -20,7 +20,7 @@ pub struct RawMatchStats {
     pub rank_in_match: i64,
 }
 
-#[derive(sqlx::FromRow, Debug)]
+#[derive(sqlx::FromRow, Debug, Serialize, Deserialize)]
 pub struct PlayerMatchDb {
     pub match_id: Uuid,
     pub score: i32,
@@ -61,7 +61,7 @@ impl From<PlayerMatchDb> for PlayerMatchResponse {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ScoreboardEntry {
     pub user_id: Uuid,
     pub user_name: String,
@@ -91,7 +91,7 @@ pub struct StatsParams {
     pub order_dir: Option<OrderDir>,
 }
 
-#[derive(Deserialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Debug, Clone, PartialEq, Copy)]
 #[serde(rename_all = "snake_case")]
 pub enum OrderDir {
     Ascending,
@@ -107,7 +107,7 @@ impl OrderDir {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Scoreboard {
     pub entries: Vec<ScoreboardEntry>,
     pub podium: Vec<ScoreboardEntry>,
@@ -181,7 +181,7 @@ impl From<Scoreboard> for ScoreboardResponse {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Player {
     pub id: Uuid,
     pub name: String,
@@ -189,13 +189,13 @@ pub struct Player {
     pub avatar_colour: AvatarColour,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct PlayerHighlightStats {
     pub player: Player,
     pub lifetime: StatsLifetime,
 }
 
-#[derive(Debug, FromRow)]
+#[derive(Debug, FromRow, Serialize, Deserialize)]
 pub struct StatsLifetime {
     pub average_score: f64,
     pub best_score: i32,
@@ -270,7 +270,7 @@ pub struct RawHighlight {
     pub stat_type: String,
 }
 
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct HighlightDetail<T> {
     pub user_id: Uuid,
     pub user_name: String,
@@ -288,7 +288,7 @@ impl<T: Default> Default for HighlightDetail<T> {
     }
 }
 
-#[derive(Serialize, Clone, Debug, Default)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
 #[serde(rename_all = "snake_case")]
 pub struct HighlightsResponse {
     pub highest_win_rate: HighlightDetail<f64>,
@@ -342,15 +342,55 @@ impl From<Vec<RawHighlight>> for HighlightsResponse {
     }
 }
 
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum Distribution {
     Gamma { lambda: f64, alpha: f64 },
 }
 
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct DistributionWithMaxMin {
     pub distribution: Distribution,
     pub min_score: i32,
     pub max_score: i32,
+}
+
+pub struct MedalsThresholds {
+    pub star: Option<i32>,
+    pub gold: Option<i32>,
+    pub silver: Option<i32>,
+    pub bronze: Option<i32>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct PlayerStats {
+    pub matches_played: i64,
+    pub average_score: f64,
+    pub wins: i64,
+    pub best_score: i32,
+    pub win_rate: f64,
+
+    pub medals: Medals,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct Medals {
+    pub star: u32,
+    pub gold: u32,
+    pub silver: u32,
+    pub bronze: u32,
+}
+
+impl Medals {
+    pub fn count_medal(&mut self, score: i32, thresholds: &MedalsThresholds) {
+        if thresholds.star.is_some_and(|t| score >= t) {
+            self.star += 1;
+        } else if thresholds.gold.is_some_and(|t| score >= t) {
+            self.gold += 1;
+        } else if thresholds.silver.is_some_and(|t| score >= t) {
+            self.silver += 1;
+        } else if thresholds.bronze.is_some_and(|t| score >= t) {
+            self.bronze += 1;
+        }
+    }
 }
