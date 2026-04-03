@@ -1,4 +1,3 @@
-import { A } from "@solidjs/router";
 import type { LucideProps } from "lucide-solid";
 import { type Component, type JSX, Show } from "solid-js";
 import { PreloadLink } from "./preload-link";

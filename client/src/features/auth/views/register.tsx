@@ -1,14 +1,14 @@
-import { A, useNavigate } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import { isAxiosError } from "axios";
 import { type Component, createEffect } from "solid-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PreloadLink } from "@/components/ui/preload-link";
 import { useToast } from "@/context/toast-context";
 import { createUserSchema } from "@/features/users/types";
 import { useZodForm } from "@/lib/zod/use-zod-form";
 import { useAuth } from "../context/auth-provider";
 import { useRegister } from "../hooks/use-register";
-import { PreloadLink } from "@/components/ui/preload-link";
 
 export const Register: Component = () => {
   const { values, errors, setField, setError, validate } = useZodForm(

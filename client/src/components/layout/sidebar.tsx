@@ -1,4 +1,4 @@
-import { A, useLocation, useNavigate } from "@solidjs/router";
+import { useLocation, useNavigate } from "@solidjs/router";
 import GamePadIcon from "lucide-solid/icons/gamepad-2";
 import MailPlusIcon from "lucide-solid/icons/mail-plus";
 import NotebookTextIcon from "lucide-solid/icons/notebook-text";

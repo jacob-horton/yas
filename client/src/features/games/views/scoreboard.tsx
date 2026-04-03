@@ -26,6 +26,7 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { hasPermission } from "@/features/groups/types";
+import { preloadPlayerStats } from "@/features/stats/preloads";
 import { cn } from "@/lib/classname";
 import { HighlightStatCard } from "../components/highlight-stat-card";
 import { PodiumCard } from "../components/podium-card";
@@ -33,7 +34,6 @@ import { ProgressBar } from "../components/progress-bar";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
 import type { GameRouteParams, ScoringMetric } from "../types/game";
 import { MEDAL_MAP } from "./create-game";
-import { preloadPlayerStats } from "@/features/stats/preloads";
 
 const TABLE_CAPTION = "Stats of all players playing this game";
 
