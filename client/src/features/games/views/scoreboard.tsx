@@ -259,7 +259,9 @@ export const Scoreboard = () => {
               headings={tableHeadings()}
               caption={TABLE_CAPTION}
             >
-              <Suspense fallback={<TableRowSkeleton numCols={4} />}>
+              <Suspense
+                fallback={<TableRowSkeleton class="h-15" numCols={4} />}
+              >
                 <For each={scoreboardData.data?.entries}>
                   {(score) => (
                     <TableRow
@@ -272,7 +274,7 @@ export const Scoreboard = () => {
                           },
                         })
                       }
-                      class={cn({
+                      class={cn("h-15", {
                         "font-semibold": score.user_id === userId(),
                       })}
                     >

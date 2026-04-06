@@ -4,11 +4,12 @@ import { TableCell, TableRow } from "./table";
 export const TableRowSkeleton: Component<{
   numCols: number;
   numRows?: number;
+  class?: string;
 }> = (props) => {
   return (
     <For each={Array(props.numRows ?? 5)}>
       {() => (
-        <TableRow>
+        <TableRow class={props.class}>
           <For each={Array(props.numCols)}>
             {() => (
               <TableCell>

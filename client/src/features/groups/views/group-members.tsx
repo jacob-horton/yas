@@ -126,22 +126,29 @@ export const GroupMembers = () => {
             onSort={setSort}
           >
             <Suspense
-              fallback={<TableRowSkeleton numCols={tableHeadings().length} />}
+              fallback={
+                <TableRowSkeleton
+                  numCols={tableHeadings().length}
+                  class="h-15"
+                />
+              }
             >
               <For each={members.data}>
                 {(member) => (
                   <TableRow
-                    class={cn({
+                    class={cn("h-15", {
                       "font-semibold": member.id === auth.user()?.id,
                     })}
                   >
-                    <TableCell class="flex items-center gap-3">
-                      <Avatar
-                        class="size-7"
-                        avatar={member.avatar}
-                        colour={member.avatar_colour}
-                      />
-                      {member.name}
+                    <TableCell>
+                      <div class="flex items-center gap-3">
+                        <Avatar
+                          class="size-7"
+                          avatar={member.avatar}
+                          colour={member.avatar_colour}
+                        />
+                        {member.name}
+                      </div>
                     </TableCell>
                     <Authorised minRole="admin">
                       <TableCell>{member.email}</TableCell>
