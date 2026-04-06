@@ -148,6 +148,7 @@ export const RecordMatchForm = (props: {
             >
               <div class="flex h-16 items-center">
                 <Button
+                  ariaLabel="Remove player"
                   variant="ghost"
                   icon="delete"
                   onClick={() => removePlayer(i())}

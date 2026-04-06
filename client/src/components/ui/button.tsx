@@ -1,5 +1,5 @@
 import LoaderCircleIcon from "lucide-solid/icons/loader-circle";
-import type { ParentComponent } from "solid-js";
+import type { Component, JSX, ParentComponent } from "solid-js";
 import { Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { cn } from "@/lib/classname";
@@ -14,6 +14,16 @@ const COLOUR_MAP: Record<Variant, string> = {
   secondary: "border hover:bg-gray-100 dark:hover:bg-gray-100/10 transition",
   ghost: "hover:bg-gray-100 dark:hover:bg-gray-100/10 transition",
 } as const;
+
+type AccessibilityProps =
+  | {
+      children: JSX.Element;
+      ariaLabel?: string;
+    }
+  | {
+      children?: never;
+      ariaLabel: string;
+    };
 
 type BaseProps = {
   variant?: Variant;
@@ -37,9 +47,9 @@ type ButtonElementProps = BaseProps & {
   onClick?: () => void;
 };
 
-type ButtonProps = AnchorProps | ButtonElementProps;
+type ButtonProps = (AnchorProps | ButtonElementProps) & AccessibilityProps;
 
-export const Button: ParentComponent<ButtonProps> = (props) => {
+export const Button: Component<ButtonProps> = (props) => {
   const [local, others] = splitProps(props, [
     "href",
     "children",
@@ -50,6 +60,7 @@ export const Button: ParentComponent<ButtonProps> = (props) => {
     "danger",
     "icon",
     "iconOnlyOnMobile",
+    "ariaLabel",
   ]);
 
   const isDisabled = () => {
@@ -97,6 +108,7 @@ export const Button: ParentComponent<ButtonProps> = (props) => {
       disabled={isA() ? undefined : isDisabled()}
       tabIndex={isA() && isDisabled() ? -1 : undefined}
       type={buttonType()}
+      aria-label={local.ariaLabel}
       {...others}
     >
       <Show when={local.loading}>

@@ -187,6 +187,7 @@ export const GroupMembers = () => {
                         minRole="admin"
                         fallback={
                           <Button
+                            ariaLabel="Remove player from group"
                             class="text-gray-200"
                             variant="ghost"
                             icon="delete"
@@ -195,6 +196,7 @@ export const GroupMembers = () => {
                         }
                       >
                         <Button
+                          ariaLabel="Remove player from group"
                           class="text-gray-400 dark:text-gray-500"
                           variant="ghost"
                           icon="delete"

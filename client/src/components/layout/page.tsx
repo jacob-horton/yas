@@ -44,6 +44,7 @@ export const Page: ParentComponent<Props> = (props) => {
           <h1 class="flex items-center gap-2 font-semibold text-2xl leading-normal sm:text-3xl">
             <Show when={sidebar && !props.showBack && !sidebar.isDesktop()}>
               <Button
+                ariaLabel="Open sidebar"
                 variant="ghost"
                 onClick={() => sidebar?.setIsOpen(true)}
                 icon="menu"
@@ -51,6 +52,7 @@ export const Page: ParentComponent<Props> = (props) => {
             </Show>
             <Show when={props.showBack}>
               <Button
+                ariaLabel="Navigate back a page"
                 variant="ghost"
                 onClick={() => navigate(-1)}
                 icon="chevronLeft"

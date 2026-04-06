@@ -148,6 +148,7 @@ export const Invites = () => {
                       <TableCell>
                         <div class="flex gap-1">
                           <Button
+                            ariaLabel="Copy invite link to clipboard"
                             icon="copy"
                             variant="ghost"
                             class="text-gray-400"
@@ -176,6 +177,7 @@ export const Invites = () => {
                             minRole="admin"
                             fallback={
                               <Button
+                                ariaLabel="Remove invite"
                                 class="text-gray-200"
                                 variant="ghost"
                                 icon="delete"
@@ -185,6 +187,7 @@ export const Invites = () => {
                           >
                             <Button
                               danger
+                              ariaLabel="Remove invite"
                               icon="delete"
                               variant="ghost"
                               class="text-gray-400"

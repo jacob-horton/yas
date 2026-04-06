@@ -95,6 +95,7 @@ export function Table<T extends string>(props: TableProps<T>) {
                   <Show when={heading.sortProp}>
                     <button
                       type="button"
+                      aria-label={`Sort by ${heading.label}`}
                       class="cursor-pointer rounded-md p-1 transition hover:bg-black/5 dark:hover:bg-white/5"
                       onClick={() => {
                         const isActive =

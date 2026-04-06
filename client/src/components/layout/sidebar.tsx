@@ -119,6 +119,7 @@ export const Sidebar: Component = () => {
             </span>
           </div>
           <PreloadLink
+            aria-label="Settings"
             href="/settings"
             class="ml-auto rounded-md p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-500 dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-400"
           >
@@ -137,7 +138,12 @@ export const Sidebar: Component = () => {
             class="w-full"
           />
 
-          <Button variant="ghost" icon="plus" href="/groups/create" />
+          <Button
+            ariaLabel="Create a group"
+            variant="ghost"
+            icon="plus"
+            href="/groups/create"
+          />
         </div>
 
         <div class="flex flex-col gap-6 overflow-clip whitespace-nowrap">
