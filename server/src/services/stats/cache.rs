@@ -15,7 +15,10 @@ use crate::{
         },
         user::UserDb,
     },
-    services::stats::{CacheInvalidator, StatsProvider},
+    services::{
+        game::fetch_game_guarded,
+        stats::{CacheInvalidator, StatsProvider},
+    },
 };
 
 pub struct RedisCachedStatsProvider<T: StatsProvider> {
@@ -75,6 +78,8 @@ impl<T: StatsProvider> RedisCachedStatsProvider<T> {
     }
 }
 
+// NOTE: each of these methods call fetch_game_guarded to ensure the user actually has access to the
+// game
 #[async_trait]
 impl<T: StatsProvider> StatsProvider for RedisCachedStatsProvider<T> {
     async fn get_scoreboard_and_stats(
@@ -85,17 +90,11 @@ impl<T: StatsProvider> StatsProvider for RedisCachedStatsProvider<T> {
         order_by: Option<OrderBy>,
         order_dir: Option<OrderDir>,
     ) -> Result<Scoreboard, AppError> {
-        let order_by_str = order_by
-            .map(|o| format!("{:?}", o))
-            .unwrap_or_else(|| "default".to_string());
-        let order_dir_str = order_dir
-            .map(|o| format!("{:?}", o))
-            .unwrap_or_else(|| "default".to_string());
+        let (game, _) = fetch_game_guarded(state, game_id, user_id).await?;
 
-        let suffix = format!(
-            "scoreboard:user:{}:{}:{}",
-            user_id, order_by_str, order_dir_str
-        );
+        let order_by_final = order_by.unwrap_or(game.metric.into());
+        let order_dir_final = order_dir.unwrap_or(OrderDir::Descending);
+        let suffix = format!("scoreboard:{:?}:{:?}", order_by_final, order_dir_final);
 
         self.with_cache(
             game_id,
@@ -113,7 +112,8 @@ impl<T: StatsProvider> StatsProvider for RedisCachedStatsProvider<T> {
         game_id: Uuid,
         player_id: Uuid,
     ) -> Result<(Vec<PlayerMatchDb>, UserDb), AppError> {
-        let suffix = format!("history:caller:{}:target:{}", user_id, player_id);
+        fetch_game_guarded(state, game_id, user_id).await?;
+        let suffix = format!("history:player:{}", player_id);
 
         self.with_cache(
             game_id,
@@ -131,7 +131,8 @@ impl<T: StatsProvider> StatsProvider for RedisCachedStatsProvider<T> {
         game_id: Uuid,
         player_id: Uuid,
     ) -> Result<PlayerHighlightStats, AppError> {
-        let suffix = format!("highlights:caller:{}:target:{}", user_id, player_id);
+        fetch_game_guarded(state, game_id, user_id).await?;
+        let suffix = format!("highlights:player:{}", player_id);
 
         self.with_cache(
             game_id,
@@ -148,11 +149,10 @@ impl<T: StatsProvider> StatsProvider for RedisCachedStatsProvider<T> {
         user_id: Uuid,
         game_id: Uuid,
     ) -> Result<HashMap<Uuid, DistributionWithMaxMin>, AppError> {
-        let suffix = format!("distributions:caller:{}", user_id);
-
+        fetch_game_guarded(state, game_id, user_id).await?;
         self.with_cache(
             game_id,
-            &suffix,
+            "distributions",
             self.inner.get_distributions(state, user_id, game_id),
         )
         .await
@@ -162,7 +162,6 @@ impl<T: StatsProvider> StatsProvider for RedisCachedStatsProvider<T> {
 #[async_trait]
 impl CacheInvalidator for RedisCacheInvalidator {
     async fn invalidate_game_stats(&self, game_id: Uuid) -> Result<(), AppError> {
-        println!("invalidating");
         let mut conn = self.pool.get().await.map_err(AppError::Redis)?;
         let version_key = format!("game:{}:stats_version", game_id);
         let _: () = redis::cmd("INCR")
