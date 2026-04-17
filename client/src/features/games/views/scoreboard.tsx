@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "@solidjs/router";
+import { useNavigate, useParams, usePreloadRoute } from "@solidjs/router";
 import {
   type Component,
   createMemo,
@@ -26,7 +26,6 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { hasPermission } from "@/features/groups/types";
-import { preloadPlayerStats } from "@/features/stats/preloads";
 import { cn } from "@/lib/classname";
 import { HighlightStatCard } from "../components/highlight-stat-card";
 import { PodiumCard } from "../components/podium-card";
@@ -56,6 +55,7 @@ const Medal: Component<{ medal: string; count: number; threshold: number }> = (
 
 export const Scoreboard = () => {
   const params = useParams<GameRouteParams>();
+  const preloadRoute = usePreloadRoute();
   const navigate = useNavigate();
   const auth = useAuth();
 
@@ -138,6 +138,7 @@ export const Scoreboard = () => {
     if (!s) return undefined;
 
     return {
+      user_id: s.user_id,
       avatar: s.user_avatar,
       avatarColour: s.user_avatar_colour,
       name: s.user_name,
@@ -173,13 +174,32 @@ export const Scoreboard = () => {
           <div class="no-scrollbar flex snap-x overflow-x-auto px-6">
             <div class="mx-auto flex w-full flex-col flex-nowrap gap-4 md:flex-row md:items-end md:justify-center">
               <For each={[0, 1, 2].slice(0, podiumTotal())}>
-                {(index) => (
-                  <PodiumCard
-                    stats={getStats(index)}
-                    position={index + 1}
-                    total={podiumTotal()}
-                  />
-                )}
+                {(index) => {
+                  const stats = () => getStats(index);
+
+                  const playerPath = () => {
+                    const player = stats();
+                    return player
+                      ? `/groups/${group.groupId()}/games/${params.gameId}/player/${player.user_id}`
+                      : undefined;
+                  };
+
+                  return (
+                    <PodiumCard
+                      stats={stats}
+                      position={index + 1}
+                      total={podiumTotal()}
+                      onClick={() => {
+                        const path = playerPath();
+                        if (path) navigate(path);
+                      }}
+                      onPreload={() => {
+                        const path = playerPath();
+                        if (path) preloadRoute(path, { preloadData: true });
+                      }}
+                    />
+                  );
+                }}
               </For>
             </div>
           </div>
@@ -267,12 +287,10 @@ export const Scoreboard = () => {
                     <TableRow
                       onClick={() => navigate(`player/${score.user_id}`)}
                       onPreload={() =>
-                        preloadPlayerStats({
-                          params: {
-                            gameId: params.gameId,
-                            playerId: score.user_id,
-                          },
-                        })
+                        preloadRoute(
+                          `/groups/${group.groupId()}/games/${params.gameId}/player/${score.user_id}`,
+                          { preloadData: true },
+                        )
                       }
                       class={cn("h-15", {
                         "font-semibold": score.user_id === userId(),

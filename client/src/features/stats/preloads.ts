@@ -2,20 +2,32 @@ import { queryClient } from "@/lib/query-client";
 import { gamesApi } from "../games/api";
 import { statsKeys } from "./hooks/query-keys";
 
-export const preloadPlayerStats = ({
+export function preloadPlayerStats({
   params,
 }: {
-  params: { gameId: string; playerId: string };
-}) => {
-  queryClient.prefetchQuery({
-    queryKey: statsKeys.playerHistory(params.gameId, params.playerId),
-    queryFn: () =>
-      gamesApi.game(params.gameId).stats().getPlayerHistory(params.playerId),
-  });
+  params: { gameId?: string; playerId?: string };
+}) {
+  // Skip if empty
+  if (!params.gameId || !params.playerId) {
+    return;
+  }
 
-  queryClient.prefetchQuery({
-    queryKey: statsKeys.playerHighlights(params.gameId, params.playerId),
-    queryFn: () =>
-      gamesApi.game(params.gameId).stats().getPlayerHighlights(params.playerId),
-  });
-};
+  return _preloadPlayerStats(params.gameId, params.playerId);
+}
+
+function _preloadPlayerStats(gameId: string, playerId: string) {
+  return Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: statsKeys.playerHistory(gameId, playerId),
+      queryFn: () => gamesApi.game(gameId).stats().getPlayerHistory(playerId),
+      staleTime: 1000 * 60 * 1, // 1 min
+    }),
+
+    queryClient.prefetchQuery({
+      queryKey: statsKeys.playerHighlights(gameId, playerId),
+      queryFn: () =>
+        gamesApi.game(gameId).stats().getPlayerHighlights(playerId),
+      staleTime: 1000 * 60 * 1, // 1 min
+    }),
+  ]);
+}

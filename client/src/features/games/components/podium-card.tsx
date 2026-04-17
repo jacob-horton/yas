@@ -1,4 +1,4 @@
-import { type Component, Show } from "solid-js";
+import { type Accessor, type Component, Show } from "solid-js";
 import {
   Avatar,
   type AvatarColour,
@@ -37,12 +37,18 @@ type PodiumStats = {
 export const PodiumCard: Component<{
   position: number;
   total: number;
-  stats?: PodiumStats;
+  stats: Accessor<PodiumStats | undefined>;
+  onPreload?: () => void;
+  onClick?: () => void;
 }> = (props) => {
   return (
-    <div
+    <button
+      onClick={props.onClick}
+      onMouseEnter={props.onPreload}
+      onTouchStart={props.onPreload}
+      type="button"
       class={cn(
-        "flex h-32 w-full flex-row overflow-clip rounded-md border bg-white md:w-76 md:flex-col md:pb-8 dark:bg-gray-800",
+        "flex h-32 w-full appearance-none flex-row justify-start overflow-clip rounded-md border bg-white text-inherit hover:cursor-pointer md:w-76 md:flex-col md:pb-8 dark:bg-gray-800",
         RANK_PODIUM_SIZES[props.position],
         getResponsiveOrder(props.position, props.total),
       )}
@@ -56,7 +62,7 @@ export const PodiumCard: Component<{
         {ordinalSuffix(props.position)}
 
         <div class="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-full flex size-16 items-center justify-center rounded-full border bg-white p-2 sm:size-20 md:top-full md:left-6 md:translate-x-0 dark:bg-gray-800">
-          <Show when={props.stats} fallback={<AvatarSkeleton />}>
+          <Show when={props.stats()} fallback={<AvatarSkeleton />}>
             {(stats) => (
               <Avatar
                 class="size-10 sm:size-14"
@@ -68,8 +74,8 @@ export const PodiumCard: Component<{
         </div>
       </div>
 
-      <div class="flex flex-1 flex-col justify-center gap-2 py-4 pr-4 pl-12 md:justify-between md:gap-4 md:px-6 md:py-0 md:pt-14">
-        <Show when={props.stats} fallback={<TextSkeleton class="w-2/3" />}>
+      <div class="flex flex-1 flex-col justify-center gap-2 py-4 pr-4 pl-12 text-start md:justify-between md:gap-4 md:px-6 md:py-0 md:pt-14">
+        <Show when={props.stats()} fallback={<TextSkeleton class="w-2/3" />}>
           {(stats) => (
             <p class="truncate font-semibold leading-normal">{stats().name}</p>
           )}
@@ -78,7 +84,7 @@ export const PodiumCard: Component<{
         <div class="flex gap-2">
           <div class="w-full font-semibold">
             <Show
-              when={props.stats}
+              when={props.stats()}
               fallback={<TextSkeleton class="w-2/3 pb-2" />}
             >
               {(stats) => (
@@ -94,7 +100,7 @@ export const PodiumCard: Component<{
 
           <div class="w-full font-semibold">
             <Show
-              when={props.stats}
+              when={props.stats()}
               fallback={<TextSkeleton class="w-2/3 pb-2" />}
             >
               {(stats) => (
@@ -109,6 +115,6 @@ export const PodiumCard: Component<{
           </div>
         </div>
       </div>
-    </div>
+    </button>
   );
 };
