@@ -212,10 +212,11 @@ export const Scoreboard = () => {
                 label="MVP"
                 subtext="Highest win rate"
                 loading={!scoreboardData.data}
-                value={`${((scoreboardData.data?.highlights.highest_win_rate.value ?? 0) * 100).toFixed(0)}%`}
-                userName={
-                  scoreboardData.data?.highlights.highest_win_rate.user_name ??
-                  ""
+                value={`${((scoreboardData.data?.highlights.highest_win_rate?.[0].value ?? 0) * 100).toFixed(0)}%`}
+                userNames={
+                  scoreboardData.data?.highlights.highest_win_rate.map(
+                    (x) => x.user_name,
+                  ) ?? [""]
                 }
               />
 
@@ -226,13 +227,14 @@ export const Scoreboard = () => {
                 subtext="Highest average score"
                 loading={!scoreboardData.data}
                 value={
-                  scoreboardData.data?.highlights.highest_average_score.value.toFixed(
+                  scoreboardData.data?.highlights.highest_average_score?.[0].value.toFixed(
                     2,
                   ) ?? "0"
                 }
-                userName={
-                  scoreboardData.data?.highlights.highest_average_score
-                    .user_name ?? ""
+                userNames={
+                  scoreboardData.data?.highlights.highest_average_score.map(
+                    (x) => x.user_name,
+                  ) ?? [""]
                 }
               />
 
@@ -243,13 +245,14 @@ export const Scoreboard = () => {
                 subtext="Highest single score"
                 loading={!scoreboardData.data}
                 value={
-                  scoreboardData.data?.highlights.highest_single_score.value.toFixed(
+                  scoreboardData.data?.highlights.highest_single_score?.[0].value.toFixed(
                     0,
                   ) ?? "0"
                 }
-                userName={
-                  scoreboardData.data?.highlights.highest_single_score
-                    .user_name ?? ""
+                userNames={
+                  scoreboardData.data?.highlights.highest_single_score.map(
+                    (x) => x.user_name,
+                  ) ?? [""]
                 }
               />
 
@@ -260,13 +263,14 @@ export const Scoreboard = () => {
                 subtext="Most games played"
                 loading={!scoreboardData.data}
                 value={
-                  scoreboardData.data?.highlights.most_games_played.value.toFixed(
+                  scoreboardData.data?.highlights.most_games_played?.[0].value.toFixed(
                     0,
                   ) ?? "0"
                 }
-                userName={
-                  scoreboardData.data?.highlights.most_games_played.user_name ??
-                  ""
+                userNames={
+                  scoreboardData.data?.highlights.most_games_played.map(
+                    (x) => x.user_name,
+                  ) ?? [""]
                 }
               />
             </div>

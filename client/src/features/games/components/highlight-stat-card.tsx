@@ -1,18 +1,21 @@
-import type { Component } from "solid-js";
+import { createMemo, Show, type Component } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { TextSkeleton } from "@/components/ui/text.skeleton";
 import { cn } from "@/lib/classname";
 import { ICON_MAP, type Icon } from "@/lib/icons";
 import { COLOUR_MAP } from "../constants";
+import { Tooltip } from "@/components/ui/tooltip";
 
 type Props = {
   icon: Icon;
   colour: keyof typeof COLOUR_MAP;
   label: string;
   subtext: string;
-  userName: string;
   value: string;
   loading?: boolean;
+
+  // Names of users who share this award
+  userNames: string[];
 };
 
 export const HighlightStatCard: Component<Props> = (props) => {
@@ -28,7 +31,6 @@ export const HighlightStatCard: Component<Props> = (props) => {
       <div class={cn("m-2 rounded-full p-4", COLOUR_MAP[props.colour].bgDark)}>
         <Dynamic component={ICON_MAP[props.icon]} size={40} />
       </div>
-
       <div class="flex w-full min-w-0 flex-col items-stretch justify-center gap-2">
         <div>
           <p class="whitespace-nowrap font-semibold text-xl leading-5">
@@ -52,7 +54,22 @@ export const HighlightStatCard: Component<Props> = (props) => {
             </>
           ) : (
             <>
-              <p class="truncate font-semibold">{props.userName}</p>
+              <p class="inline-flex items-center gap-1.5 overflow-visible truncate font-semibold">
+                {props.userNames[0]}
+                <Show when={props.userNames.length > 1}>
+                  <Tooltip tooltip={props.userNames.slice(1).join(", ")}>
+                    <span
+                      class={cn(
+                        "h-min rounded-full border px-1.5 font-normal text-xs",
+                        COLOUR_MAP[props.colour].bgDark,
+                        COLOUR_MAP[props.colour].border,
+                      )}
+                    >
+                      +{props.userNames.length - 1}
+                    </span>
+                  </Tooltip>
+                </Show>
+              </p>
               <p>{props.value}</p>
             </>
           )}

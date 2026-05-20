@@ -87,8 +87,6 @@ impl StatsRepo {
                     'highest_win_rate' as stat_type
                 FROM ranks
                 GROUP BY user_id
-                ORDER BY val DESC 
-                LIMIT 1
             ),
 
             -- Highest average score
@@ -99,19 +97,16 @@ impl StatsRepo {
                     'highest_average_score' as stat_type
                 FROM scores
                 GROUP BY user_id
-                ORDER BY val DESC
-                LIMIT 1
             ),
 
             -- Highest single score
             stat_high_score AS (
                 SELECT
                     user_id,
-                    score::FLOAT8 as val,
+                    MAX(score)::FLOAT8 as val,
                     'highest_single_score' as stat_type
                 FROM scores
-                ORDER BY val DESC
-                LIMIT 1
+                GROUP BY user_id
             ),
 
             -- Most games played
@@ -122,16 +117,14 @@ impl StatsRepo {
                     'most_games_played' as stat_type
                 FROM scores
                 GROUP BY user_id
-                ORDER BY val DESC
-                LIMIT 1
             ),
 
-            -- Combine them all
+            -- Combine them all, keeping only tied leaders per stat
             all_stats AS (
-                SELECT * FROM stat_win_rate
-                UNION ALL SELECT * FROM stat_avg_score
-                UNION ALL SELECT * FROM stat_high_score
-                UNION ALL SELECT * FROM stat_most_games
+                SELECT * FROM stat_win_rate WHERE val = (SELECT MAX(val) FROM stat_win_rate)
+                UNION ALL SELECT * FROM stat_avg_score WHERE val = (SELECT MAX(val) FROM stat_avg_score)
+                UNION ALL SELECT * FROM stat_high_score WHERE val = (SELECT MAX(val) FROM stat_high_score)
+                UNION ALL SELECT * FROM stat_most_games WHERE val = (SELECT MAX(val) FROM stat_most_games)
             )
 
             -- Join with users to get names

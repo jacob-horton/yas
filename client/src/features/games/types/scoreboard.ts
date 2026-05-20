@@ -21,10 +21,10 @@ export type HighlightDetail = {
 };
 
 export type Highlights = {
-  highest_win_rate: HighlightDetail;
-  highest_average_score: HighlightDetail;
-  highest_single_score: HighlightDetail;
-  most_games_played: HighlightDetail;
+  highest_win_rate: HighlightDetail[];
+  highest_average_score: HighlightDetail[];
+  highest_single_score: HighlightDetail[];
+  most_games_played: HighlightDetail[];
 };
 
 export type ScoreboardEntry = {

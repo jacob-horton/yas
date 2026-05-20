@@ -291,10 +291,10 @@ impl<T: Default> Default for HighlightDetail<T> {
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
 #[serde(rename_all = "snake_case")]
 pub struct HighlightsResponse {
-    pub highest_win_rate: HighlightDetail<f64>,
-    pub highest_average_score: HighlightDetail<f64>,
-    pub highest_single_score: HighlightDetail<i32>,
-    pub most_games_played: HighlightDetail<u32>,
+    pub highest_win_rate: Vec<HighlightDetail<f64>>,
+    pub highest_average_score: Vec<HighlightDetail<f64>>,
+    pub highest_single_score: Vec<HighlightDetail<i32>>,
+    pub most_games_played: Vec<HighlightDetail<u32>>,
     // TODO: longest win streak
     // TODO: most consistent
 }
@@ -307,32 +307,32 @@ impl From<Vec<RawHighlight>> for HighlightsResponse {
         for row in rows {
             match row.stat_type.as_str() {
                 "highest_win_rate" => {
-                    response.highest_win_rate = HighlightDetail {
+                    response.highest_win_rate.push(HighlightDetail {
                         user_id: row.user_id,
                         user_name: row.user_name,
                         value: row.value,
-                    };
+                    });
                 }
                 "highest_average_score" => {
-                    response.highest_average_score = HighlightDetail {
+                    response.highest_average_score.push(HighlightDetail {
                         user_id: row.user_id,
                         user_name: row.user_name,
                         value: row.value,
-                    };
+                    });
                 }
                 "highest_single_score" => {
-                    response.highest_single_score = HighlightDetail {
+                    response.highest_single_score.push(HighlightDetail {
                         user_id: row.user_id,
                         user_name: row.user_name,
                         value: row.value as i32,
-                    };
+                    });
                 }
                 "most_games_played" => {
-                    response.most_games_played = HighlightDetail {
+                    response.most_games_played.push(HighlightDetail {
                         user_id: row.user_id,
                         user_name: row.user_name,
                         value: row.value as u32,
-                    };
+                    });
                 }
                 _ => panic!("Unknown stat type {}", row.stat_type),
             }
