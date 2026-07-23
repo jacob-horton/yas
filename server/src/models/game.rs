@@ -1,7 +1,13 @@
 use crate::models::trim_string;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, prelude::Type};
+use sqlx::{
+    Decode, Encode, FromRow, Postgres,
+    encode::IsNull,
+    error::BoxDynError,
+    postgres::{PgArgumentBuffer, PgHasArrayType, PgTypeInfo, PgValueRef, types::PgInterval},
+    prelude::Type,
+};
 use uuid::Uuid;
 use validator::Validate;
 
@@ -14,6 +20,7 @@ pub struct GameDb {
     pub min_players_per_match: i32,
     pub max_players_per_match: i32,
     pub metric: ScoringMetric,
+    pub season_duration: Option<Interval>,
 
     pub star_threshold: Option<i32>,
     pub gold_threshold: Option<i32>,
@@ -30,6 +37,7 @@ pub struct GameResponse {
     pub min_players_per_match: i32,
     pub max_players_per_match: i32,
     pub metric: ScoringMetric,
+    pub season_duration: Option<Interval>,
 
     pub star_threshold: Option<i32>,
     pub gold_threshold: Option<i32>,
@@ -47,6 +55,7 @@ impl From<GameDb> for GameResponse {
             min_players_per_match: game.min_players_per_match,
             max_players_per_match: game.max_players_per_match,
             metric: game.metric,
+            season_duration: game.season_duration,
 
             star_threshold: game.star_threshold,
             gold_threshold: game.gold_threshold,
@@ -111,6 +120,7 @@ pub struct CreateGameReq {
     pub max_players_per_match: i32,
 
     pub metric: ScoringMetric,
+    pub season_duration: Option<Interval>,
     pub medal_scores: Option<GameMedals>,
 }
 
@@ -135,5 +145,61 @@ pub struct UpdateGameReq {
     pub max_players_per_match: i32,
 
     pub metric: ScoringMetric,
+    pub season_duration: Option<Interval>,
     pub medal_scores: Option<GameMedals>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Interval {
+    Months(i32),
+    Days(i32),
+}
+
+impl Type<Postgres> for Interval {
+    fn type_info() -> PgTypeInfo {
+        PgInterval::type_info()
+    }
+}
+
+impl PgHasArrayType for Interval {
+    fn array_type_info() -> PgTypeInfo {
+        PgInterval::array_type_info()
+    }
+}
+
+impl<'de> Decode<'de, Postgres> for Interval {
+    fn decode(value: PgValueRef<'de>) -> Result<Self, BoxDynError> {
+        let pg_interval = PgInterval::decode(value)?;
+
+        // NOTE: if months are defined, days are ignored
+        if pg_interval.months > 0 {
+            return Ok(Interval::Months(pg_interval.months));
+        }
+
+        Ok(Interval::Days(pg_interval.days))
+    }
+}
+
+impl Encode<'_, Postgres> for Interval {
+    fn encode_by_ref(&self, buf: &mut PgArgumentBuffer) -> Result<IsNull, BoxDynError> {
+        let pg_interval = match self {
+            Self::Months(months) => PgInterval {
+                months: *months,
+                days: 0,
+                microseconds: 0,
+            },
+            Self::Days(days) => PgInterval {
+                months: 0,
+                days: *days,
+                microseconds: 0,
+            },
+        };
+
+        pg_interval.encode(buf)
+    }
+
+    fn size_hint(&self) -> usize {
+        2 * std::mem::size_of::<i64>()
+    }
 }

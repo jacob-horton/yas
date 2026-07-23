@@ -19,15 +19,18 @@ pub async fn create_game(
         return Err(GameError::MaxLessThanMin.into());
     }
 
+    let mut tx = state.pool.begin().await?;
+
     let game = state
         .game_repo
         .create(
-            &state.pool,
+            &mut tx,
             member.group_id,
             &payload.name,
             payload.min_players_per_match,
             payload.max_players_per_match,
             payload.metric,
+            payload.season_duration,
             payload.medal_scores.and_then(|s| s.star),
             payload.medal_scores.and_then(|s| s.gold),
             payload.medal_scores.and_then(|s| s.silver),
@@ -35,6 +38,8 @@ pub async fn create_game(
         )
         .await
         .map_err(GameError::Database)?;
+
+    tx.commit().await?;
 
     Ok(game)
 }
@@ -59,6 +64,7 @@ pub async fn update_game(
             payload.min_players_per_match,
             payload.max_players_per_match,
             payload.metric,
+            payload.season_duration,
             payload.medal_scores.and_then(|s| s.star),
             payload.medal_scores.and_then(|s| s.gold),
             payload.medal_scores.and_then(|s| s.silver),

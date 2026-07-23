@@ -24,10 +24,11 @@ impl DbStatsProvider {
     async fn get_scoreboard_entries(
         state: &AppState,
         game: &GameDb,
+        season_id: Option<Uuid>,
     ) -> Result<Vec<ScoreboardEntry>, AppError> {
         let raw_data = state
             .stats_repo
-            .get_all_matches(&state.pool, game.id)
+            .get_all_matches(&state.pool, game.id, season_id)
             .await?;
 
         Ok(build_scoreboard_entries(raw_data, game))
@@ -41,11 +42,12 @@ impl StatsProvider for DbStatsProvider {
         state: &AppState,
         user_id: Uuid,
         game_id: Uuid,
+        season_id: Option<Uuid>,
         order_by: Option<OrderBy>,
         order_dir: Option<OrderDir>,
     ) -> Result<Scoreboard, AppError> {
         let (game, _) = fetch_game_guarded(state, game_id, user_id).await?;
-        let mut entries = Self::get_scoreboard_entries(state, &game).await?;
+        let mut entries = Self::get_scoreboard_entries(state, &game, season_id).await?;
 
         let podium: Vec<ScoreboardEntry> = entries.iter().take(3).cloned().collect();
 
@@ -61,7 +63,7 @@ impl StatsProvider for DbStatsProvider {
 
         let highlights: HighlightsResponse = state
             .stats_repo
-            .get_highlights(&state.pool, game_id)
+            .get_highlights(&state.pool, game_id, season_id)
             .await?
             .into();
 
@@ -80,6 +82,7 @@ impl StatsProvider for DbStatsProvider {
         state: &AppState,
         user_id: Uuid,
         game_id: Uuid,
+        season_id: Option<Uuid>,
         player_id: Uuid,
     ) -> Result<(Vec<PlayerMatchDb>, UserDb), AppError> {
         let (game, _) = fetch_game_guarded(state, game_id, user_id).await?;
@@ -95,7 +98,7 @@ impl StatsProvider for DbStatsProvider {
 
         let player_history = state
             .stats_repo
-            .get_player_history(&state.pool, game.id, player_id)
+            .get_player_history(&state.pool, game.id, player_id, season_id)
             .await?;
 
         let player = state
@@ -112,6 +115,7 @@ impl StatsProvider for DbStatsProvider {
         state: &AppState,
         user_id: Uuid,
         game_id: Uuid,
+        season_id: Option<Uuid>,
         player_id: Uuid,
     ) -> Result<PlayerHighlightStats, AppError> {
         let (game, _) = fetch_game_guarded(state, game_id, user_id).await?;
@@ -125,7 +129,7 @@ impl StatsProvider for DbStatsProvider {
             return Err(GroupError::MemberNotFound.into());
         }
 
-        let scoreboard = Self::get_scoreboard_entries(state, &game).await?;
+        let scoreboard = Self::get_scoreboard_entries(state, &game, season_id).await?;
         let (rank_index, entry) = scoreboard
             .iter()
             .enumerate()
@@ -156,12 +160,13 @@ impl StatsProvider for DbStatsProvider {
         state: &AppState,
         user_id: Uuid,
         game_id: Uuid,
+        season_id: Option<Uuid>,
     ) -> Result<HashMap<Uuid, DistributionWithMaxMin>, AppError> {
         let (game, _) = fetch_game_guarded(state, game_id, user_id).await?;
 
         let raw_data = state
             .stats_repo
-            .get_all_matches(&state.pool, game.id)
+            .get_all_matches(&state.pool, game.id, season_id)
             .await?;
 
         let members = state

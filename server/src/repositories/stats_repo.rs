@@ -9,6 +9,7 @@ impl StatsRepo {
         &self,
         pool: &sqlx::PgPool,
         game_id: Uuid,
+        season_id: Option<Uuid>,
     ) -> Result<Vec<RawMatchStats>, sqlx::Error> {
         sqlx::query_as::<_, RawMatchStats>(
             r#"
@@ -24,11 +25,12 @@ impl StatsRepo {
             FROM match_leaderboards lb
             JOIN matches m ON m.id = lb.match_id
             JOIN users u ON u.id = lb.user_id
-            WHERE m.game_id = $1
+            WHERE m.game_id = $1 AND ($2 IS NULL OR season_id = $2)
             ORDER BY m.played_at DESC;
             "#,
         )
         .bind(game_id)
+        .bind(season_id)
         .fetch_all(pool)
         .await
     }
@@ -38,6 +40,7 @@ impl StatsRepo {
         pool: &sqlx::PgPool,
         game_id: Uuid,
         user_id: Uuid,
+        season_id: Option<Uuid>,
     ) -> Result<Vec<PlayerMatchDb>, sqlx::Error> {
         sqlx::query_as::<_, PlayerMatchDb>(
             r#"
@@ -48,12 +51,13 @@ impl StatsRepo {
                 m.played_at
             FROM matches m
             JOIN match_leaderboards lb ON m.id = lb.match_id
-            WHERE m.game_id = $1 AND lb.user_id = $2
+            WHERE m.game_id = $1 AND lb.user_id = $2 AND ($3 IS NULL OR season_id = $3)
             ORDER BY m.played_at DESC
             "#,
         )
         .bind(game_id)
         .bind(user_id)
+        .bind(season_id)
         .fetch_all(pool)
         .await
     }
@@ -62,6 +66,7 @@ impl StatsRepo {
         &self,
         pool: &sqlx::PgPool,
         game_id: Uuid,
+        season_id: Option<Uuid>,
     ) -> Result<Vec<RawHighlight>, sqlx::Error> {
         let rows = sqlx::query_as::<_, RawHighlight>(
             r#"
@@ -70,13 +75,13 @@ impl StatsRepo {
                 SELECT ms.user_id, ms.score
                 FROM match_scores ms
                 JOIN matches m ON ms.match_id = m.id
-                WHERE m.game_id = $1
+                WHERE m.game_id = $1 AND ($2 IS NULL OR season_id = $2)
             ),
             ranks AS (
                 SELECT lb.user_id, lb.rank
                 FROM match_leaderboards lb
                 JOIN matches m ON lb.match_id = m.id
-                WHERE m.game_id = $1
+                WHERE m.game_id = $1 AND ($2 IS NULL OR season_id = $2)
             ),
 
             -- Highest win rate
@@ -138,6 +143,7 @@ impl StatsRepo {
             "#,
         )
         .bind(game_id)
+        .bind(season_id)
         .fetch_all(pool)
         .await?;
 

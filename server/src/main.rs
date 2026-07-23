@@ -32,11 +32,12 @@ use crate::{
     extractors::rate_limiting::ip::{create_ip_limiter, ip_limit_mw},
     repositories::{
         game_repo::GameRepo, group_repo::GroupRepo, invite_repo::InviteRepo, match_repo::MatchRepo,
-        password_resets_repo::PasswordResetsRepo, stats_repo::StatsRepo, user_repo::UserRepo,
-        verification_repo::VerificationRepo,
+        password_resets_repo::PasswordResetsRepo, season_repo::SeasonRepo, stats_repo::StatsRepo,
+        user_repo::UserRepo, verification_repo::VerificationRepo,
     },
     services::{
         email::EmailService,
+        season::check_and_update_seasons,
         stats::{
             CacheInvalidator, StatsProvider,
             cache::{RedisCacheInvalidator, RedisCachedStatsProvider},
@@ -61,6 +62,7 @@ pub struct AppState {
     pub game_repo: Arc<GameRepo>,
     pub match_repo: Arc<MatchRepo>,
     pub stats_repo: Arc<StatsRepo>,
+    pub season_repo: Arc<SeasonRepo>,
 }
 
 impl AppState {
@@ -73,6 +75,7 @@ impl AppState {
         let stats_repo = Arc::new(StatsRepo {});
         let verification_repo = Arc::new(VerificationRepo {});
         let password_resets_repo = Arc::new(PasswordResetsRepo {});
+        let season_repo = Arc::new(SeasonRepo {});
 
         let email_service = Arc::new(Self::get_email_service());
 
@@ -112,6 +115,7 @@ impl AppState {
             game_repo,
             match_repo,
             stats_repo,
+            season_repo,
         }
     }
 
@@ -196,6 +200,7 @@ async fn main() {
     let cleanup_verification_repo = app_state.verification_repo.clone();
     let cleanup_password_reset_repo = app_state.password_resets_repo.clone();
     let cleanup_session_store = session_store.clone();
+    let cleanup_app_state = app_state.clone();
     tokio::spawn(async move {
         let mut interval = tokio::time::interval(std::time::Duration::from_secs(60 * 60));
 
@@ -221,6 +226,11 @@ async fn main() {
             match cleanup_session_store.delete_expired().await {
                 Ok(()) => println!("Cleaned up expired sessions"),
                 Err(e) => eprintln!("Failed to clean up expired sessions: {}", e),
+            }
+
+            match check_and_update_seasons(&cleanup_app_state).await {
+                Ok(()) => println!("Updated seasons"),
+                Err(e) => eprintln!("Failed to update seasons: {}", e),
             }
         }
     });
