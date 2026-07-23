@@ -24,6 +24,7 @@ pub trait StatsProvider: Send + Sync {
         state: &AppState,
         user_id: Uuid,
         game_id: Uuid,
+        season_id: Option<Uuid>,
         order_by: Option<OrderBy>,
         order_dir: Option<OrderDir>,
     ) -> Result<Scoreboard, AppError>;
@@ -33,6 +34,7 @@ pub trait StatsProvider: Send + Sync {
         state: &AppState,
         user_id: Uuid,
         game_id: Uuid,
+        season_id: Option<Uuid>,
         player_id: Uuid,
     ) -> Result<(Vec<PlayerMatchDb>, UserDb), AppError>;
 
@@ -41,6 +43,7 @@ pub trait StatsProvider: Send + Sync {
         state: &AppState,
         user_id: Uuid,
         game_id: Uuid,
+        season_id: Option<Uuid>,
         player_id: Uuid,
     ) -> Result<PlayerHighlightStats, AppError>;
 
@@ -49,6 +52,7 @@ pub trait StatsProvider: Send + Sync {
         state: &AppState,
         user_id: Uuid,
         game_id: Uuid,
+        season_id: Option<Uuid>,
     ) -> Result<HashMap<Uuid, DistributionWithMaxMin>, AppError>;
 }
 

@@ -87,6 +87,7 @@ impl<T: StatsProvider> StatsProvider for RedisCachedStatsProvider<T> {
         state: &AppState,
         user_id: Uuid,
         game_id: Uuid,
+        season_id: Option<Uuid>,
         order_by: Option<OrderBy>,
         order_dir: Option<OrderDir>,
     ) -> Result<Scoreboard, AppError> {
@@ -94,13 +95,16 @@ impl<T: StatsProvider> StatsProvider for RedisCachedStatsProvider<T> {
 
         let order_by_final = order_by.unwrap_or(game.metric.into());
         let order_dir_final = order_dir.unwrap_or(OrderDir::Descending);
-        let suffix = format!("scoreboard:{:?}:{:?}", order_by_final, order_dir_final);
+        let suffix = format!(
+            "scoreboard:{:?}:{:?}:{:?}",
+            season_id, order_by_final, order_dir_final
+        );
 
         self.with_cache(
             game_id,
             &suffix,
             self.inner
-                .get_scoreboard_and_stats(state, user_id, game_id, order_by, order_dir),
+                .get_scoreboard_and_stats(state, user_id, game_id, season_id, order_by, order_dir),
         )
         .await
     }
@@ -110,16 +114,17 @@ impl<T: StatsProvider> StatsProvider for RedisCachedStatsProvider<T> {
         state: &AppState,
         user_id: Uuid,
         game_id: Uuid,
+        season_id: Option<Uuid>,
         player_id: Uuid,
     ) -> Result<(Vec<PlayerMatchDb>, UserDb), AppError> {
         fetch_game_guarded(state, game_id, user_id).await?;
-        let suffix = format!("history:player:{}", player_id);
+        let suffix = format!("history:season:{:?}:player:{}", season_id, player_id);
 
         self.with_cache(
             game_id,
             &suffix,
             self.inner
-                .get_player_history(state, user_id, game_id, player_id),
+                .get_player_history(state, user_id, game_id, season_id, player_id),
         )
         .await
     }
@@ -129,16 +134,17 @@ impl<T: StatsProvider> StatsProvider for RedisCachedStatsProvider<T> {
         state: &AppState,
         user_id: Uuid,
         game_id: Uuid,
+        season_id: Option<Uuid>,
         player_id: Uuid,
     ) -> Result<PlayerHighlightStats, AppError> {
         fetch_game_guarded(state, game_id, user_id).await?;
-        let suffix = format!("highlights:player:{}", player_id);
+        let suffix = format!("highlights:season:{:?}:player:{}", season_id, player_id);
 
         self.with_cache(
             game_id,
             &suffix,
             self.inner
-                .get_player_highlights(state, user_id, game_id, player_id),
+                .get_player_highlights(state, user_id, game_id, season_id, player_id),
         )
         .await
     }
@@ -148,12 +154,14 @@ impl<T: StatsProvider> StatsProvider for RedisCachedStatsProvider<T> {
         state: &AppState,
         user_id: Uuid,
         game_id: Uuid,
+        season_id: Option<Uuid>,
     ) -> Result<HashMap<Uuid, DistributionWithMaxMin>, AppError> {
         fetch_game_guarded(state, game_id, user_id).await?;
         self.with_cache(
             game_id,
-            "distributions",
-            self.inner.get_distributions(state, user_id, game_id),
+            &format!("distributions:season:{:?}", season_id),
+            self.inner
+                .get_distributions(state, user_id, game_id, season_id),
         )
         .await
     }

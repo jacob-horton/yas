@@ -86,9 +86,10 @@ pub struct ScoreboardEntry {
 }
 
 #[derive(Deserialize)]
-pub struct StatsParams {
+pub struct ScoreboardParams {
     pub order_by: Option<OrderBy>,
     pub order_dir: Option<OrderDir>,
+    pub season: Option<Uuid>,
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Copy)]
@@ -393,4 +394,9 @@ impl Medals {
             self.bronze += 1;
         }
     }
+}
+
+#[derive(Deserialize)]
+pub struct StatsParams {
+    pub season: Option<Uuid>,
 }

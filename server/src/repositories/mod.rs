@@ -3,6 +3,7 @@ pub mod group_repo;
 pub mod invite_repo;
 pub mod match_repo;
 pub mod password_resets_repo;
+pub mod season_repo;
 pub mod stats_repo;
 pub mod user_repo;
 pub mod verification_repo;

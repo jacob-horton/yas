@@ -20,7 +20,7 @@ use crate::{
     },
     models::{
         game::{CreateGameReq, GameResponse, UpdateGameReq},
-        stats::{ScoreboardResponse, StatsParams},
+        stats::{ScoreboardParams, ScoreboardResponse},
     },
     services,
 };
@@ -71,12 +71,19 @@ async fn get_games_in_group(
 async fn get_scoreboard(
     State(state): State<AppState>,
     Path(game_id): Path<Uuid>,
-    Query(query): Query<StatsParams>,
+    Query(query): Query<ScoreboardParams>,
     user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
     let scoreboard = state
         .stats_service
-        .get_scoreboard_and_stats(&state, user.id, game_id, query.order_by, query.order_dir)
+        .get_scoreboard_and_stats(
+            &state,
+            user.id,
+            game_id,
+            query.season,
+            query.order_by,
+            query.order_dir,
+        )
         .await?;
 
     let response: ScoreboardResponse = scoreboard.into();

@@ -10,14 +10,16 @@ impl MatchRepo {
         &self,
         tx: &mut PgConnection,
         game_id: Uuid,
+        season_id: Uuid,
         recorded_by: Uuid,
         scores: Vec<MatchScoreDb>,
     ) -> Result<MatchDb, sqlx::Error> {
         let match_details = sqlx::query_as::<_, MatchDetailsDb>(
-            "INSERT INTO matches (game_id, recorded_by) VALUES ($1, $2) RETURNING *",
+            "INSERT INTO matches (game_id, recorded_by, season_id) VALUES ($1, $2, $3) RETURNING *",
         )
         .bind(game_id)
         .bind(recorded_by)
+        .bind(season_id)
         .fetch_one(&mut *tx)
         .await?;
 

@@ -53,9 +53,11 @@ pub async fn create_match(
         return Err(MatchError::OneOrMorePlayersNotMember.into());
     }
 
+    let latest_season = state.season_repo.get_latest(&mut tx, game_id).await?;
+
     let game_match = state
         .match_repo
-        .create(&mut tx, game_id, user_id, scores)
+        .create(&mut tx, game_id, latest_season.id, user_id, scores)
         .await
         .map_err(MatchError::Database)?;
 
