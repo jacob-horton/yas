@@ -83,6 +83,7 @@ const EditGroupForm: Component<Props> = (props) => {
       onSubmit={handleSubmit}
       actions={[
         {
+          type: "button",
           text: "Delete",
           icon: "delete",
           onAction: handleDelete,

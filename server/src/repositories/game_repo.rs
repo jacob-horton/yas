@@ -51,7 +51,7 @@ impl GameRepo {
 
     pub async fn update<'e>(
         &self,
-        executor: impl PgExecutor<'e, Database = Postgres>,
+        tx: &mut PgConnection,
         game_id: Uuid,
         name: &str,
         min_players_per_match: i32,
@@ -76,7 +76,7 @@ impl GameRepo {
         .bind(silver_threshold)
         .bind(bronze_threshold)
         .bind(game_id)
-        .fetch_one(executor)
+        .fetch_one(tx)
         .await
     }
 

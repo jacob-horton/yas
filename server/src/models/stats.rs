@@ -1,11 +1,15 @@
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use sqlx::prelude::FromRow;
 use uuid::Uuid;
 
-use crate::models::{
-    game::{GameDb, GameResponse, OrderBy},
-    user::{Avatar, AvatarColour, UserDb},
+use crate::{
+    AppState,
+    errors::AppError,
+    models::{
+        game::{GameDb, GameResponse, OrderBy},
+        user::{Avatar, AvatarColour, UserDb},
+    },
 };
 
 #[derive(sqlx::FromRow, Debug)]
@@ -40,6 +44,7 @@ pub struct PlayerResponse {
 pub struct PlayerHistoryResponse {
     pub player: PlayerResponse,
     pub matches: Vec<PlayerMatchResponse>,
+    pub season_id: Option<Uuid>,
 }
 
 #[derive(Debug, Serialize)]
@@ -89,7 +94,51 @@ pub struct ScoreboardEntry {
 pub struct ScoreboardParams {
     pub order_by: Option<OrderBy>,
     pub order_dir: Option<OrderDir>,
-    pub season: Option<Uuid>,
+    pub season: Option<SeasonScope>,
+}
+
+#[derive(Debug)]
+pub enum SeasonScope {
+    All,
+    Latest,
+    Id(Uuid),
+}
+
+impl SeasonScope {
+    pub async fn to_season_id(
+        &self,
+        state: &AppState,
+        game_id: Uuid,
+    ) -> Result<Option<Uuid>, AppError> {
+        match self {
+            SeasonScope::All => Ok(None),
+            SeasonScope::Latest => {
+                let mut tx = state.pool.begin().await?;
+                let season = state
+                    .season_repo
+                    .get_latest(&mut tx, game_id)
+                    .await
+                    .expect("Encountered a game without a season");
+                tx.commit().await?;
+
+                Ok(Some(season.id))
+            }
+            SeasonScope::Id(id) => Ok(Some(*id)),
+        }
+    }
+}
+
+impl<'de> Deserialize<'de> for SeasonScope {
+    fn deserialize<D: Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let s = String::deserialize(d)?;
+        match s.as_str() {
+            "all" => Ok(Self::All),
+            "latest" => Ok(Self::Latest),
+            _ => Uuid::parse_str(&s)
+                .map(Self::Id)
+                .map_err(serde::de::Error::custom),
+        }
+    }
 }
 
 #[derive(Deserialize, Debug, Clone, PartialEq, Copy)]
@@ -122,6 +171,7 @@ pub struct ScoreboardResponse {
     pub podium: Vec<ScoreboardEntryResponse>,
     pub highlights: HighlightsResponse,
     pub game: GameResponse,
+    pub current_season: Option<Uuid>,
 }
 
 #[derive(Serialize)]
@@ -171,13 +221,14 @@ impl From<ScoreboardEntry> for ScoreboardEntryResponse {
     }
 }
 
-impl From<Scoreboard> for ScoreboardResponse {
-    fn from(scoreboard: Scoreboard) -> Self {
+impl ScoreboardResponse {
+    pub fn new(scoreboard: Scoreboard, current_season: Option<Uuid>) -> Self {
         Self {
             entries: scoreboard.entries.into_iter().map(|s| s.into()).collect(),
             podium: scoreboard.podium.into_iter().map(|s| s.into()).collect(),
             highlights: scoreboard.highlights,
             game: scoreboard.game.into(),
+            current_season,
         }
     }
 }
@@ -209,6 +260,7 @@ pub struct StatsLifetime {
 pub struct PlayerHighlightsResponse {
     pub player: PlayerResponse,
     pub lifetime: HighlightsLifetimeResponse,
+    pub season_id: Option<Uuid>,
 }
 
 #[derive(Serialize)]
@@ -254,11 +306,12 @@ impl From<UserDb> for PlayerResponse {
     }
 }
 
-impl From<PlayerHighlightStats> for PlayerHighlightsResponse {
-    fn from(value: PlayerHighlightStats) -> Self {
+impl PlayerHighlightsResponse {
+    pub fn new(stats: PlayerHighlightStats, season_id: Option<Uuid>) -> Self {
         Self {
-            player: value.player.into(),
-            lifetime: value.lifetime.into(),
+            player: stats.player.into(),
+            lifetime: stats.lifetime.into(),
+            season_id,
         }
     }
 }
@@ -398,5 +451,5 @@ impl Medals {
 
 #[derive(Deserialize)]
 pub struct StatsParams {
-    pub season: Option<Uuid>,
+    pub season: Option<SeasonScope>,
 }

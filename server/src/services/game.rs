@@ -2,8 +2,10 @@ use crate::AppState;
 use crate::errors::{AppError, GameError, GroupError};
 use crate::models::game::{CreateGameReq, GameDb, UpdateGameReq};
 use crate::models::group::GroupMemberDb;
+use crate::models::season::SeasonDb;
 use crate::policies::GroupAction;
 
+use chrono::Utc;
 use uuid::Uuid;
 
 pub async fn create_game(
@@ -55,10 +57,11 @@ pub async fn update_game(
         return Err(GroupError::Forbidden.into());
     }
 
+    let mut tx = state.pool.begin().await?;
     let game = state
         .game_repo
         .update(
-            &state.pool,
+            &mut tx,
             game.id,
             &payload.name,
             payload.min_players_per_match,
@@ -72,6 +75,28 @@ pub async fn update_game(
         )
         .await
         .map_err(GameError::Database)?;
+
+    let latest_season = state.season_repo.get_latest(&mut tx, game.id).await?;
+    let mut latest_season = state
+        .season_repo
+        .update_season_end_date(&mut tx, latest_season.id, payload.next_season_start)
+        .await?;
+
+    if let Some(mut next_season_start) = payload.next_season_start {
+        while next_season_start < Utc::now() {
+            latest_season = state
+                .season_repo
+                .new_season(&mut tx, &latest_season)
+                .await?;
+
+            next_season_start = match latest_season.end_date {
+                Some(val) => val,
+                None => break,
+            };
+        }
+    }
+
+    tx.commit().await?;
 
     Ok(game)
 }
@@ -109,6 +134,20 @@ pub async fn get_last_players(
         .await?;
 
     Ok(last_players)
+}
+
+pub async fn get_seasons(
+    state: &AppState,
+    user_id: Uuid,
+    game_id: Uuid,
+) -> Result<Vec<SeasonDb>, AppError> {
+    let (game, _) = fetch_game_guarded(state, game_id, user_id).await?;
+
+    let mut tx = state.pool.begin().await?;
+    let seasons = state.season_repo.get_seasons(&mut tx, game.id).await?;
+    tx.commit().await?;
+
+    Ok(seasons)
 }
 
 pub async fn fetch_game_guarded(

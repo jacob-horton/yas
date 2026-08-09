@@ -24,13 +24,16 @@ export type PlayerStatsRouteParams = {
 export type PlayerHighlightStats = {
   player: Player;
   lifetime: HighlightStatsLifetime;
+  season_id: string | null;
 };
 
 export type PlayerHistory = {
   player: Player;
   matches: MatchStats[];
+  season_id: string | null;
 };
 
+// TODO: limit to season?
 export type HighlightStatsLifetime = {
   average_score: number;
   best_score: number;

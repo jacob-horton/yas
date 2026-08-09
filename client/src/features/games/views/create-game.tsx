@@ -9,11 +9,16 @@ import { useGroup } from "@/features/groups/context/group-provider";
 import { useZodForm } from "@/lib/zod/use-zod-form";
 import { SCORING_METRIC_LABELS } from "../constants";
 import { useCreateGame } from "../hooks/use-create-game";
-import { createGameSchema, scoringMetrics } from "../types/game";
+import {
+  createGameSchema,
+  type DurationUnit,
+  durationUnits,
+  scoringMetrics,
+} from "../types/game";
 
 export type MedalType = "star" | "gold" | "silver" | "bronze";
 export const MEDAL_MAP: Record<MedalType, string> = {
-  star: "🎖️",
+  star: "🎖",
   gold: "🥇",
   silver: "🥈",
   bronze: "🥉",
@@ -32,6 +37,10 @@ export const CreateGame = () => {
     max_players_per_match: "",
     metric: scoringMetrics[0],
     medal_scores: undefined,
+    season_duration: {
+      value: "30",
+      unit: "days",
+    },
   });
 
   const isMedalsEnabled = () => !!values.medal_scores;
@@ -45,6 +54,18 @@ export const CreateGame = () => {
       });
     } else {
       setField("medal_scores", undefined);
+    }
+  };
+
+  const isSeasonsEnabled = () => !!values.season_duration;
+  const toggleSeasons = (checked: boolean) => {
+    if (checked) {
+      setField("season_duration", {
+        value: "30",
+        unit: "days",
+      });
+    } else {
+      setField("season_duration", undefined);
     }
   };
 
@@ -108,6 +129,37 @@ export const CreateGame = () => {
             value: m,
           }))}
           error={errors.metric}
+        />
+      </FormSection>
+
+      <FormSection
+        title="Seasons"
+        tooltip="Start the leaderboard again each season to make things new and exciting!"
+        enabled={isSeasonsEnabled()}
+        onToggle={toggleSeasons}
+      >
+        <Input
+          label="Duration"
+          tooltip="How long a season lasts"
+          // biome-ignore lint/style/noNonNullAssertion: Will only show when season_duration is defined
+          value={values.season_duration!.value}
+          onChange={(val) => setField("season_duration", "value", val)}
+          placeholder="e.g. 30"
+          error={errors["season_duration.value"]}
+        />
+
+        <Dropdown
+          label="Unit"
+          // biome-ignore lint/style/noNonNullAssertion: Will only show when season_duration is defined
+          value={values.season_duration!.unit}
+          onChange={(val) =>
+            setField("season_duration", "unit", val as DurationUnit)
+          }
+          options={durationUnits.map((m) => ({
+            label: m[0].toUpperCase() + m.slice(1),
+            value: m,
+          }))}
+          error={errors["season_duration.unit"]}
         />
       </FormSection>
 

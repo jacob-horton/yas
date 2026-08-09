@@ -17,7 +17,10 @@ type Props = {
 };
 
 export const DistributionCart: Component<Props> = (props) => {
-  const distributions = useDistributions(() => props.gameId);
+  const distributions = useDistributions(
+    () => props.gameId,
+    () => undefined,
+  );
 
   const userMap = createMemo(() => {
     const map = new Map<string, User>();

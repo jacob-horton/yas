@@ -7,6 +7,9 @@ import {
 export const scoringMetrics = ["win_rate", "average_score"] as const;
 export type ScoringMetric = (typeof scoringMetrics)[number];
 
+export const durationUnits = ["days", "months"] as const;
+export type DurationUnit = (typeof durationUnits)[number];
+
 export type GameRouteParams = {
   gameId: string;
 };
@@ -18,6 +21,11 @@ export type Game = {
   min_players_per_match: number;
   max_players_per_match: number;
   metric: ScoringMetric;
+
+  season_duration: {
+    value: number;
+    unit: DurationUnit;
+  } | null;
 
   star_threshold: number | null;
   gold_threshold: number | null;
@@ -58,6 +66,15 @@ export const createGameSchema = z
 
     metric: z.string().pipe(z.enum(scoringMetrics)),
 
+    season_duration: z
+      .object({
+        value: nullableNumericStringSchema.pipe(
+          z.number().min(1, "Must be at least 1").nullable(),
+        ),
+        unit: z.enum(durationUnits),
+      })
+      .optional(),
+
     medal_scores: medalScoresSchema,
   })
   .refine((data) => data.min_players_per_match <= data.max_players_per_match, {
@@ -90,6 +107,15 @@ export const updateGameSchema = z
 
     metric: z.string().pipe(z.enum(scoringMetrics)),
 
+    season_duration: z
+      .object({
+        value: nullableNumericStringSchema.pipe(
+          z.number().min(1, "Must be at least 1").nullable(),
+        ),
+        unit: z.enum(durationUnits),
+      })
+      .optional(),
+
     medal_scores: z
       .object({
         star: nullableNumericStringSchema,
@@ -103,4 +129,6 @@ export const updateGameSchema = z
     message: "Max players cannot be less than min players",
     path: ["max_players_per_match"],
   });
-export type UpdateGameRequest = z.output<typeof updateGameSchema>;
+export type UpdateGameRequest = z.output<typeof updateGameSchema> & {
+  next_season_start?: string | undefined;
+};

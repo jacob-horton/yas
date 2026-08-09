@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use sqlx::PgConnection;
 use uuid::Uuid;
 
@@ -12,8 +13,40 @@ impl SeasonRepo {
         game_id: Uuid,
     ) -> Result<SeasonDb, sqlx::Error> {
         let season = sqlx::query_as::<_, SeasonDb>(
-            "SELECT * FROM seasons WHERE seasons.game_id = $1 ORDER BY start_date DESC LIMIT 1",
+            "SELECT * FROM seasons WHERE game_id = $1 ORDER BY start_date DESC LIMIT 1",
         )
+        .bind(game_id)
+        .fetch_one(&mut *tx)
+        .await?;
+
+        Ok(season)
+    }
+
+    pub async fn get_seasons(
+        &self,
+        tx: &mut PgConnection,
+        game_id: Uuid,
+    ) -> Result<Vec<SeasonDb>, sqlx::Error> {
+        let seasons = sqlx::query_as::<_, SeasonDb>(
+            "SELECT * FROM seasons WHERE game_id = $1 ORDER BY start_date DESC",
+        )
+        .bind(game_id)
+        .fetch_all(&mut *tx)
+        .await?;
+
+        Ok(seasons)
+    }
+
+    pub async fn get_season(
+        &self,
+        tx: &mut PgConnection,
+        game_id: Uuid,
+        season_id: Uuid,
+    ) -> Result<SeasonDb, sqlx::Error> {
+        let season = sqlx::query_as::<_, SeasonDb>(
+            "SELECT * FROM seasons WHERE id = $1 AND game_id = $2 LIMIT 1",
+        )
+        .bind(season_id)
         .bind(game_id)
         .fetch_one(&mut *tx)
         .await?;
@@ -71,6 +104,23 @@ impl SeasonRepo {
         .bind(last_season_number + 1)
         .bind(old_season.end_date)
         .bind(duration)
+        .fetch_one(&mut *tx)
+        .await?;
+
+        Ok(season)
+    }
+
+    pub async fn update_season_end_date(
+        &self,
+        tx: &mut PgConnection,
+        season_id: Uuid,
+        end_date: Option<DateTime<Utc>>,
+    ) -> Result<SeasonDb, sqlx::Error> {
+        let season = sqlx::query_as::<_, SeasonDb>(
+            "UPDATE seasons SET end_date = $1 WHERE id = $2 RETURNING *",
+        )
+        .bind(end_date)
+        .bind(season_id)
         .fetch_one(&mut *tx)
         .await?;
 

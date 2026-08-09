@@ -6,11 +6,13 @@ import { gameKeys } from "./query-keys";
 
 export const useScoreboardData = <T extends string>(
   gameId: Accessor<string>,
+  season: Accessor<string | undefined>,
   sort: Accessor<Sort<T> | undefined>,
 ) => {
   return useQuery(() => ({
-    queryKey: gameKeys.scoreboard(gameId(), sort()),
-    queryFn: async () => gamesApi.game(gameId()).stats().getScoreboard(sort()),
+    queryKey: gameKeys.scoreboard(gameId(), season(), sort()),
+    queryFn: async () =>
+      gamesApi.game(gameId()).stats().getScoreboard(season(), sort()),
     placeholderData: keepPreviousData,
   }));
 };

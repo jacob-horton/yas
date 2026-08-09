@@ -5,14 +5,27 @@ export const gameKeys = {
 
   game: (gameId: string) => [...gameKeys.all, gameId] as const,
 
+  gameSeasons: (gameId: string) =>
+    [...gameKeys.all, gameId, "seasons"] as const,
+
   lastPlayers: (gameId: string) =>
     [...gameKeys.game(gameId), "last_players"] as const,
 
-  scoreboard: <T extends string>(gameId: string, sort?: Sort<T>) => {
-    if (sort) {
-      return [...gameKeys.game(gameId), "scoreboard", sort] as const;
+  scoreboard: <T extends string>(
+    gameId: string,
+    season?: string,
+    sort?: Sort<T>,
+  ) => {
+    const key: unknown[] = [...gameKeys.game(gameId), "scoreboard"];
+
+    if (season) {
+      key.push(season);
     }
 
-    return [...gameKeys.game(gameId), "scoreboard"] as const;
+    if (sort) {
+      key.push(sort);
+    }
+
+    return key;
   },
 };

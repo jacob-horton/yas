@@ -27,10 +27,13 @@ import { useAuth } from "@/features/auth/context/auth-provider";
 import { useGroup } from "@/features/groups/context/group-provider";
 import { hasPermission } from "@/features/groups/types";
 import { cn } from "@/lib/classname";
+import { useSessionStorage } from "@/lib/use-session-storage";
 import { HighlightStatCard } from "../components/highlight-stat-card";
 import { PodiumCard } from "../components/podium-card";
 import { ProgressBar } from "../components/progress-bar";
+import { useGameSeasons } from "../hooks/use-game-seasons";
 import { useScoreboardData } from "../hooks/use-scoreboard-data";
+import { seasonName, seasonSessionKey } from "../seasons";
 import type { GameRouteParams, ScoringMetric } from "../types/game";
 import { MEDAL_MAP } from "./create-game";
 
@@ -62,10 +65,29 @@ export const Scoreboard = () => {
   const [sort, setSort] = createSignal<
     Sort<ScoringMetric | "name"> | undefined
   >(undefined);
-  const scoreboardData = useScoreboardData(() => params.gameId, sort);
+
+  const [seasonId, setSeasonId] = useSessionStorage(() =>
+    seasonSessionKey(params.gameId),
+  );
+
+  const scoreboardData = useScoreboardData(
+    () => params.gameId,
+    () => seasonId() ?? undefined,
+    sort,
+  );
+  const seasons = useGameSeasons(() => params.gameId);
 
   const userId = () => auth.user()?.id;
   const group = useGroup();
+
+  // The season currently backing what's on screen, whether picked explicitly
+  // or defaulted server-side
+  const effectiveSeasonId = () =>
+    seasonId() ?? scoreboardData.data?.current_season ?? undefined;
+
+  const playerUrl = (playerId: string) => {
+    return `/groups/${group.groupId()}/games/${params.gameId}/player/${playerId}`;
+  };
 
   // User/front-end sort, fall back to default sort metric
   const effectiveSort = () => {
@@ -110,12 +132,32 @@ export const Scoreboard = () => {
   const actions = createMemo(() => {
     const actions: Action[] = [];
 
+    if (
+      (seasons.data?.length ?? 0) > 1 ||
+      !!scoreboardData.data?.game.season_duration
+    ) {
+      actions.push({
+        type: "menu",
+        options:
+          seasons.data?.map((s) => ({
+            value: s.id,
+            label: s.name ?? `Season ${s.number}`,
+            onClick: () => setSeasonId(s.id),
+          })) ?? [],
+        value: effectiveSeasonId() ?? "",
+        text: seasonName(
+          seasons.data?.find((s) => s.id === effectiveSeasonId()),
+        ),
+      });
+    }
+
     if (hasPermission(group.userRole(), "admin", auth.user()?.email_verified)) {
       actions.push({
         text: "Edit",
         variant: "secondary",
         href: "edit",
         icon: "edit",
+        type: "href",
       });
     }
 
@@ -127,6 +169,7 @@ export const Scoreboard = () => {
         variant: "primary",
         href: "record",
         icon: "notebookPen",
+        type: "href",
       });
     }
 
@@ -179,9 +222,7 @@ export const Scoreboard = () => {
 
                   const playerPath = () => {
                     const player = stats();
-                    return player
-                      ? `/groups/${group.groupId()}/games/${params.gameId}/player/${player.user_id}`
-                      : undefined;
+                    return player ? playerUrl(player.user_id) : undefined;
                   };
 
                   return (
@@ -289,12 +330,11 @@ export const Scoreboard = () => {
                 <For each={scoreboardData.data?.entries}>
                   {(score) => (
                     <TableRow
-                      onClick={() => navigate(`player/${score.user_id}`)}
+                      onClick={() => navigate(playerUrl(score.user_id))}
                       onPreload={() =>
-                        preloadRoute(
-                          `/groups/${group.groupId()}/games/${params.gameId}/player/${score.user_id}`,
-                          { preloadData: true },
-                        )
+                        preloadRoute(playerUrl(score.user_id), {
+                          preloadData: true,
+                        })
                       }
                       class={cn("h-15", {
                         "font-semibold": score.user_id === userId(),

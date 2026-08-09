@@ -11,7 +11,7 @@ use crate::{
     AppState,
     errors::AppError,
     extractors::auth_user::AuthUser,
-    models::stats::{PlayerHighlightsResponse, PlayerHistoryResponse, StatsParams},
+    models::stats::{PlayerHighlightsResponse, PlayerHistoryResponse, SeasonScope, StatsParams},
 };
 
 pub async fn get_user_history(
@@ -20,14 +20,21 @@ pub async fn get_user_history(
     Query(query): Query<StatsParams>,
     user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
+    let season_id = query
+        .season
+        .unwrap_or(SeasonScope::All)
+        .to_season_id(&state, game_id)
+        .await?;
+
     let (stats, player) = state
         .stats_service
-        .get_player_history(&state, user.id, game_id, query.season, player_id)
+        .get_player_history(&state, user.id, game_id, season_id, player_id)
         .await?;
 
     let response = PlayerHistoryResponse {
         player: player.into(),
         matches: stats.into_iter().map(|s| s.into()).collect(),
+        season_id,
     };
 
     Ok((StatusCode::OK, Json(response)))
@@ -39,12 +46,18 @@ pub async fn get_player_highlights(
     Query(query): Query<StatsParams>,
     user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
-    let stats = state
-        .stats_service
-        .get_player_highlights(&state, user.id, game_id, query.season, player_id)
+    let season_id = query
+        .season
+        .unwrap_or(SeasonScope::All)
+        .to_season_id(&state, game_id)
         .await?;
 
-    let response: PlayerHighlightsResponse = stats.into();
+    let stats = state
+        .stats_service
+        .get_player_highlights(&state, user.id, game_id, season_id, player_id)
+        .await?;
+
+    let response = PlayerHighlightsResponse::new(stats, season_id);
 
     Ok((StatusCode::OK, Json(response)))
 }
@@ -55,9 +68,15 @@ pub async fn get_distributions(
     Query(query): Query<StatsParams>,
     user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
+    let season_id = query
+        .season
+        .unwrap_or(SeasonScope::All)
+        .to_season_id(&state, game_id)
+        .await?;
+
     let distribution = state
         .stats_service
-        .get_distributions(&state, user.id, game_id, query.season)
+        .get_distributions(&state, user.id, game_id, season_id)
         .await?;
 
     Ok((StatusCode::OK, Json(distribution)))

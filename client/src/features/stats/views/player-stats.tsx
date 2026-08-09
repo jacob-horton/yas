@@ -1,9 +1,9 @@
 import { useParams } from "@solidjs/router";
 import { isAxiosError } from "axios";
-import { For, Show, Suspense } from "solid-js";
+import { createMemo, For, Show, Suspense } from "solid-js";
 import VisualiseDataSvg from "@/assets/empty-states/visualise-data.svg";
 import { Container } from "@/components/layout/container";
-import { Page } from "@/components/layout/page";
+import { type Action, Page } from "@/components/layout/page";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorMessage } from "@/components/ui/error-message";
 import { SmartDate } from "@/components/ui/smart-date";
@@ -14,9 +14,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TableRowSkeleton } from "@/components/ui/table.skeleton";
+import { useGameSeasons } from "@/features/games/hooks/use-game-seasons";
+import { seasonName, seasonSessionKey } from "@/features/games/seasons";
 import { cn } from "@/lib/classname";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_TEXT_COLOURS } from "@/lib/rank-colours";
+import { useSessionStorage } from "@/lib/use-session-storage";
 import { PlayerHistoryChart } from "../components/player-history-chart";
 import { StatCard } from "../components/stat-card";
 import { LIFETIME_STATS } from "../constants";
@@ -32,20 +35,55 @@ const TABLE_HEADINGS = [
 
 export const PlayerStats = () => {
   const params = useParams<PlayerStatsRouteParams>();
+
+  const [seasonId, setSeasonId] = useSessionStorage(() =>
+    seasonSessionKey(params.gameId),
+  );
+
   const history = usePlayerHistory(
     () => params.gameId,
     () => params.playerId,
+    () => seasonId() ?? undefined,
   );
 
   const highlights = usePlayerHighlights(
     () => params.gameId,
     () => params.playerId,
+    () => seasonId() ?? undefined,
+  );
+
+  const seasons = useGameSeasons(() => params.gameId);
+
+  const effectiveSeasonId = () =>
+    seasonId() ??
+    history.data?.season_id ??
+    highlights.data?.season_id ??
+    undefined;
+
+  const actions = createMemo(
+    () =>
+      [
+        {
+          type: "menu",
+          options:
+            seasons.data?.map((s) => ({
+              value: s.id,
+              label: s.name ?? `Season ${s.number}`,
+              onClick: () => setSeasonId(s.id),
+            })) ?? [],
+          value: effectiveSeasonId() ?? "",
+          text: seasonName(
+            seasons.data?.find((s) => s.id === effectiveSeasonId()),
+          ),
+        },
+      ] satisfies Action[],
   );
 
   return (
     <Page
       title={`Stats for ${history.data?.player.name ?? highlights.data?.player.name ?? "Loading..."}`}
       showBack
+      actions={actions()}
       class="flex flex-col gap-8"
     >
       <Show

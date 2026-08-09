@@ -6,11 +6,15 @@ import { statsKeys } from "./query-keys";
 export const usePlayerHighlights = (
   gameId: Accessor<string>,
   playerId: Accessor<string>,
+  seasonId: Accessor<string | undefined>,
 ) => {
   return useQuery(() => ({
-    queryKey: statsKeys.playerHighlights(gameId(), playerId()),
+    queryKey: statsKeys.playerHighlights(gameId(), playerId(), seasonId()),
     queryFn: () =>
-      gamesApi.game(gameId()).stats().getPlayerHighlights(playerId()),
+      gamesApi
+        .game(gameId())
+        .stats()
+        .getPlayerHighlights(playerId(), seasonId()),
     placeholderData: keepPreviousData,
   }));
 };

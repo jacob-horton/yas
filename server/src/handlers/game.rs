@@ -10,7 +10,7 @@ use uuid::Uuid;
 
 use crate::{
     AppState,
-    errors::AppError,
+    errors::{AppError, GameError},
     extractors::{
         auth_member::AuthMember,
         auth_user::AuthUser,
@@ -19,8 +19,8 @@ use crate::{
         verified::Verified,
     },
     models::{
-        game::{CreateGameReq, GameResponse, UpdateGameReq},
-        stats::{ScoreboardParams, ScoreboardResponse},
+        game::{CreateGameReq, GameResponse, SeasonsResponse, UpdateGameReq},
+        stats::{ScoreboardParams, ScoreboardResponse, SeasonScope},
     },
     services,
 };
@@ -43,6 +43,12 @@ async fn update_game(
     ValidatedJson(payload): ValidatedJson<UpdateGameReq>,
 ) -> Result<impl IntoResponse, AppError> {
     let game = services::game::update_game(&state, user.id, game_id, payload).await?;
+
+    // Invalidate cache
+    state
+        .stats_cache_invalidator
+        .invalidate_game_stats(game_id)
+        .await?;
 
     let response: GameResponse = game.into();
     Ok((StatusCode::CREATED, Json(response)))
@@ -74,19 +80,37 @@ async fn get_scoreboard(
     Query(query): Query<ScoreboardParams>,
     user: AuthUser,
 ) -> Result<impl IntoResponse, AppError> {
+    let season_id = query
+        .season
+        .unwrap_or(SeasonScope::All)
+        .to_season_id(&state, game_id)
+        .await?;
+
+    // If getting a specific season, check the season actually exists for that game
+    if let Some(season_id) = season_id {
+        let mut tx = state.pool.begin().await?;
+        state
+            .season_repo
+            .get_season(&mut tx, game_id, season_id)
+            .await
+            .map_err(|_| GameError::SeasonNotFound)?;
+
+        tx.commit().await?;
+    }
+
     let scoreboard = state
         .stats_service
         .get_scoreboard_and_stats(
             &state,
             user.id,
             game_id,
-            query.season,
+            season_id,
             query.order_by,
             query.order_dir,
         )
         .await?;
 
-    let response: ScoreboardResponse = scoreboard.into();
+    let response = ScoreboardResponse::new(scoreboard, season_id);
 
     Ok((StatusCode::OK, Json(response)))
 }
@@ -112,6 +136,19 @@ async fn get_last_players(
     Ok((StatusCode::OK, Json(players)))
 }
 
+async fn get_seasons(
+    State(state): State<AppState>,
+    Path(game_id): Path<Uuid>,
+    user: AuthUser,
+) -> Result<impl IntoResponse, AppError> {
+    let seasons = services::game::get_seasons(&state, user.id, game_id).await?;
+    let result = SeasonsResponse {
+        seasons: seasons.into_iter().map(|s| s.into()).collect(),
+    };
+
+    Ok((StatusCode::OK, Json(result)))
+}
+
 pub fn router() -> Router<AppState> {
     Router::new()
         .route(
@@ -126,4 +163,5 @@ pub fn router() -> Router<AppState> {
         .route("/games/{game_id}", delete(delete_game))
         .route("/games/{game_id}/scoreboard", get(get_scoreboard))
         .route("/games/{game_id}/last-players", get(get_last_players))
+        .route("/games/{game_id}/seasons", get(get_seasons))
 }

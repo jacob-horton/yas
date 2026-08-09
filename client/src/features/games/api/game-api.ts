@@ -2,12 +2,14 @@ import type { CreateMatchRequest, Match } from "@/features/matches/types";
 import { StatsApi, type StatsApiContract } from "@/features/stats/api";
 import { api } from "@/lib/api";
 import type { Game, UpdateGameRequest } from "../types/game";
+import type { Season } from "../types/scoreboard";
 
 export interface GameApiContract {
   get(): Promise<Game>;
   delete(): Promise<void>;
   createMatch(match: CreateMatchRequest): Promise<Match>;
   lastPlayers(): Promise<string[]>;
+  seasons(): Promise<Season[]>;
 
   update(payload: UpdateGameRequest): Promise<Game>;
 
@@ -39,6 +41,12 @@ export class GameApi implements GameApiContract {
     return api
       .get(`/games/${this.gameId}/last-players`)
       .then((resp) => resp.data);
+  }
+
+  public async seasons(): Promise<Season[]> {
+    return api
+      .get(`/games/${this.gameId}/seasons`)
+      .then((resp) => resp.data.seasons);
   }
 
   public stats(): StatsApiContract {

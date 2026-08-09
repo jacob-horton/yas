@@ -1,9 +1,10 @@
 import { useNavigate } from "@solidjs/router";
-import { For, type ParentComponent, Show } from "solid-js";
+import { For, Match, type ParentProps, Show, Switch } from "solid-js";
 import { useOptionalSidebar } from "@/context/sidebar-context";
 import { cn } from "@/lib/classname";
 import type { Icon } from "@/lib/icons";
 import { Button, type Variant } from "../ui/button";
+import { Menu, type MenuOption } from "../ui/menu";
 import { Container } from "./container";
 
 type ActionBase = {
@@ -11,19 +12,29 @@ type ActionBase = {
   text: string;
   danger?: boolean;
   icon?: Icon;
+  type: "href" | "button" | "menu";
 };
 
 type ActionHref = ActionBase & {
   href: string;
   onAction?: never;
+  type: "href";
 };
 
 type ActionButton = ActionBase & {
   onAction: () => void;
   href?: never;
+  type: "button";
 };
 
-export type Action = ActionHref | ActionButton;
+type ActionMenu = {
+  text: string;
+  options: MenuOption[];
+  value: string;
+  type: "menu";
+};
+
+export type Action = ActionHref | ActionButton | ActionMenu;
 
 type Props = {
   title: string;
@@ -33,7 +44,7 @@ type Props = {
   narrow?: boolean;
 };
 
-export const Page: ParentComponent<Props> = (props) => {
+export function Page(props: ParentProps<Props>) {
   const navigate = useNavigate();
   const sidebar = useOptionalSidebar();
 
@@ -63,30 +74,57 @@ export const Page: ParentComponent<Props> = (props) => {
           <div class="flex gap-2 sm:gap-4">
             <For each={props.actions ?? []}>
               {(action) => (
-                <Show
-                  when={"href" in action}
-                  fallback={
-                    <Button
-                      onClick={action.onAction}
-                      variant={action.variant}
-                      danger={action.danger}
-                      icon={action.icon}
-                      iconOnlyOnMobile={!!action.icon}
-                    >
-                      {action.text}
-                    </Button>
-                  }
-                >
-                  <Button
-                    href={(action as ActionHref).href}
-                    variant={action.variant}
-                    danger={action.danger}
-                    icon={action.icon}
-                    iconOnlyOnMobile={!!action.icon}
-                  >
-                    {action.text}
-                  </Button>
-                </Show>
+                <Switch>
+                  <Match when={action.type === "button"}>
+                    {(_) => {
+                      const buttonAction = action as ActionButton;
+
+                      return (
+                        <Button
+                          onClick={buttonAction.onAction}
+                          variant={buttonAction.variant}
+                          danger={buttonAction.danger}
+                          icon={buttonAction.icon}
+                          iconOnlyOnMobile={!!buttonAction.icon}
+                        >
+                          {buttonAction.text}
+                        </Button>
+                      );
+                    }}
+                  </Match>
+
+                  <Match when={action.type === "href"}>
+                    {(_) => {
+                      const hrefAction = action as ActionHref;
+
+                      return (
+                        <Button
+                          href={hrefAction.href}
+                          variant={hrefAction.variant}
+                          danger={hrefAction.danger}
+                          icon={hrefAction.icon}
+                          iconOnlyOnMobile={!!hrefAction.icon}
+                        >
+                          {action.text}
+                        </Button>
+                      );
+                    }}
+                  </Match>
+
+                  <Match when={action.type === "menu"}>
+                    {(_) => {
+                      const menuAction = action as ActionMenu;
+
+                      return (
+                        <Menu
+                          options={menuAction.options}
+                          text={menuAction.text}
+                          value={menuAction.value}
+                        />
+                      );
+                    }}
+                  </Match>
+                </Switch>
               )}
             </For>
           </div>
@@ -98,4 +136,4 @@ export const Page: ParentComponent<Props> = (props) => {
       </div>
     </div>
   );
-};
+}

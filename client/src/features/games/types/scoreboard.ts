@@ -6,6 +6,7 @@ export type Scoreboard = {
   podium: ScoreboardEntry[];
   highlights: Highlights;
   game: Game;
+  current_season: string | null;
 };
 
 export type HighlightType =
@@ -46,4 +47,13 @@ export type ScoreboardEntry = {
   rank_diff: number;
   average_score_diff: number;
   win_rate_diff: number;
+};
+
+export type Season = {
+  id: string;
+  game_id: string;
+  number: number;
+  name: string | null;
+  start_date: string;
+  end_date: string;
 };

@@ -96,6 +96,7 @@ export const GroupDetails = () => {
 
     if (hasPermission(group.userRole(), "admin", auth.user()?.email_verified)) {
       actions.push({
+        type: "href",
         text: "Edit",
         href: "edit",
         variant: "secondary",
@@ -105,6 +106,7 @@ export const GroupDetails = () => {
 
     if (group.userRole() !== "owner") {
       actions.push({
+        type: "button",
         text: "Leave",
         onAction: handleLeave,
         variant: "secondary",

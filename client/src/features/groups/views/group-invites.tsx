@@ -93,6 +93,7 @@ export const Invites = () => {
         hasPermission(group.userRole(), "admin", auth.user()?.email_verified)
           ? [
               {
+                type: "href",
                 text: "Create",
                 variant: "primary",
                 href: "create",

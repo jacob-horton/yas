@@ -1,5 +1,5 @@
 import LoaderCircleIcon from "lucide-solid/icons/loader-circle";
-import type { Component, JSX, ParentComponent } from "solid-js";
+import type { Component, JSX } from "solid-js";
 import { Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { cn } from "@/lib/classname";

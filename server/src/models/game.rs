@@ -1,4 +1,4 @@
-use crate::models::trim_string;
+use crate::models::{season::SeasonResponse, trim_string};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::{
@@ -63,6 +63,11 @@ impl From<GameDb> for GameResponse {
             bronze_threshold: game.bronze_threshold,
         }
     }
+}
+
+#[derive(Debug, Serialize)]
+pub struct SeasonsResponse {
+    pub seasons: Vec<SeasonResponse>,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Type, PartialEq, Eq)]
@@ -146,11 +151,12 @@ pub struct UpdateGameReq {
 
     pub metric: ScoringMetric,
     pub season_duration: Option<Interval>,
+    pub next_season_start: Option<DateTime<Utc>>,
     pub medal_scores: Option<GameMedals>,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "snake_case", tag = "unit", content = "value")]
 pub enum Interval {
     Months(i32),
     Days(i32),
