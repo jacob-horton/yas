@@ -3,7 +3,7 @@ import { Dynamic } from "solid-js/web";
 import { TextSkeleton } from "@/components/ui/text.skeleton";
 import { Tooltip } from "@/components/ui/tooltip";
 import { cn } from "@/lib/classname";
-import { ICON_MAP, type Icon } from "@/lib/icons";
+import type { Icon } from "@/lib/icons";
 import { COLOUR_MAP } from "../constants";
 
 type Props = {
@@ -29,7 +29,7 @@ export const HighlightStatCard: Component<Props> = (props) => {
       )}
     >
       <div class={cn("m-2 rounded-full p-4", COLOUR_MAP[props.colour].bgDark)}>
-        <Dynamic component={ICON_MAP[props.icon]} size={40} />
+        <Dynamic component={props.icon} size={40} />
       </div>
       <div class="flex w-full min-w-0 flex-col items-stretch justify-center gap-2">
         <div>

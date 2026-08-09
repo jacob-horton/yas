@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from "@solidjs/router";
 import { addDays, addMonths, startOfDay } from "date-fns";
+import TrashIcon from "lucide-solid/icons/trash-2";
 import type { Component } from "solid-js";
 import { createMemo, createSignal, For, Show } from "solid-js";
 import { FormPage, FormSection } from "@/components/layout/form-page";
@@ -223,7 +224,7 @@ const EditGameForm: Component<Props> = (props) => {
         {
           type: "button",
           text: "Delete",
-          icon: "delete",
+          icon: TrashIcon,
           onAction: handleDelete,
           variant: "secondary",
           danger: true,

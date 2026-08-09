@@ -1,3 +1,4 @@
+import TrashIcon from "lucide-solid/icons/trash-2";
 import { createMemo, createSignal, For, Show, Suspense } from "solid-js";
 import { Container } from "@/components/layout/container";
 import { Page } from "@/components/layout/page";
@@ -190,7 +191,7 @@ export const GroupMembers = () => {
                             ariaLabel="Remove player from group"
                             class="text-gray-200"
                             variant="ghost"
-                            icon="delete"
+                            icon={TrashIcon}
                             disabled
                           />
                         }
@@ -199,7 +200,7 @@ export const GroupMembers = () => {
                           ariaLabel="Remove player from group"
                           class="text-gray-400 dark:text-gray-500"
                           variant="ghost"
-                          icon="delete"
+                          icon={TrashIcon}
                           danger
                           onClick={() => handleRemove(member)}
                         />

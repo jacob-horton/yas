@@ -1,5 +1,10 @@
 import { useNavigate } from "@solidjs/router";
 import { isAxiosError } from "axios";
+import CalendarIcon from "lucide-solid/icons/calendar";
+import LogOutIcon from "lucide-solid/icons/log-out";
+import EditIcon from "lucide-solid/icons/square-pen";
+import UserStarIcon from "lucide-solid/icons/user-star";
+import UsersIcon from "lucide-solid/icons/users";
 import {
   createEffect,
   createMemo,
@@ -16,7 +21,7 @@ import { useConfirmation } from "@/context/confirmation-context";
 import { useToast } from "@/context/toast-context";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { LS_LAST_GROUP_ID } from "@/features/home/constants";
-import { ICON_MAP, type Icon } from "@/lib/icons";
+import type { Icon } from "@/lib/icons";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
 import { useRemoveMember } from "../hooks/use-remove-member";
@@ -32,7 +37,7 @@ const DetailCard: ParentComponent<DetailCardProps> = (props) => {
     <div class="flex h-42 min-h-42 min-w-76 flex-1 flex-col justify-between gap-6 whitespace-nowrap rounded-md border px-6 py-4">
       <div class="flex items-center justify-between gap-2">
         <p class="font-semibold text-2xl">{props.title}</p>
-        <Dynamic component={ICON_MAP[props.icon]} size={32} />
+        <Dynamic component={props.icon} size={32} />
       </div>
       <div class="font-semibold text-4xl">{props.children}</div>
     </div>
@@ -100,7 +105,7 @@ export const GroupDetails = () => {
         text: "Edit",
         href: "edit",
         variant: "secondary",
-        icon: "edit",
+        icon: EditIcon,
       });
     }
 
@@ -111,7 +116,7 @@ export const GroupDetails = () => {
         onAction: handleLeave,
         variant: "secondary",
         danger: true,
-        icon: "logOut",
+        icon: LogOutIcon,
       });
     }
 
@@ -141,17 +146,17 @@ export const GroupDetails = () => {
               />
             }
           >
-            <DetailCard icon="users" title="Members">
+            <DetailCard icon={UsersIcon} title="Members">
               <Suspense>{members.data?.length ?? 0}</Suspense>
             </DetailCard>
-            <DetailCard icon="calendar" title="Created On">
+            <DetailCard icon={CalendarIcon} title="Created On">
               <Suspense>
                 <Show when={group.groupQuery.data?.created_at}>
                   {(createdAt) => <SmartDate date={createdAt()} />}
                 </Show>
               </Suspense>
             </DetailCard>
-            <DetailCard icon="userStar" title="Created By">
+            <DetailCard icon={UserStarIcon} title="Created By">
               <Suspense>
                 <Show when={createdBy()}>
                   {(createdBy) => {

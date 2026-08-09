@@ -1,4 +1,5 @@
 import { useNavigate, useParams } from "@solidjs/router";
+import TrashIcon from "lucide-solid/icons/trash-2";
 import { For, Show } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
@@ -150,7 +151,7 @@ export const RecordMatchForm = (props: {
                 <Button
                   ariaLabel="Remove player"
                   variant="ghost"
-                  icon="delete"
+                  icon={TrashIcon}
                   onClick={() => removePlayer(i())}
                   disabled={
                     values.scores.length <= props.game.min_players_per_match

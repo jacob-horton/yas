@@ -141,7 +141,7 @@ export const Sidebar: Component = () => {
           <Button
             ariaLabel="Create a group"
             variant="ghost"
-            icon="plus"
+            icon={PlusIcon}
             href="/groups/create"
           />
         </div>

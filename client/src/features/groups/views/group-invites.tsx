@@ -1,3 +1,6 @@
+import ClipboardIcon from "lucide-solid/icons/clipboard";
+import PlusIcon from "lucide-solid/icons/plus";
+import TrashIcon from "lucide-solid/icons/trash-2";
 import { type Component, For, Show, Suspense } from "solid-js";
 import LetterSvg from "@/assets/empty-states/letter.svg";
 import { Container } from "@/components/layout/container";
@@ -97,7 +100,7 @@ export const Invites = () => {
                 text: "Create",
                 variant: "primary",
                 href: "create",
-                icon: "plus",
+                icon: PlusIcon,
               },
             ]
           : []
@@ -150,7 +153,7 @@ export const Invites = () => {
                         <div class="flex gap-1">
                           <Button
                             ariaLabel="Copy invite link to clipboard"
-                            icon="copy"
+                            icon={ClipboardIcon}
                             variant="ghost"
                             class="text-gray-400"
                             onClick={async () => {
@@ -181,7 +184,7 @@ export const Invites = () => {
                                 ariaLabel="Remove invite"
                                 class="text-gray-200"
                                 variant="ghost"
-                                icon="delete"
+                                icon={TrashIcon}
                                 disabled
                               />
                             }
@@ -189,7 +192,7 @@ export const Invites = () => {
                             <Button
                               danger
                               ariaLabel="Remove invite"
-                              icon="delete"
+                              icon={TrashIcon}
                               variant="ghost"
                               class="text-gray-400"
                               onClick={() => handleDelete(invite)}

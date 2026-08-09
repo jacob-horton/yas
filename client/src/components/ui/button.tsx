@@ -3,7 +3,7 @@ import type { Component, JSX } from "solid-js";
 import { Show, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { cn } from "@/lib/classname";
-import { ICON_MAP, type Icon } from "@/lib/icons";
+import type { Icon } from "@/lib/icons";
 import { PreloadLink } from "./preload-link";
 
 export type Variant = "primary" | "secondary" | "ghost";
@@ -119,7 +119,7 @@ export const Button: Component<ButtonProps> = (props) => {
 
       <div class={cn("flex items-center gap-2", { invisible: local.loading })}>
         <Show when={local.icon}>
-          {(iconName) => <Dynamic component={ICON_MAP[iconName()]} size={18} />}
+          {(icon) => <Dynamic component={icon()} size={18} />}
         </Show>
         <Show when={local.children}>
           <span

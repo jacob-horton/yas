@@ -1,7 +1,7 @@
 import type { ParentComponent } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { cn } from "@/lib/classname";
-import { ICON_MAP, type Icon } from "@/lib/icons";
+import type { Icon } from "@/lib/icons";
 
 export type Variant = "primary" | "secondary" | "ghost";
 
@@ -18,7 +18,7 @@ export const ButtonSkeleton: ParentComponent<{
       )}
       disabled
     >
-      {props.icon && <Dynamic component={ICON_MAP[props.icon]} />}
+      {props.icon && <Dynamic component={props.icon} />}
       {props.children}
     </button>
   );

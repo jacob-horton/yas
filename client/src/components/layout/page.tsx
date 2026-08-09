@@ -1,4 +1,6 @@
 import { useNavigate } from "@solidjs/router";
+import ChevronLeftIcon from "lucide-solid/icons/chevron-left";
+import MenuIcon from "lucide-solid/icons/menu";
 import { For, Match, type ParentProps, Show, Switch } from "solid-js";
 import { useOptionalSidebar } from "@/context/sidebar-context";
 import { cn } from "@/lib/classname";
@@ -58,7 +60,7 @@ export function Page(props: ParentProps<Props>) {
                 ariaLabel="Open sidebar"
                 variant="ghost"
                 onClick={() => sidebar?.setIsOpen(true)}
-                icon="menu"
+                icon={MenuIcon}
               />
             </Show>
             <Show when={props.showBack}>
@@ -66,7 +68,7 @@ export function Page(props: ParentProps<Props>) {
                 ariaLabel="Navigate back a page"
                 variant="ghost"
                 onClick={() => navigate(-1)}
-                icon="chevronLeft"
+                icon={ChevronLeftIcon}
               />
             </Show>
             {props.title}

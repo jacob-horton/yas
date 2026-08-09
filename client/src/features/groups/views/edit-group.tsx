@@ -1,4 +1,5 @@
 import { useNavigate } from "@solidjs/router";
+import TrashIcon from "lucide-solid/icons/trash-2";
 import type { Component } from "solid-js";
 import { Show } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
@@ -85,7 +86,7 @@ const EditGroupForm: Component<Props> = (props) => {
         {
           type: "button",
           text: "Delete",
-          icon: "delete",
+          icon: TrashIcon,
           onAction: handleDelete,
           variant: "secondary",
           danger: true,

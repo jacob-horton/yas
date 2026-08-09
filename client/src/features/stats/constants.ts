@@ -1,3 +1,8 @@
+import ChartColumnIcon from "lucide-solid/icons/chart-column";
+import HashIcon from "lucide-solid/icons/hash";
+import Layers2Icon from "lucide-solid/icons/layers-2";
+import StarIcon from "lucide-solid/icons/star";
+import TrophyIcon from "lucide-solid/icons/trophy";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import type { StatData } from "./types";
 
@@ -74,31 +79,31 @@ export type Colour = keyof typeof COLOUR_MAP;
 
 export const LIFETIME_STATS: StatData[] = [
   {
-    icon: "trophy",
+    icon: TrophyIcon,
     colour: "orange",
     label: "Win Rate",
     getValue: (d) => `${(d.lifetime.win_rate * 100).toFixed(0)}%`,
   },
   {
-    icon: "chart",
+    icon: ChartColumnIcon,
     colour: "green",
     label: "Average Score",
     getValue: (d) => d.lifetime.average_score.toFixed(2),
   },
   {
-    icon: "star",
+    icon: StarIcon,
     colour: "purple",
     label: "Best Score",
     getValue: (d) => d.lifetime.best_score.toFixed(0),
   },
   {
-    icon: "stack",
+    icon: Layers2Icon,
     colour: "blue",
     label: "Total Games",
     getValue: (d) => d.lifetime.total_games.toFixed(0),
   },
   {
-    icon: "hash",
+    icon: HashIcon,
     colour: "yellow",
     label: "Current Rank",
     getValue: (d) => ordinalSuffix(d.lifetime.rank),

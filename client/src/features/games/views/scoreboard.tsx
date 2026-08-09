@@ -1,4 +1,10 @@
 import { useNavigate, useParams, usePreloadRoute } from "@solidjs/router";
+import CrownIcon from "lucide-solid/icons/crown";
+import InfinityIcon from "lucide-solid/icons/infinity";
+import MountainIcon from "lucide-solid/icons/mountain";
+import NotebookPenIcon from "lucide-solid/icons/notebook-pen";
+import EditIcon from "lucide-solid/icons/square-pen";
+import WheatIcon from "lucide-solid/icons/wheat";
 import {
   type Component,
   createMemo,
@@ -156,7 +162,7 @@ export const Scoreboard = () => {
         text: "Edit",
         variant: "secondary",
         href: "edit",
-        icon: "edit",
+        icon: EditIcon,
         type: "href",
       });
     }
@@ -168,7 +174,7 @@ export const Scoreboard = () => {
         text: "Record Match",
         variant: "primary",
         href: "record",
-        icon: "notebookPen",
+        icon: NotebookPenIcon,
         type: "href",
       });
     }
@@ -249,7 +255,7 @@ export const Scoreboard = () => {
             <div class="mx-auto flex flex-nowrap gap-4">
               <HighlightStatCard
                 colour="orange"
-                icon="crown"
+                icon={CrownIcon}
                 label="MVP"
                 subtext="Highest win rate"
                 loading={!scoreboardData.data}
@@ -263,7 +269,7 @@ export const Scoreboard = () => {
 
               <HighlightStatCard
                 colour="green"
-                icon="wheat"
+                icon={WheatIcon}
                 label="Point Farmer"
                 subtext="Highest average score"
                 loading={!scoreboardData.data}
@@ -281,7 +287,7 @@ export const Scoreboard = () => {
 
               <HighlightStatCard
                 colour="purple"
-                icon="mountain"
+                icon={MountainIcon}
                 label="Peak Performer"
                 subtext="Highest single score"
                 loading={!scoreboardData.data}
@@ -299,7 +305,7 @@ export const Scoreboard = () => {
 
               <HighlightStatCard
                 colour="blue"
-                icon="infinity"
+                icon={InfinityIcon}
                 label="Addict"
                 subtext="Most games played"
                 loading={!scoreboardData.data}
