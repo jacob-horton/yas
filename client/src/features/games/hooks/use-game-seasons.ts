@@ -8,5 +8,6 @@ export const useGameSeasons = (gameId: Accessor<string>) => {
     queryKey: gameKeys.gameSeasons(gameId()),
     queryFn: () => gamesApi.game(gameId()).seasons(),
     placeholderData: keepPreviousData,
+    staleTime: 5000,
   }));
 };

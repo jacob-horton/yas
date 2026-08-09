@@ -35,6 +35,7 @@ export const GroupProvider: ParentComponent = (props) => {
     queryFn: () => groupsApi.group(groupId()).get(),
     enabled: !!groupId(),
     placeholderData: keepPreviousData,
+    staleTime: 5000,
   }));
 
   createEffect(() => {

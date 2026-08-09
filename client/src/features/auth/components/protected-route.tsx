@@ -1,5 +1,5 @@
 import { useNavigate } from "@solidjs/router";
-import { createEffect, type ParentComponent, Show } from "solid-js";
+import { createEffect, type ParentComponent } from "solid-js";
 import { useAuth } from "../context/auth-provider";
 
 export const ProtectedRoute: ParentComponent = (props) => {
@@ -13,5 +13,5 @@ export const ProtectedRoute: ParentComponent = (props) => {
   });
 
   // TODO: fallback?
-  return <Show when={auth.user()}>{props.children}</Show>;
+  return props.children;
 };

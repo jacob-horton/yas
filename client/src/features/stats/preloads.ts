@@ -3,6 +3,7 @@ import { queryClient } from "@/lib/query-client";
 import { gamesApi } from "../games/api";
 import { seasonSessionKey } from "../games/seasons";
 import { statsKeys } from "./hooks/query-keys";
+import { gameKeys } from "../games/hooks/query-keys";
 
 export function preloadPlayerStats({ params }: RoutePreloadFuncArgs) {
   // Skip if empty
@@ -25,6 +26,11 @@ function _preloadPlayerStats(
   season?: string,
 ) {
   return Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: gameKeys.gameSeasons(gameId),
+      queryFn: () => gamesApi.game(gameId).seasons(),
+    }),
+
     queryClient.prefetchQuery({
       queryKey: statsKeys.playerHistory(gameId, playerId, season),
       queryFn: () =>

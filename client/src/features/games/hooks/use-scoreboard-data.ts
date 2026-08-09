@@ -14,5 +14,6 @@ export const useScoreboardData = <T extends string>(
     queryFn: async () =>
       gamesApi.game(gameId()).stats().getScoreboard(season(), sort()),
     placeholderData: keepPreviousData,
+    staleTime: 5000,
   }));
 };

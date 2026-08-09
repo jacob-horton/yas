@@ -13,6 +13,11 @@ export const preloadScoreboard: RoutePreloadFunc = ({ params }) => {
   const season = window.sessionStorage.getItem(seasonSessionKey(gameId));
 
   queryClient.prefetchQuery({
+    queryKey: gameKeys.gameSeasons(gameId),
+    queryFn: () => gamesApi.game(gameId).seasons(),
+  });
+
+  queryClient.prefetchQuery({
     queryKey: gameKeys.scoreboard(gameId, season ?? undefined, undefined),
     queryFn: () =>
       gamesApi
@@ -27,6 +32,11 @@ export const preloadEditGame: RoutePreloadFunc = ({ params }) => {
   if (!gameId) {
     return;
   }
+
+  queryClient.prefetchQuery({
+    queryKey: gameKeys.gameSeasons(gameId),
+    queryFn: () => gamesApi.game(gameId).seasons(),
+  });
 
   queryClient.prefetchQuery({
     queryKey: gameKeys.game(gameId),

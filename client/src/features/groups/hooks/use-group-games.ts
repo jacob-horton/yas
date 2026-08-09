@@ -8,5 +8,6 @@ export const useGroupGames = (groupId: Accessor<string>) => {
     queryKey: groupKeys.games(groupId()),
     queryFn: () => groupsApi.group(groupId()).games(),
     placeholderData: keepPreviousData,
+    staleTime: 5000,
   }));
 };
