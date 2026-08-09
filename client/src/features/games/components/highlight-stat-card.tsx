@@ -1,10 +1,10 @@
-import { createMemo, Show, type Component } from "solid-js";
+import { type Component, Show } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import { TextSkeleton } from "@/components/ui/text.skeleton";
+import { Tooltip } from "@/components/ui/tooltip";
 import { cn } from "@/lib/classname";
 import { ICON_MAP, type Icon } from "@/lib/icons";
 import { COLOUR_MAP } from "../constants";
-import { Tooltip } from "@/components/ui/tooltip";
 
 type Props = {
   icon: Icon;
@@ -54,8 +54,8 @@ export const HighlightStatCard: Component<Props> = (props) => {
             </>
           ) : (
             <>
-              <p class="inline-flex items-center gap-1.5 overflow-visible truncate font-semibold">
-                {props.userNames[0]}
+              <span class="inline-flex min-w-0 items-center gap-1.5 font-semibold">
+                <p class="truncate">{props.userNames[0]}</p>
                 <Show when={props.userNames.length > 1}>
                   <Tooltip tooltip={props.userNames.slice(1).join(", ")}>
                     <span
@@ -69,7 +69,7 @@ export const HighlightStatCard: Component<Props> = (props) => {
                     </span>
                   </Tooltip>
                 </Show>
-              </p>
+              </span>
               <p>{props.value}</p>
             </>
           )}
