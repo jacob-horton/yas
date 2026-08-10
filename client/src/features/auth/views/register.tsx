@@ -1,11 +1,11 @@
 import { useNavigate } from "@solidjs/router";
-import { isAxiosError } from "axios";
 import { type Component, createEffect } from "solid-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PreloadLink } from "@/components/ui/preload-link";
 import { useToast } from "@/context/toast-context";
 import { createUserSchema } from "@/features/users/types";
+import { isApiError } from "@/lib/api";
 import { useZodForm } from "@/lib/zod/use-zod-form";
 import { useAuth } from "../context/auth-provider";
 import { useRegister } from "../hooks/use-register";
@@ -41,7 +41,7 @@ export const Register: Component = () => {
 
     register.mutate(validData, {
       onError: (e) => {
-        if (isAxiosError(e) && e.status === 409) {
+        if (isApiError(e) && e.status === 409) {
           setError("email", "Email already taken");
         }
       },

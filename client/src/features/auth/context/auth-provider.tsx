@@ -10,7 +10,7 @@ import { LS_LAST_GROUP_ID } from "@/features/home/constants";
 import { usersApi } from "@/features/users/api";
 import { userKeys } from "@/features/users/hooks/query-keys";
 import type { User } from "@/features/users/types";
-import { setupAxiosInterceptors } from "@/lib/api";
+import { setupApiInterceptors } from "@/lib/api";
 
 declare global {
   interface Window {
@@ -70,7 +70,7 @@ export const AuthProvider: ParentComponent = (props) => {
     },
   };
 
-  setupAxiosInterceptors(authContextValue.clearSession);
+  setupApiInterceptors(authContextValue.clearSession);
 
   return (
     <AuthContext.Provider value={authContextValue}>

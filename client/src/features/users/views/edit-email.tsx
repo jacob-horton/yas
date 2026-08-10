@@ -1,5 +1,4 @@
 import { useNavigate } from "@solidjs/router";
-import { isAxiosError } from "axios";
 import { type Component, Show } from "solid-js";
 import { FormPage } from "@/components/layout/form-page";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useConfirmation } from "@/context/confirmation-context";
 import { useToast } from "@/context/toast-context";
 import { useAuth } from "@/features/auth/context/auth-provider";
+import { isApiError } from "@/lib/api";
 import { useZodForm } from "@/lib/zod/use-zod-form";
 import { useUpdateEmail } from "../hooks/use-update-email";
 import { updateEmailSchema } from "../types";
@@ -65,7 +65,7 @@ const EditEmailForm: Component<Props> = (props) => {
         navigate(-1);
       },
       onError: (error) => {
-        if (isAxiosError(error) && error.response?.status === 409) {
+        if (isApiError(error) && error.response?.status === 409) {
           setError("email", "Email already taken");
         }
       },

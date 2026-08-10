@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/solid-query";
-import { isAxiosError } from "axios";
 import { userKeys } from "@/features/users/hooks/query-keys";
+import { isApiError } from "@/lib/api";
 import { useAppMutation } from "@/lib/use-app-mutation";
 import { authApi } from "../api";
 
@@ -16,7 +16,7 @@ export const useLogin = () => {
     }),
     () => ({
       errorMessage: (error) => {
-        if (isAxiosError(error) && error.status === 401) {
+        if (isApiError(error) && error.status === 401) {
           return "Email or password is incorrect";
         }
 

@@ -1,6 +1,6 @@
 import { type UseMutationOptions, useMutation } from "@tanstack/solid-query";
-import { isAxiosError } from "axios";
 import { useToast } from "@/context/toast-context";
+import { isApiError } from "@/lib/api";
 
 type AppMutationOptions<TError> = {
   errorMessage?: string | ((error: TError) => string);
@@ -23,7 +23,7 @@ export const useAppMutation = <
     return {
       ...options,
       onError: (err, variables, context, mutFn) => {
-        if (isAxiosError(err) && err.response?.status === 429) {
+        if (isApiError(err) && err.response?.status === 429) {
           toast.error({
             title: "Rate Limit",
             description: "Too many requests. Please slow down!",

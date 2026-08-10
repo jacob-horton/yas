@@ -1,5 +1,4 @@
 import { useNavigate } from "@solidjs/router";
-import { isAxiosError } from "axios";
 import CalendarIcon from "lucide-solid/icons/calendar";
 import LogOutIcon from "lucide-solid/icons/log-out";
 import EditIcon from "lucide-solid/icons/square-pen";
@@ -21,6 +20,7 @@ import { useConfirmation } from "@/context/confirmation-context";
 import { useToast } from "@/context/toast-context";
 import { useAuth } from "@/features/auth/context/auth-provider";
 import { LS_LAST_GROUP_ID } from "@/features/home/constants";
+import { isApiError } from "@/lib/api";
 import type { Icon } from "@/lib/icons";
 import { useGroup } from "../context/group-provider";
 import { useGroupMembers } from "../hooks/use-group-members";
@@ -62,7 +62,7 @@ export const GroupDetails = () => {
     }
 
     const error = group.groupQuery.error;
-    if (isAxiosError(error) && error.response?.status === 404) {
+    if (isApiError(error) && error.response?.status === 404) {
       localStorage.removeItem(LS_LAST_GROUP_ID);
       navigate("/");
     }

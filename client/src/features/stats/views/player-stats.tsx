@@ -1,5 +1,4 @@
 import { useParams } from "@solidjs/router";
-import { isAxiosError } from "axios";
 import { createMemo, For, Show, Suspense } from "solid-js";
 import VisualiseDataSvg from "@/assets/empty-states/visualise-data.svg";
 import { Container } from "@/components/layout/container";
@@ -16,6 +15,7 @@ import {
 import { TableRowSkeleton } from "@/components/ui/table.skeleton";
 import { useGameSeasons } from "@/features/games/hooks/use-game-seasons";
 import { seasonName, seasonSessionKey } from "@/features/games/seasons";
+import { isApiError } from "@/lib/api";
 import { cn } from "@/lib/classname";
 import { ordinalSuffix } from "@/lib/ordinal-suffix";
 import { RANK_TEXT_COLOURS } from "@/lib/rank-colours";
@@ -93,7 +93,7 @@ export const PlayerStats = () => {
           <Show
             when={
               !(
-                isAxiosError(highlights.error) &&
+                isApiError(highlights.error) &&
                 highlights.error.response?.status === 422
               )
             }
