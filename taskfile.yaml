@@ -70,5 +70,7 @@ tasks:
       - ssh {{.VPS_USER}}@{{.VPS_IP}} "mkdir -p {{.VPS_DIR}}/client {{.VPS_DIR}}/server"
       - rsync -avz --delete ./client/dist/ {{.VPS_USER}}@{{.VPS_IP}}:{{.VPS_DIR}}/client/
       - rsync -avz ./server/target/x86_64-unknown-linux-gnu/release/server {{.VPS_USER}}@{{.VPS_IP}}:{{.VPS_DIR}}/server/yas
-      - ssh {{.VPS_USER}}@{{.VPS_IP}} "chmod +x {{.VPS_DIR}}/server/yas && sudo systemctl restart yas"
+      - rsync -avz ./infra/Caddyfile {{.VPS_USER}}@{{.VPS_IP}}:/etc/caddy/Caddyfile
+      - ssh {{.VPS_USER}}@{{.VPS_IP}} "systemctl reload caddy"
+      - ssh {{.VPS_USER}}@{{.VPS_IP}} "chmod +x {{.VPS_DIR}}/server/yas && systemctl restart yas"
       - echo "Deployment complete!"
