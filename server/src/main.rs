@@ -63,6 +63,8 @@ pub struct AppState {
     pub match_repo: Arc<MatchRepo>,
     pub stats_repo: Arc<StatsRepo>,
     pub season_repo: Arc<SeasonRepo>,
+
+    pub vitals_log: Arc<tokio::sync::Mutex<tokio::fs::File>>,
 }
 
 impl AppState {
@@ -99,6 +101,16 @@ impl AppState {
         let stats_service = Arc::new(cached_stats_service);
         let stats_cache_invalidator = Arc::new(RedisCacheInvalidator { pool: redis_pool });
 
+        let vitals_log_path =
+            std::env::var("VITALS_LOG_PATH").expect("VITALS_LOG_PATH must be set");
+        let vitals_log_file = tokio::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&vitals_log_path)
+            .await
+            .expect("Failed to open VITALS_LOG_PATH for writing");
+        let vitals_log = Arc::new(tokio::sync::Mutex::new(vitals_log_file));
+
         Self {
             pool: pool.clone(),
 
@@ -116,6 +128,8 @@ impl AppState {
             match_repo,
             stats_repo,
             season_repo,
+
+            vitals_log,
         }
     }
 

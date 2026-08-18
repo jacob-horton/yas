@@ -1,3 +1,4 @@
 .env
 .env.deploy
 .env.production
+vitals.jsonl

@@ -2,6 +2,7 @@
 import "solid-devtools";
 import { registerSW } from "virtual:pwa-register";
 import { render } from "solid-js/web";
+import { reportWebVitals } from "@/lib/vitals";
 
 registerSW({
   onNeedRefresh() {
@@ -11,6 +12,8 @@ registerSW({
     console.log("App ready to work offline");
   },
 });
+
+reportWebVitals();
 
 import App from "./app";
 

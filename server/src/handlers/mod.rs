@@ -9,6 +9,7 @@ mod group;
 mod invite;
 mod stats;
 mod user;
+mod vitals;
 
 // Combines all sub-modules into one router
 pub fn api_router() -> Router<AppState> {
@@ -20,4 +21,5 @@ pub fn api_router() -> Router<AppState> {
         .merge(game::router())
         .merge(game_match::router())
         .merge(stats::router())
+        .merge(vitals::router())
 }

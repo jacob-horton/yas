@@ -6,6 +6,7 @@ pub mod invite;
 pub mod season;
 pub mod stats;
 pub mod user;
+pub mod vitals;
 
 use serde::{Deserialize, Deserializer};
 
