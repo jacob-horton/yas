@@ -1,4 +1,5 @@
 import subprocess
+import base64
 import json
 import statistics
 import tempfile
@@ -19,10 +20,13 @@ URL = os.getenv("TARGET_URL")
 COOKIE = os.getenv("SESSION_COOKIE")
 COOKIE_NAME = os.getenv("SESSION_COOKIE_NAME", "id")
 RUNS = int(os.getenv("RUNS", 3))
+THROTTLE = os.getenv("THROTTLE", "true").lower() == "true"
 
 METRICS = {
     "lcp": "largest-contentful-paint",
     "fcp": "first-contentful-paint",
+    "ttfb": "server-response-time",
+    "rtt": "network-rtt",
     "cls": "cumulative-layout-shift",
     "tti": "interactive",
     "speed_index": "speed-index"
@@ -102,6 +106,8 @@ def run_lighthouse(url, port):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as tmp:
         output_path = tmp.name
 
+    throttling_flag = "--throttling-method=simulate" if THROTTLE else "--throttling-method=provided"
+
     try:
         subprocess.run([
             "pnpm", "exec", "lighthouse",
@@ -110,12 +116,23 @@ def run_lighthouse(url, port):
             f"--output-path={output_path}",
             f"--port={port}",
             "--quiet",
-            "--throttling-method=simulate", # Throttle - better for reproducibility
-            # "--throttling-method=provided" # Don't throttle - real world performance
+            throttling_flag
         ], check=True)
 
         with open(output_path) as f:
             data = json.load(f)
+
+        final_url = data.get("finalUrl", "")
+        if "login" in final_url or final_url.rstrip("/") != url.rstrip("/"):
+            raise RuntimeError(f"AUTH FAILED: Requested '{url}' but landed on '{final_url}'")
+
+        screenshot_data = data.get("audits", {}).get("final-screenshot", {}).get("details", {}).get("data")
+        if screenshot_data and screenshot_data.startswith("data:image"):
+            # Strip data URI header
+            img_bytes = base64.b64decode(screenshot_data.split(",")[1])
+            with open("debug_screenshot.png", "wb") as img_file:
+                img_file.write(img_bytes)
+            print("Saved page render to debug_screenshot.png")
 
         check_auth(url, data)
 
@@ -124,6 +141,23 @@ def run_lighthouse(url, port):
         run_data = {}
         for key, audit_name in METRICS.items():
             run_data[key] = audits[audit_name]["numericValue"]
+
+        # Extract specific API endpoint durations from the waterfall
+        network_items = audits.get("network-requests", {}).get("details", {}).get("items", [])
+        api_timings = {}
+
+        for item in network_items:
+            url_path = urllib.parse.urlparse(item.get("url", "")).path
+            # Filter for your backend API endpoints
+            if url_path.startswith("/api/"):
+                api_timings[url_path] = {
+                    "duration": round(item.get("duration", 0), 2),
+                    "network_duration": round(item.get("lrStatistics", {}).get("totalBytes", 0), 2),
+                    "start_time": round(item.get("startTime", 0), 2),
+                    "end_time": round(item.get("endTime", 0), 2),
+                }
+
+        run_data["_api_waterfall"] = api_timings
 
         return run_data
 
